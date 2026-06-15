@@ -15,6 +15,18 @@ export default defineConfig({
       title: 'Orchard',
       description:
         'Documentation for Orchard — the all-in-one Cashu mint manager. Guides for setting up and running your own sovereign bank in cyberspace.',
+      // i18n: English serves from the root (content stays in src/content/docs/);
+      // each other locale lives in src/content/docs/<lang>/ and gets a /<lang>/
+      // prefix. Starlight adds the language picker and localizes its own UI
+      // strings; pages without a translation fall back to English automatically.
+      defaultLocale: 'root',
+      locales: {
+        root: { label: 'English', lang: 'en' },
+        es: { label: 'Español', lang: 'es' },
+        de: { label: 'Deutsch', lang: 'de' },
+        ko: { label: '한국어', lang: 'ko' },
+        pl: { label: 'Polski', lang: 'pl' },
+      },
       logo: {
         src: './src/assets/orchard-logo.svg',
         alt: 'Orchard',

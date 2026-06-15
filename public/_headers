@@ -1,0 +1,15 @@
+# Cloudflare Pages headers. https://developers.cloudflare.com/pages/configuration/headers/
+
+# Astro emits content-hashed asset filenames, so they can be cached forever.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Self-hosted fonts are stable; cache them hard and skip revalidation.
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Conservative security headers for a fully static site.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY

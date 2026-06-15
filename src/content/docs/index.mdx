@@ -1,0 +1,46 @@
+---
+title: Orchard Documentation
+description: Guides for setting up and running Orchard, the all-in-one Cashu mint manager — your sovereign bank in cyberspace.
+template: splash
+hero:
+  tagline: Your sovereign bank in cyberspace. Everything you need to set up, run, and tend your own Cashu mint with Orchard.
+  image:
+    alt: Orchard
+    file: ../../assets/orchard-logo.svg
+  actions:
+    - text: Get started
+      link: /getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: View source
+      link: https://github.com/cashubtc/orchard
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkButton } from '@astrojs/starlight/components';
+
+## Welcome to the orchard
+
+Orchard is an all-in-one manager for [Cashu](https://cashu.space) mints — the
+free, open-source Chaumian ecash protocol for Bitcoin. These docs will grow
+alongside the project. Start with the guide below.
+
+<CardGrid stagger>
+  <Card title="Getting Started" icon="rocket">
+    What Orchard is, what you'll need, and where the source lives — your first
+    stop. [Read the guide →](/getting-started/)
+  </Card>
+  <Card title="Built on Cashu" icon="approve-check">
+    Private, instant, low-fee digital cash with no accounts and no surveillance.
+    [Learn about Cashu →](https://cashu.space)
+  </Card>
+  <Card title="Open source" icon="github">
+    Orchard is released to the public domain. Read the code, file issues, and
+    contribute. [Browse the repo →](https://github.com/cashubtc/orchard)
+  </Card>
+  <Card title="Search everything" icon="magnifier">
+    Press <kbd>/</kbd> to search these docs instantly — full-text, offline, and
+    keyboard-first, courtesy of Pagefind.
+  </Card>
+</CardGrid>

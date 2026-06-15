@@ -1,0 +1,156 @@
+/* Orchard docs theme
+ * --------------------
+ * Carries over the marketing site's palette, fonts, and warm dark aesthetic
+ * (see orchard-space/src/styles/global.css) onto Starlight's design tokens.
+ *
+ * Tailwind v4 is layered under Starlight per the official integration so its
+ * reset never clobbers Starlight's component styles. The @layer order below is
+ * required and must come first. */
+@layer base, starlight, theme, components, utilities;
+@import '@astrojs/starlight-tailwind';
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+/* Brand tokens, mirrored from the marketing site so any custom component can
+ * reach for `bg-theme-7`, `text-title`, `font-heading`, etc., just like there. */
+@theme {
+  --color-theme-1: #fffd9f; /* light yellow */
+  --color-theme-2: #ffd61f; /* yellow */
+  --color-theme-3: #f58f22; /* orange */
+  --color-theme-4: #f3651d; /* red-orange */
+  --color-theme-5: #9c2222; /* dark red */
+  --color-theme-6: #280000; /* dark brown */
+  --color-theme-7: #110000; /* near-black */
+
+  --color-title: #efeecb; /* warm cream */
+  --color-body: #937f6a; /* warm gray */
+
+  --font-heading: 'Tarotheque', 'Cinzel Decorative', serif;
+  --font-body: 'Bai Jamjuree', sans-serif;
+
+  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Self-hosted fonts. Bai Jamjuree carries the UI + body + content headings
+ * (a clean, scannable sans for long-form docs); Tarotheque is reserved for the
+ * header wordmark so the brand flourish reads without hurting readability. */
+@font-face {
+  font-family: 'Bai Jamjuree';
+  src: url('/fonts/bai-jamjuree/BaiJamjuree-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Bai Jamjuree';
+  src: url('/fonts/bai-jamjuree/BaiJamjuree-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Bai Jamjuree';
+  src: url('/fonts/bai-jamjuree/BaiJamjuree-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Tarotheque';
+  src:
+    url('/fonts/tarotheque/Tarotheque.woff2') format('woff2'),
+    url('/fonts/tarotheque/Tarotheque.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------------------------------------------------------------------------
+ * Starlight theme tokens. Dark is the brand-default; light is a warm cream
+ * variant so the theme toggle (and prefers-color-scheme) still works well.
+ * Accent runs the logo's orange gradient; grays are warmed toward the palette.
+ * ------------------------------------------------------------------------- */
+
+:root {
+  --sl-font: 'Bai Jamjuree', sans-serif;
+
+  /* Accent — Orchard orange. */
+  --sl-color-accent-low: #3a1605;
+  --sl-color-accent: #f3651d; /* theme-4 */
+  --sl-color-accent-high: #ffd61f; /* theme-2, for high-contrast accent text */
+
+  /* Neutral scale, warmed. white = brightest (headings), black = page bg. */
+  --sl-color-white: #efeecb; /* theme title cream — headings / strong text */
+  --sl-color-gray-1: #e5e1c4;
+  --sl-color-gray-2: #cabfa6; /* body copy — comfortably AA on the dark bg */
+  --sl-color-gray-3: #9b8870; /* muted text */
+  --sl-color-gray-4: #6a5547;
+  --sl-color-gray-5: #3a221c;
+  --sl-color-gray-6: #21100c; /* panels / sidebar */
+  --sl-color-black: #110000; /* theme-7 — page background */
+
+  /* Surfaces. */
+  --sl-color-bg: #110000;
+  --sl-color-bg-nav: color-mix(in srgb, #110000 86%, transparent);
+  --sl-color-bg-sidebar: #190805;
+  --sl-color-bg-inline-code: #2a120c;
+  --sl-color-hairline-shade: #2c1610;
+
+  /* Hero gradient backdrop for the splash page. */
+  --orchard-aura: color-mix(in srgb, var(--sl-color-white) 10%, transparent);
+}
+
+:root[data-theme='light'] {
+  /* Warm cream paper instead of pure white. */
+  --sl-color-accent-low: #f7e6c6;
+  --sl-color-accent: #c0490c; /* darker orange — AA on cream */
+  --sl-color-accent-high: #7a1f0c;
+
+  --sl-color-white: #1c0d06; /* darkest — headings on light */
+  --sl-color-gray-1: #2e1a10;
+  --sl-color-gray-2: #4a3526; /* body copy */
+  --sl-color-gray-3: #6a5341;
+  --sl-color-gray-4: #9a8266;
+  --sl-color-gray-5: #d8caa6;
+  --sl-color-gray-6: #efe7cc; /* panels / sidebar */
+  --sl-color-gray-7: #f6f0db;
+  --sl-color-black: #fbf6e6; /* page background */
+
+  --sl-color-bg: #fbf6e6;
+  --sl-color-bg-nav: color-mix(in srgb, #fbf6e6 86%, transparent);
+  --sl-color-bg-sidebar: #f4ecd2;
+  --sl-color-bg-inline-code: #efe4c4;
+  --sl-color-hairline-shade: #e6d9b4;
+
+  --orchard-aura: color-mix(in srgb, var(--sl-color-accent) 12%, transparent);
+}
+
+/* The header wordmark in Tarotheque, tracked and uppercased — echoing the
+ * marketing site's ORCHARD lockup. The logo mark sits to its left. */
+.site-title {
+  font-family: var(--font-heading);
+  font-size: var(--sl-text-h4);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* A soft warm aura behind the splash hero, lifted from the marketing site's
+ * radial glows — purely decorative, zero JS. */
+.hero > .stack {
+  position: relative;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: -10% -20% auto;
+  z-index: -1;
+  height: 120%;
+  background: radial-gradient(60% 60% at 50% 30%, var(--orchard-aura), transparent 70%);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto;
+  }
+}

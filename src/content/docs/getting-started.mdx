@@ -1,0 +1,73 @@
+---
+title: Getting Started
+description: What Orchard is, what you need to run it, and where to find the source — your first stop in the Orchard documentation.
+---
+
+import { Aside, Steps, LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+Orchard is an all-in-one manager for [Cashu](https://cashu.space) mints. It
+gives you a single place to set up, operate, and keep watch over your own
+mint — the **groundskeeper** for your sovereign bank in cyberspace.
+
+This guide orients you before you install. As the project's first release
+stabilizes, the command-level steps will land right here.
+
+<Aside type="tip" title="Brand new?">
+  Cashu is a free, open-source Chaumian ecash protocol for Bitcoin — private,
+  instant, low-fee digital cash with no accounts and no surveillance. If that's
+  unfamiliar, skim [cashu.space](https://cashu.space) first; the rest of these
+  docs assume that mental model.
+</Aside>
+
+## What Orchard does
+
+A Cashu mint issues and redeems ecash backed by a Lightning wallet. Running one
+well means watching balances, keys, and proofs; reacting when something needs
+attention; and doing it without babysitting a terminal. Orchard wraps that work
+in one manager:
+
+- **Operate your mint** — keys, balances, and mint info from a single dashboard.
+- **Stay informed** — health and activity surfaced where you already are.
+- **Tend, don't babysit** — the groundskeepers watch the mint so you don't have
+  to refresh a log all day.
+
+## What you'll need
+
+<Steps>
+
+1. **A Cashu mint to manage.** Orchard manages a mint — it doesn't replace one.
+   You'll point it at your mint's backend.
+
+2. **A Lightning backend.** Cashu mints settle against Lightning, so you'll need
+   a node or service your mint can reach.
+
+3. **Somewhere to run it.** Orchard is self-hosted: a VPS, a home server, or any
+   box you control and can keep online.
+
+</Steps>
+
+<Aside type="caution" title="Installation steps are on the way">
+  Orchard is under active development. Until the step-by-step install guide
+  lands here, the [project README on GitHub](https://github.com/cashubtc/orchard)
+  is the source of truth for building and running the current version.
+</Aside>
+
+## Next steps
+
+<CardGrid>
+  <LinkCard
+    title="Get the source"
+    href="https://github.com/cashubtc/orchard"
+    description="Clone the repo, read the README, and follow the current build instructions."
+  />
+  <LinkCard
+    title="Back to orchard.space"
+    href="https://orchard.space"
+    description="The product site — what Orchard is and who it's for."
+  />
+</CardGrid>
+
+<Aside type="note">
+  Spotted something missing or wrong? These docs are open source — open an issue
+  or a pull request on the [Orchard repository](https://github.com/cashubtc/orchard).
+</Aside>

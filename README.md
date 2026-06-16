@@ -33,9 +33,11 @@ npm run preview  # serve dist/ locally
 src/
 ├── assets/
 │   └── orchard-logo.svg     # brand mark (hardcoded gradient fills)
+├── components/
+│   └── CopyPrompt.astro     # "Copy prompt" CTA (clipboard → LLM primer)
 ├── content/
 │   └── docs/                # the docs — Markdown / MDX
-│       ├── index.mdx        # splash landing
+│       ├── index.mdx        # Overview (home, rendered in the docs layout)
 │       └── getting-started.mdx
 ├── content.config.ts        # Starlight docs collection
 └── styles/

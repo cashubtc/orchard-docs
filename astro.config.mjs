@@ -12,7 +12,7 @@ export default defineConfig({
   site,
   integrations: [
     starlight({
-      title: 'Orchard',
+      title: 'Orchard Docs',
       description:
         'Documentation for Orchard — the all-in-one Cashu mint manager. Guides for setting up and running your own sovereign bank in cyberspace.',
       // i18n: English serves from the root (content stays in src/content/docs/);
@@ -34,6 +34,10 @@ export default defineConfig({
       favicon: '/favicon.ico',
       // Carries over the marketing site's palette, fonts, and warm dark theme.
       customCss: ['./src/styles/orchard.css'],
+      // Swap Starlight's built-in nostr glyph for Orchard's own "nostrich" mark.
+      components: {
+        SocialIcons: './src/components/SocialIcons.astro',
+      },
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/cashubtc/orchard' },
         {
@@ -44,10 +48,14 @@ export default defineConfig({
         { icon: 'x.com', label: 'X', href: 'https://x.com/CashuOrchard' },
       ],
       // Surfaced by Starlight's built-in (Pagefind) search and a11y tooling.
+      // `slug` entries auto-localize across locales; 'index' is the root page.
       sidebar: [
         {
-          label: 'Start Here',
-          items: [{ label: 'Getting Started', slug: 'getting-started' }],
+          label: 'Get Started',
+          items: [
+            { label: 'Overview', slug: 'index' },
+            { label: 'Getting Started', slug: 'getting-started' },
+          ],
         },
       ],
       // Starlight emits canonical, og:title/description/type and twitter:card

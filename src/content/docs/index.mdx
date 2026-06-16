@@ -1,35 +1,34 @@
 ---
 title: Orchard Documentation
-description: Guides for setting up and running Orchard, the all-in-one Cashu mint manager — your sovereign bank in cyberspace.
-template: splash
-hero:
-  tagline: Your sovereign bank in cyberspace. Everything you need to set up, run, and tend your own Cashu mint with Orchard.
-  image:
-    alt: Orchard
-    file: ../../assets/orchard-logo.svg
-  actions:
-    - text: Get started
-      link: /getting-started/
-      icon: right-arrow
-      variant: primary
-    - text: View source
-      link: https://github.com/cashubtc/orchard
-      icon: external
-      variant: minimal
+description: Guides and references for setting up and running Orchard, the all-in-one Cashu mint manager — your sovereign bank in cyberspace.
+sidebar:
+  label: Overview
+  order: 0
 ---
 
 import { Card, CardGrid, LinkButton } from '@astrojs/starlight/components';
+import CopyPrompt from '../../components/CopyPrompt.astro';
 
-## Welcome to the orchard
+<p class="lead">
+  Explore guides and references for setting up, running, and tending your own
+  Cashu mint with Orchard — your sovereign bank in cyberspace.
+</p>
+
+<div class="not-content cta-row">
+  <LinkButton href="getting-started/" icon="right-arrow">Get started</LinkButton>
+  <CopyPrompt />
+</div>
+
+## Start building
 
 Orchard is an all-in-one manager for [Cashu](https://cashu.space) mints — the
-free, open-source Chaumian ecash protocol for Bitcoin. These docs will grow
-alongside the project. Start with the guide below.
+free, open-source Chaumian ecash protocol for Bitcoin. These docs grow alongside
+the project; here's where to begin.
 
-<CardGrid stagger>
+<CardGrid>
   <Card title="Getting Started" icon="rocket">
     What Orchard is, what you'll need, and where the source lives — your first
-    stop. [Read the guide →](/getting-started/)
+    stop. [Read the guide →](getting-started/)
   </Card>
   <Card title="Built on Cashu" icon="approve-check">
     Private, instant, low-fee digital cash with no accounts and no surveillance.

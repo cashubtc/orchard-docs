@@ -27,27 +27,28 @@ const {
 </button>
 
 <style>
+  /* Dashed secondary CTA — the marketing site's "Read the Docs" button: dashed
+     cream border (→ full cream on hover), transparent fill, matching the primary
+     button's rounded corners and size. */
   .copy-prompt {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 1.125rem;
-    border-radius: 999px;
-    border: 1px solid var(--sl-color-gray-5);
-    background: var(--sl-color-bg);
+    padding: 0.75rem 1.75rem;
+    border-radius: 0.75rem;
+    border: 1px dashed color-mix(in srgb, var(--sl-color-white) 40%, transparent);
+    background: transparent;
     color: var(--sl-color-white);
-    font-size: var(--sl-text-sm);
+    font-size: 1rem;
     font-weight: 600;
-    line-height: 1.2;
+    line-height: 1.1875;
     cursor: pointer;
     transition:
       border-color 0.2s ease,
-      background 0.2s ease,
       color 0.2s ease;
   }
   .copy-prompt:hover {
-    border-color: var(--sl-color-accent);
-    color: var(--sl-color-accent-high);
+    border-color: var(--sl-color-white);
   }
   .copy-prompt:focus-visible {
     outline: 2px solid var(--sl-color-accent);

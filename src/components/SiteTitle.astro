@@ -1,0 +1,43 @@
+---
+// Override of Starlight's SiteTitle: keep the colorful Orchard mark, but render
+// the official "ORCHARD DOCS" wordmark (public/orchard-docs-word-mark.svg) in
+// place of the plain text. The wordmark is painted with a CSS mask so it takes a
+// theme-aware color (cream on dark, near-black on light) and the SVG stays a
+// cached resource instead of being inlined on every page. The real title text
+// rides along as sr-only for accessibility and SEO.
+import { logos } from 'virtual:starlight/user-images';
+import config from 'virtual:starlight/user-config';
+const { siteTitle, siteTitleHref } = Astro.locals.starlightRoute;
+---
+
+<a href={siteTitleHref} class="site-title sl-flex">
+  {config.logo && logos.dark && (
+    <img alt="" src={logos.dark.src} width={logos.dark.width} height={logos.dark.height} />
+  )}
+  <span class="sr-only">{siteTitle}</span>
+  <span class="orchard-wordmark" aria-hidden="true"></span>
+</a>
+
+<style>
+  /* Restore the flex layout the default SiteTitle provided (lost when overriding
+     the component): center the mark + wordmark and space them apart. */
+  .site-title {
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    text-decoration: none;
+  }
+  .site-title:hover {
+    opacity: 0.9;
+  }
+  /* Wordmark drawn via mask; color comes from the theme (cream on dark, dark on
+     light). aspect-ratio matches the SVG's viewBox so width tracks the height. */
+  .orchard-wordmark {
+    display: block;
+    height: 1.125rem;
+    aspect-ratio: 433.28 / 46.67;
+    background-color: var(--sl-color-white);
+    -webkit-mask: url('/orchard-docs-word-mark.svg') no-repeat left center / contain;
+    mask: url('/orchard-docs-word-mark.svg') no-repeat left center / contain;
+  }
+</style>

@@ -34,8 +34,10 @@ export default defineConfig({
       favicon: '/favicon.ico',
       // Carries over the marketing site's palette, fonts, and warm dark theme.
       customCss: ['./src/styles/orchard.css'],
-      // Swap Starlight's built-in nostr glyph for Orchard's own "nostrich" mark.
+      // Custom header chrome: the official "ORCHARD DOCS" wordmark in place of
+      // the text title, and Orchard's own "nostrich" mark for the Nostr link.
       components: {
+        SiteTitle: './src/components/SiteTitle.astro',
         SocialIcons: './src/components/SocialIcons.astro',
       },
       social: [

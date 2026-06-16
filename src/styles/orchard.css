@@ -120,23 +120,9 @@
   --sl-color-hairline-shade: #e6d9b4;
 }
 
-/* The header wordmark in Tarotheque, tracked and uppercased — echoing the
- * marketing site's ORCHARD lockup. The logo mark sits to its left. Tracking is
- * a touch tighter than the marketing site's so "ORCHARD DOCS" stays on one line. */
-.site-title {
-  font-family: var(--font-heading);
-  /* Match the marketing wordmark: text-xl (1.25rem) with 0.2em tracking. */
-  font-size: 1.25rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  /* Cream wordmark (theme `title`), not the gold accent Starlight defaults to —
-   * matches the marketing site. --sl-color-white is cream on dark, dark on light. */
-  color: var(--sl-color-white);
-}
-
 /* Logo mark sized to match the marketing header (2rem-wide mark ≈ 1.625rem tall
- * at the orchard glyph's aspect ratio); Starlight defaults it taller. */
+ * at the orchard glyph's aspect ratio); Starlight defaults it taller. The
+ * "ORCHARD DOCS" wordmark beside it is rendered by the SiteTitle override. */
 .site-title img {
   height: 1.625rem;
   width: auto;
@@ -149,6 +135,16 @@
 }
 .social-icons a:hover {
   color: var(--sl-color-white);
+}
+
+/* Active sidebar item: a faint accent-tinted highlight with cream text, instead
+ * of Starlight's solid bright-accent fill (too loud against the warm palette).
+ * The bold weight from Starlight's rule still applies. */
+.sidebar a[aria-current='page'],
+.sidebar a[aria-current='page']:hover,
+.sidebar a[aria-current='page']:focus {
+  color: var(--sl-color-white);
+  background-color: color-mix(in srgb, var(--sl-color-accent) 15%, transparent);
 }
 
 /* Overview hero: lead subtitle + the Get started / Copy prompt CTA pair, echoing
@@ -164,8 +160,50 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
   margin-top: 1.75rem;
+}
+
+/* Ember primary CTA — the marketing site's "Source Code" button, rebuilt from
+ * the brand ramp (theme-4 → theme-1). Applied to Starlight's <LinkButton> via a
+ * class; these rules are un-layered, so they override the layered .sl-link-button
+ * pill/accent styles. Rounded corners (not a full pill) and dark text on the
+ * bright ramp in both themes. A top gloss + inset sheen give it depth; on hover
+ * the ramp drifts (no ambient motion, disabled under reduced motion). */
+.cta-primary,
+.cta-primary:hover {
+  color: var(--color-theme-7);
+}
+.cta-primary {
+  margin: 0;
+  border: 1px solid transparent;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background-image:
+    radial-gradient(130% 90% at 28% -20%, color-mix(in srgb, var(--color-theme-1) 70%, transparent), transparent 55%),
+    linear-gradient(100deg, var(--color-theme-4) 0%, var(--color-theme-3) 28%, var(--color-theme-2) 58%, var(--color-theme-1) 80%, var(--color-theme-2) 100%);
+  background-size: 100% 100%, 200% 100%;
+  background-position: 28% 0%, 16% 50%;
+  background-repeat: no-repeat;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--color-theme-1) 60%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--color-theme-5) 40%, transparent);
+}
+@keyframes cta-flow {
+  from { background-position: 28% 0%, 16% 50%; }
+  to { background-position: 28% 0%, 84% 50%; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cta-primary {
+    animation: cta-flow 5s ease-in-out infinite alternate;
+    animation-play-state: paused;
+  }
+  .cta-primary:hover,
+  .cta-primary:focus-visible {
+    animation-play-state: running;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

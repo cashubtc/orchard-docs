@@ -1,0 +1,18 @@
+---
+import type { Props } from '@astrojs/starlight/props';
+import Default from '@astrojs/starlight/components/Head.astro';
+
+// Extends Starlight's default <head> with a <link rel="alternate"> advertising
+// this page's raw-Markdown variant (served by src/pages/[...slug].md.ts) so AI
+// agents and tools can discover it. The .md path mirrors the page URL: the root
+// maps to /index.md, '/new-mint/system/' maps to /new-mint/system.md.
+const path = Astro.url.pathname.replace(/\/$/, '');
+const slug = path === '' ? '/index' : path;
+// Starlight's built-in 404 route has no Markdown variant — skip it rather than
+// advertise a dead /404.md.
+const markdownHref =
+  slug === '/404' ? undefined : new URL(`${slug}.md`, Astro.site ?? Astro.url.origin).href;
+---
+
+<Default {...Astro.props}><slot /></Default>
+{markdownHref && <link rel="alternate" type="text/markdown" href={markdownHref} />}

@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import starlightLlmsTxt from 'starlight-llms-txt';
 import tailwindcss from '@tailwindcss/vite';
 import icon from 'astro-icon';
 
@@ -15,6 +16,42 @@ export default defineConfig({
       title: 'Orchard Docs',
       description:
         'Documentation for Orchard — the all-in-one Cashu mint manager. Guides for setting up and running your own sovereign bank in cyberspace.',
+      // Emits /llms.txt (a curated map), /llms-full.txt (the whole corpus),
+      // /llms-small.txt (a trimmed variant), and one subset per journey — all
+      // static files generated at build for AI agents. Pairs with the per-page
+      // `<slug>.md` endpoint (src/pages/[...slug].md.ts). See AGENTS.md pillar 3.
+      plugins: [
+        starlightLlmsTxt({
+          projectName: 'Orchard',
+          description:
+            'Operator documentation for Orchard, the free, self-hosted, all-in-one Cashu mint manager. Written for people running their own Bitcoin + Lightning + Cashu mint, not for API consumers.',
+          details: [
+            'Orchard is a free, open-source, self-hosted web app that manages a complete Cashu mint stack — Bitcoin Core, a Lightning node, the mint, and the machine they run on — from one dashboard.',
+            'These are product/operator docs for self-hosters setting up and running their own mint, not developer API docs. The source code lives at https://github.com/cashubtc/orchard; this site is canonical for how to install, run, and operate Orchard.',
+            'Append `.md` to any page URL (for example https://docs.orchard.space/new-mint/system.md) to fetch that page as raw Markdown.',
+          ].join('\n\n'),
+          customSets: [
+            {
+              label: 'New Mint',
+              description:
+                'Stand up a full Cashu mint stack from scratch: system, Bitcoin, Lightning, the mint, then Orchard.',
+              paths: ['new-mint', 'new-mint/**'],
+            },
+            {
+              label: 'Existing Mint',
+              description:
+                'Connect Orchard to Bitcoin, Lightning, and mint services you already run.',
+              paths: ['existing-mint', 'existing-mint/**'],
+            },
+            {
+              label: 'Using Orchard',
+              description:
+                'Operate Orchard day to day: the dashboard, monitoring & health, and configuration.',
+              paths: ['orchard', 'orchard/**'],
+            },
+          ],
+        }),
+      ],
       // i18n is intentionally OFF while the docs are still being authored:
       // English is the single source of truth, served from the root. Locales and
       // translations get re-introduced in one pass once content is frozen — see
@@ -32,6 +69,9 @@ export default defineConfig({
       components: {
         SiteTitle: './src/components/SiteTitle.astro',
         SocialIcons: './src/components/SocialIcons.astro',
+        // Adds a <link rel="alternate" type="text/markdown"> per page pointing at
+        // its `<slug>.md` variant, so agents can auto-discover the raw Markdown.
+        Head: './src/components/Head.astro',
       },
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/cashubtc/orchard' },

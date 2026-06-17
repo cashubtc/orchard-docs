@@ -8,6 +8,11 @@
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable
 
+# Serve the per-page raw-markdown endpoints (src/pages/[...slug].md.ts) as text
+# so agents and browsers read them inline instead of downloading a file.
+/*.md
+  Content-Type: text/markdown; charset=utf-8
+
 # Conservative security headers for a fully static site.
 /*
   X-Content-Type-Options: nosniff

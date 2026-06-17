@@ -23,5 +23,8 @@
   "overrides": {
     "vite": "^7",
     "@astrojs/mdx": "6.0.2"
+  },
+  "devDependencies": {
+    "starlight-llms-txt": "^0.10.0"
   }
 }

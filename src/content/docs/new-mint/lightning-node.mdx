@@ -1,41 +1,54 @@
 ---
 title: Run a Lightning Node
-description: Stand up an LND or Core Lightning node on top of your Bitcoin node — the layer your Cashu mint settles ecash against. Part of the New Mint walkthrough.
+description: Stand up an LND node on top of your Bitcoin node — the layer your Cashu mint settles ecash against. Follows the MiniBolt Lightning guide. Part of the New Mint walkthrough.
 ---
 
-import { Aside, CardGrid, LinkCard, Tabs, TabItem } from '@astrojs/starlight/components';
+import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 The settlement layer. Your Cashu mint issues ecash backed by Lightning, so this
 node is what moves real sats in and out when users mint and melt. It anchors to
 the Bitcoin node you set up in the previous step.
 
-## Pick an implementation
+This guide uses [LND](https://github.com/lightningnetwork/lnd), Lightning Labs'
+widely deployed node. Your mint connects to it over gRPC/REST with a macaroon and
+TLS certificate.
 
-<Tabs>
-  <TabItem label="LND">
-    [LND](https://github.com/lightningnetwork/lnd) — Lightning Labs' widely
-    deployed node. Connects to your mint via gRPC/REST with a macaroon and TLS
-    certificate.
-  </TabItem>
-  <TabItem label="Core Lightning">
-    [Core Lightning](https://github.com/ElementsProject/lightning) (CLN) —
-    Blockstream's implementation, extensible through plugins and connected over its
-    RPC socket.
-  </TabItem>
-</Tabs>
+## What this step covers
 
-## What you'll set up
-
-- **The node**, pointed at your Bitcoin Core node's RPC and notification
-  endpoints.
-- **A funded channel or two** — outbound liquidity to melt, inbound to mint.
+- **The node**, pointed at your Bitcoin Core node's RPC and notification endpoints.
+- **A funded channel or two**: outbound liquidity to melt, inbound to mint.
 - **API access** your mint can authenticate against in the next step.
 
-<Aside type="caution" title="Exact commands are on the way">
-  Until the step-by-step setup lands here, follow the official docs for your chosen
-  node — [LND](https://docs.lightning.engineering/) or
-  [Core Lightning](https://docs.corelightning.org/) — as the source of truth.
+## Follow MiniBolt's Lightning guide
+
+[MiniBolt's Lightning section](https://minibolt.minibolt.info/lightning/lightning)
+is the step-by-step we recommend. The first two pages are required for an Orchard
+mint; the apps after them are optional:
+
+- **[3.1 Lightning client: LND](https://minibolt.minibolt.info/lightning/lightning/lightning-client)** (follow):
+  Install and configure LND on top of your Bitcoin node.
+- **[3.2 Channel backup for LND](https://minibolt.minibolt.info/lightning/lightning/channel-backup)** (follow):
+  Set up static channel backups. Do not skip this. It is how you recover funds if
+  the node is lost.
+- **[3.3 Web app: ThunderHub](https://minibolt.minibolt.info/lightning/lightning/web-app)** (optional, recommended):
+  A web channel manager for LND. Orchard does not have channel management yet, so
+  run ThunderHub (or a similar manager) in the meantime.
+- **[3.4 Mobile app: Zeus](https://minibolt.minibolt.info/lightning/lightning/mobile-app)** (optional):
+  A phone app for keeping an eye on your node.
+
+<Aside type="note" title="Keep the credentials handy">
+  Your mint authenticates to LND with its TLS certificate and a macaroon, pointed at
+  the node's gRPC or REST endpoint. Note where those live: you hand them to the mint
+  in the next step.
 </Aside>
+
+<LinkCard
+  title="Open MiniBolt: Lightning"
+  href="https://minibolt.minibolt.info/lightning/lightning"
+  target="_blank"
+  rel="noopener noreferrer"
+  description="Stand up LND and back up your channels, then come back here for the mint."
+/>
 
 ## Next
 

@@ -1,41 +1,80 @@
 ---
 title: Set Up Your System
-description: Prepare and harden the machine your whole Orchard stack runs on — the foundation under Bitcoin, Lightning, and your Cashu mint. Part of the New Mint walkthrough.
+description: Prepare and harden the Linux machine your whole Orchard stack runs on — the foundation under Bitcoin, Lightning, and your Cashu mint. Follows the MiniBolt System guide. Part of the New Mint walkthrough.
 ---
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 The foundation. Bitcoin Core, your Lightning node, the mint, and Orchard all run
-on this one machine, so it's the first thing to get right. A mint holds value and
-is expected to stay online around the clock — that makes the host itself part of
+on this one machine, so it is the first thing to get right. A mint holds value and
+is expected to stay online around the clock, which makes the host itself part of
 your security model, not just a place to install software.
 
-## What you'll set up
+Run it on a machine you control. A home server or a dedicated personal computer is
+the recommended path for public infrastructure like a mint. A Linux VPS works too
+as a lighter-touch option; the main difference shows up in the first step, where a
+VPS arrives with Linux already installed instead of you installing it yourself.
 
-- **A host you control.** A VPS or a home server with room for the whole stack:
-  enough disk for a full Bitcoin node (several hundred gigabytes and growing), plus
-  the CPU, RAM, and a connection to keep it online around the clock.
-- **A current, supported OS.** The stack's tooling targets Linux — install a
-  maintained release and keep it patched.
-- **Hardened remote access.** Key-only SSH (no password login), a non-root user
-  with `sudo`, and the SSH port reachable only to you.
-- **A firewall.** Default-deny inbound, opening only the ports each service needs
-  as you add it in the steps that follow.
-- **Unattended security updates** and an accurate clock (NTP) — Lightning and TLS
+## What this step covers
+
+- **A host you control** with room for the whole stack: a 2 TB+ SSD for a full
+  Bitcoin node and the data that grows with it, 4 GB+ RAM, and a connection that
+  stays online.
+- **A supported Linux OS.** The stack targets Ubuntu Server LTS. Install it and
+  keep it patched.
+- **Hardened remote access**: key-only SSH, a non-root admin user with `sudo`, and
+  the SSH port reachable only to you.
+- **A firewall** that denies inbound by default and opens only the ports each
+  service needs as you add it.
+- **Unattended security updates** and an accurate clock (NTP). Lightning and TLS
   are both time-sensitive.
 - **A backup plan** for keys and configuration, in place before anything holds value.
 
-<Aside type="tip" title="VPS or home server?">
-  Either works. A VPS is quick to stand up and stays online without effort; a home
-  server keeps everything on hardware you physically control. Pick what you can keep
-  patched, backed up, and running — that matters more than the venue.
+## Follow MiniBolt's System guide
+
+We do not reproduce these steps. [MiniBolt's System section](https://minibolt.minibolt.info/system/system)
+is the guide we recommend and keep current (see [the guides we build on](/new-mint/#the-guides-we-build-on)
+for why). Work through it start to finish, with a few Orchard-specific adjustments:
+
+- **[1.1 Preparations](https://minibolt.minibolt.info/system/system/preparations)** (adapt):
+  Get the hardware and write down your passwords. For an Orchard mint you need a
+  master admin password, a Bitcoin RPC password, an LND wallet password, and an
+  Orchard setup key. The ThunderHub, BTC RPC Explorer, and i2pd passwords on
+  MiniBolt's list are optional: only create them if you run those extras (ThunderHub
+  is recommended, see the [Lightning step](/new-mint/lightning-node/)).
+- **[1.2 Operating system](https://minibolt.minibolt.info/system/system/operating-system)** (bare-metal only):
+  Flash Ubuntu Server to a USB stick and install it on your hardware. On a VPS your
+  provider gives you a running Linux box already, so this page does not apply (see the
+  note below).
+- **[1.3 Remote access](https://minibolt.minibolt.info/system/system/remote-access)** (follow):
+  Find the machine on your network and reach it over SSH. On a VPS, start here.
+- **[1.4 Configuration](https://minibolt.minibolt.info/system/system/configuration)** (follow):
+  Create the admin user, apply system updates, and set up the data directory. The
+  whole stack's chain and data live in that directory, so put it on the large drive.
+- **[1.5 Security](https://minibolt.minibolt.info/system/system/security)** (follow, with a note):
+  Set up the UFW firewall. The exact ports MiniBolt opens are tuned to its own
+  stack; open ports per service as you add them. Leave the reverse-proxy (Nginx)
+  decision until you [install Orchard](/install/orchard/).
+- **[1.6 Privacy](https://minibolt.minibolt.info/system/system/privacy)** (optional):
+  Add Tor and I2P if you want them.
+
+<Aside type="tip" title="On a VPS?">
+  A VPS arrives as a running Linux box with SSH already enabled, reached at a public IP
+  using the key or password your provider set up. So there is no Operating system page
+  to do and no machine to find on your network: connect with your provider's details,
+  skim [Remote access](https://minibolt.minibolt.info/system/system/remote-access) for
+  the SSH and command-line basics, then start at
+  [Configuration](https://minibolt.minibolt.info/system/system/configuration) (your own
+  admin user, key-only login, system updates). Everything from there applies the same.
 </Aside>
 
-<Aside type="caution" title="Exact commands are on the way">
-  Until the hardening steps land here, follow your distribution's security guide and
-  the [OpenSSH manual](https://www.openssh.com/manual.html) as the source of truth for
-  locking down access. Treat these basics as prerequisites for every step below.
-</Aside>
+<LinkCard
+  title="Open MiniBolt: System"
+  href="https://minibolt.minibolt.info/system/system"
+  target="_blank"
+  rel="noopener noreferrer"
+  description="The step-by-step system setup we recommend. Work through 1.1–1.6, then come back here for Bitcoin."
+/>
 
 ## Next
 
@@ -43,6 +82,6 @@ your security model, not just a place to install software.
   <LinkCard
     title="Next: Bitcoin Node"
     href="/new-mint/bitcoin-node/"
-    description="With the box ready and secured, stand up Bitcoin Core — the base layer everything else settles to."
+    description="With the box ready and secured, stand up Bitcoin Core, the base layer everything else settles to."
   />
 </CardGrid>

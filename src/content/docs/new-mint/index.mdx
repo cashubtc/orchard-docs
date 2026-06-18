@@ -34,6 +34,33 @@ point it at each one.
   [Install](/install/).
 </Aside>
 
+## The guides we build on
+
+Orchard manages a mint; it is not a Bitcoin or Lightning distribution. Rather than
+reinvent and maintain our own bare-metal setup steps, we hand the base layers
+(System, Bitcoin, and Lightning) off to a guide that already does this well, and
+note the Orchard-specific adjustments on each step. Two guides shaped this path:
+
+<CardGrid>
+  <LinkCard
+    title="RaspiBolt (the origin)"
+    href="https://raspibolt.org"
+    target="_blank"
+    rel="noopener noreferrer"
+    description="The Raspberry Pi self-hosting guide we have run for years and learned these best practices from. It does not port cleanly to Ubuntu: the drive setup, OS, and binary paths all differ, and translating it takes real sysadmin work. We credit it as the origin, not the guide to follow on a Linux machine."
+  />
+  <LinkCard
+    title="MiniBolt (what we recommend)"
+    href="https://minibolt.minibolt.info"
+    target="_blank"
+    rel="noopener noreferrer"
+    description="The same best practices already built for Linux on capable hardware, so there is nothing to translate. A mint is public-facing infrastructure, so this is the purpose-fit path. Our base-layer steps hand off here directly."
+  />
+</CardGrid>
+
+Orchard's own docs pick up where MiniBolt leaves off, at the Cashu mint and the
+[Install](/install/) steps.
+
 ## Where to start
 
 <CardGrid>

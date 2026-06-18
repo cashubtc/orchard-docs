@@ -1,6 +1,6 @@
 ---
 title: Run a Bitcoin Node
-description: Stand up your own Bitcoin Core node — the base layer your Lightning node and Cashu mint settle down to. Part of the New Mint walkthrough.
+description: Stand up your own Bitcoin Core node — the base layer your Lightning node and Cashu mint settle down to. Follows the MiniBolt Bitcoin guide. Part of the New Mint walkthrough.
 ---
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
@@ -9,9 +9,9 @@ The base layer. A Bitcoin full node validates the chain independently, so your
 Lightning node trusts your own copy of the ledger rather than someone else's.
 Running your own node is what makes the rest of the stack genuinely sovereign.
 
-## What you'll set up
+## What this step covers
 
-- **Bitcoin Core (`bitcoind`)** — the reference full node. Install it, let it
+- **Bitcoin Core (`bitcoind`)**: the reference full node. You install it, let it
   perform its initial block download, and keep it online.
 - **An RPC connection** your Lightning node can reach, so Lightning can watch the
   chain and broadcast transactions.
@@ -20,17 +20,36 @@ Plan for the initial sync to take time and disk: a full node needs several hundr
 gigabytes and can take a day or more to validate from genesis.
 
 <Aside type="note" title="Pruned vs. full">
-  Lightning backends differ in what they need from Bitcoin Core. Check your chosen
-  Lightning node's requirements before committing to a pruned node — some features
+  Lightning backends differ in what they need from Bitcoin Core. Check your
+  Lightning node's requirements before committing to a pruned node; some features
   expect an unpruned chain or a transaction index.
 </Aside>
 
-<Aside type="caution" title="Exact commands are on the way">
-  Until the step-by-step setup lands here, follow the official
-  [Bitcoin Core documentation](https://bitcoincore.org/en/doc/) and the
-  [bitcoin/bitcoin repository](https://github.com/bitcoin/bitcoin) as the source of
-  truth for installing and configuring `bitcoind`.
-</Aside>
+## Follow MiniBolt's Bitcoin guide
+
+[MiniBolt's Bitcoin section](https://minibolt.minibolt.info/bitcoin/bitcoin) is the
+step-by-step we recommend. Only the first page is required for an Orchard mint; the
+rest are optional add-ons:
+
+- **[2.1 Bitcoin client: Bitcoin Core](https://minibolt.minibolt.info/bitcoin/bitcoin/bitcoin-client)** (follow):
+  Install and configure `bitcoind`. The RPC connection you set up here is what your
+  Lightning node connects to in the next step.
+- **[2.3 Blockchain explorer: BTC RPC Explorer](https://minibolt.minibolt.info/bitcoin/bitcoin/blockchain-explorer)** (optional, nice to have):
+  Orchard does not have rich block and transaction exploration yet, so a local
+  explorer is a useful add-on in the meantime.
+- **[2.2 Electrum server: Fulcrum](https://minibolt.minibolt.info/bitcoin/bitcoin/electrum-server)**
+  and **[2.4 Desktop signing app: Sparrow](https://minibolt.minibolt.info/bitcoin/bitcoin/desktop-signing-app-sparrow)** (optional, paired):
+  Set these up only if you want to use this Bitcoin node as the backend for your own
+  signing wallets. Fulcrum is the Electrum server, Sparrow the desktop wallet that
+  connects to it. The mint and Lightning do not need either, so skip both otherwise.
+
+<LinkCard
+  title="Open MiniBolt: Bitcoin"
+  href="https://minibolt.minibolt.info/bitcoin/bitcoin"
+  target="_blank"
+  rel="noopener noreferrer"
+  description="Install Bitcoin Core and let it sync, then come back here for Lightning."
+/>
 
 ## Next
 
@@ -38,6 +57,6 @@ gigabytes and can take a day or more to validate from genesis.
   <LinkCard
     title="Next: Lightning Node"
     href="/new-mint/lightning-node/"
-    description="With the chain in place, stand up LND or Core Lightning on top of it."
+    description="With the chain in place, stand up LND on top of it."
   />
 </CardGrid>

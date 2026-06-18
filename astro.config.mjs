@@ -9,8 +9,33 @@ import icon from 'astro-icon';
 // the edge; this is a fully static site (no SSR/adapter).
 const site = 'https://docs.orchard.space';
 
+// Open external links in a new tab. The New Mint pages hand off to off-site setup
+// guides (MiniBolt, RaspiBolt); opening those in a new tab keeps the reader's place
+// in the docs. Internal navigation (relative or same-origin links) is left alone.
+// Small inline rehype pass so we don't pull in a dependency for one rule.
+function rehypeExternalLinksNewTab() {
+  return (tree) => {
+    const visit = (node) => {
+      if (node.type === 'element' && node.tagName === 'a') {
+        const href = node.properties?.href;
+        if (typeof href === 'string' && /^https?:\/\//i.test(href) && !href.startsWith(site)) {
+          node.properties.target = '_blank';
+          node.properties.rel = 'noopener noreferrer';
+        }
+      }
+      node.children?.forEach(visit);
+    };
+    visit(tree);
+  };
+}
+
 export default defineConfig({
   site,
+  // Inline external links (the off-site guides we hand off to) open in a new tab.
+  // LinkCard components aren't markdown, so external ones carry `target` directly.
+  markdown: {
+    rehypePlugins: [rehypeExternalLinksNewTab],
+  },
   // Old URLs from the previous "Existing Mint" structure now live under the
   // "Install" section. Redirect them so inbound links and search results don't
   // 404 (Astro emits static redirect pages for these in `dist/`).

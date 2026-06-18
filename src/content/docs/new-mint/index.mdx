@@ -1,6 +1,6 @@
 ---
 title: New Mint
-description: The sovereign path — stand up Bitcoin, Lightning, and a Cashu mint from scratch, then hand the keys to Orchard. The suggested route to a fully self-hosted mint.
+description: The suggested path to a fully sovereign mint — run Bitcoin, Lightning, and a Cashu mint yourself, on hardware you control, then connect Orchard to manage it all from one place.
 ---
 
 import { Aside, CardGrid, LinkCard, Steps } from '@astrojs/starlight/components';
@@ -11,10 +11,10 @@ connect Orchard to each service to manage everything from one place.
 
 <Steps>
 
-1. **[System](/new-mint/system/)** — the foundation. A machine you control, set up
+1. **[System](/new-mint/system/)** — the soil. A machine you control, set up
    and secured, with room for every service.
 
-2. **[Bitcoin node](/new-mint/bitcoin-node/)** — the base layer. Your own Bitcoin
+2. **[Bitcoin node](/new-mint/bitcoin-node/)** — the roots of your mint. Your own Bitcoin
   node, the source of truth your Lightning node trusts.
 
 3. **[Lightning node](/new-mint/lightning-node/)** — processes deposits and
@@ -36,7 +36,7 @@ point it at each one.
 
 ## The guides we build on
 
-Orchard manages a mint; it is not a Bitcoin or Lightning distribution. Rather than
+Orchard manages bitcoin infrastructure; it is not a Bitcoin or Lightning distribution. Rather than
 reinvent and maintain our own bare-metal setup steps, we hand the base layers
 (System, Bitcoin, and Lightning) off to a guide that already does this well, and
 note the Orchard-specific adjustments on each step. Two guides shaped this path:
@@ -47,19 +47,26 @@ note the Orchard-specific adjustments on each step. Two guides shaped this path:
     href="https://raspibolt.org"
     target="_blank"
     rel="noopener noreferrer"
-    description="The Raspberry Pi self-hosting guide we have run for years and learned these best practices from. It does not port cleanly to Ubuntu: the drive setup, OS, and binary paths all differ, and translating it takes real sysadmin work. We credit it as the origin, not the guide to follow on a Linux machine."
+    description="The Raspberry Pi guide we learned these best practices from. It does not port cleanly to Linux. Only use this if you are familiar with server setup."
   />
   <LinkCard
     title="MiniBolt (what we recommend)"
     href="https://minibolt.minibolt.info"
     target="_blank"
     rel="noopener noreferrer"
-    description="The same best practices already built for Linux on capable hardware, so there is nothing to translate. A mint is public-facing infrastructure, so this is the purpose-fit path. Our base-layer steps hand off here directly."
+    description="The same best practices, already built for Linux on capable hardware. The purpose-fit path for a public-facing mint, and where our base-layer steps hand off."
   />
 </CardGrid>
 
 Orchard's own docs pick up where MiniBolt leaves off, at the Cashu mint and the
 [Install](/install/) steps.
+
+<Aside type="note" title="Node-in-a-box setups">
+  Umbrel, Start9, and similar appliances are great for plug-and-play
+  self-hosting, but not the right fit here. They run pre-packaged apps on an OS
+  you do not fully control, tuned for private use. A mint is public-facing
+  infrastructure, and this path builds and hardens each base layer yourself.
+</Aside>
 
 ## Where to start
 

@@ -5,15 +5,14 @@ description: Prepare and harden the Linux machine your whole Orchard stack runs 
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-The foundation. Bitcoin Core, your Lightning node, the mint, and Orchard all run
-on this one machine, so it is the first thing to get right. A mint holds value and
-is expected to stay online around the clock, which makes the host itself part of
-your security model, not just a place to install software.
+The soil. Bitcoin Core, your Lightning node, the mint, and Orchard all run
+on this one machine, so it is the first thing to get right. Liveness is critical
+to both the lightning node and the mint. This makes the host itself critical to
+your service model.
 
-Run it on a machine you control. A home server or a dedicated personal computer is
-the recommended path for public infrastructure like a mint. A Linux VPS works too
-as a lighter-touch option; the main difference shows up in the first step, where a
-VPS arrives with Linux already installed instead of you installing it yourself.
+Run it on a machine you control with reliable hardware — a home server or a
+hosted VPS. Both work, and the rest of this guide is the same either way; the
+section below lays out the trade-off.
 
 ## What this step covers
 
@@ -24,11 +23,41 @@ VPS arrives with Linux already installed instead of you installing it yourself.
   keep it patched.
 - **Hardened remote access**: key-only SSH, a non-root admin user with `sudo`, and
   the SSH port reachable only to you.
-- **A firewall** that denies inbound by default and opens only the ports each
-  service needs as you add it.
-- **Unattended security updates** and an accurate clock (NTP). Lightning and TLS
-  are both time-sensitive.
+- **Security and privacy hardening**: a default-deny firewall that opens only the
+  ports each service needs, plus the network and privacy measures that keep the
+  host locked down.
 - **A backup plan** for keys and configuration, in place before anything holds value.
+
+## Home server or VPS?
+
+Both work, and the rest of this guide is the same either way. The choice comes
+down to one trade-off: a home server maximizes sovereignty and privacy, while a
+VPS maximizes uptime and reachability. For a mint — public-facing infrastructure
+that holds value — we lean toward the home server, but a VPS is a reasonable
+lighter-touch start.
+
+| | Home server | Hosted VPS |
+| --- | --- | --- |
+| **Control** | Hardware is physically yours | The provider owns the host |
+| **Key & data privacy** | Keys never leave your hardware | The provider can access disk and RAM |
+| **Uptime** | Rests on your power and home internet | Datacenter-grade, often with an SLA |
+| **Public reachability** | More manual configuration and networking | Static public IP off the shelf |
+| **Bandwidth** | Capped by residential upload | High and symmetric |
+| **Cost** | One-time hardware | Recurring monthly fee |
+| **Setup** | You install the OS yourself (step 1.2) | Arrives with Linux and SSH ready |
+| **Best when** | Sovereignty and privacy come first | You want reliable uptime without running hardware |
+
+<Aside type="tip" title="Which should I pick?">
+  Pick a **home server** for full sovereignty, if you want to own the hardware, and can own the uptime. Pick a
+  **VPS** for dependable uptime and a public IP, trusting the provider with the
+  machine your keys run on.
+</Aside>
+
+<Aside type="tip" title="Running at home?">
+  Uptime is on you, so design for it. Put the machine on a **UPS** so a power blip
+  cannot corrupt your drives or knock your services offline, and run it on **wired
+  ethernet** instead of Wi-Fi for a stable, always-on connection.
+</Aside>
 
 ## Follow MiniBolt's System guide
 
@@ -75,13 +104,3 @@ for why). Work through it start to finish, with a few Orchard-specific adjustmen
   rel="noopener noreferrer"
   description="The step-by-step system setup we recommend. Work through 1.1–1.6, then come back here for Bitcoin."
 />
-
-## Next
-
-<CardGrid>
-  <LinkCard
-    title="Next: Bitcoin Node"
-    href="/new-mint/bitcoin-node/"
-    description="With the box ready and secured, stand up Bitcoin Core, the base layer everything else settles to."
-  />
-</CardGrid>

@@ -3,7 +3,7 @@ title: Set Up Your System
 description: Prepare and harden the Linux machine your whole Orchard stack runs on — the foundation under Bitcoin, Lightning, and your Cashu mint. Follows the MiniBolt System guide. Part of the New Mint walkthrough.
 ---
 
-import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { Aside, LinkCard } from '@astrojs/starlight/components';
 
 The soil. Bitcoin Core, your Lightning node, the mint, and Orchard all run
 on this one machine, so it is the first thing to get right. Liveness is critical
@@ -62,40 +62,9 @@ lighter-touch start.
 ## Follow MiniBolt's System guide
 
 We do not reproduce these steps. [MiniBolt's System section](https://minibolt.minibolt.info/system/system)
-is the guide we recommend and keep current (see [the guides we build on](/new-mint/#the-guides-we-build-on)
-for why). Work through it start to finish, with a few Orchard-specific adjustments:
-
-- **[1.1 Preparations](https://minibolt.minibolt.info/system/system/preparations)** (adapt):
-  Get the hardware and write down your passwords. For an Orchard mint you need a
-  master admin password, a Bitcoin RPC password, an LND wallet password, and an
-  Orchard setup key. The ThunderHub, BTC RPC Explorer, and i2pd passwords on
-  MiniBolt's list are optional: only create them if you run those extras (ThunderHub
-  is recommended, see the [Lightning step](/new-mint/lightning-node/)).
-- **[1.2 Operating system](https://minibolt.minibolt.info/system/system/operating-system)** (bare-metal only):
-  Flash Ubuntu Server to a USB stick and install it on your hardware. On a VPS your
-  provider gives you a running Linux box already, so this page does not apply (see the
-  note below).
-- **[1.3 Remote access](https://minibolt.minibolt.info/system/system/remote-access)** (follow):
-  Find the machine on your network and reach it over SSH. On a VPS, start here.
-- **[1.4 Configuration](https://minibolt.minibolt.info/system/system/configuration)** (follow):
-  Create the admin user, apply system updates, and set up the data directory. The
-  whole stack's chain and data live in that directory, so put it on the large drive.
-- **[1.5 Security](https://minibolt.minibolt.info/system/system/security)** (follow, with a note):
-  Set up the UFW firewall. The exact ports MiniBolt opens are tuned to its own
-  stack; open ports per service as you add them. Leave the reverse-proxy (Nginx)
-  decision until you [install Orchard](/install/orchard/).
-- **[1.6 Privacy](https://minibolt.minibolt.info/system/system/privacy)** (optional):
-  Add Tor and I2P if you want them.
-
-<Aside type="tip" title="On a VPS?">
-  A VPS arrives as a running Linux box with SSH already enabled, reached at a public IP
-  using the key or password your provider set up. So there is no Operating system page
-  to do and no machine to find on your network: connect with your provider's details,
-  skim [Remote access](https://minibolt.minibolt.info/system/system/remote-access) for
-  the SSH and command-line basics, then start at
-  [Configuration](https://minibolt.minibolt.info/system/system/configuration) (your own
-  admin user, key-only login, system updates). Everything from there applies the same.
-</Aside>
+is the guide we recommend (see [the guides we build on](/new-mint/#the-guides-we-build-on)
+for why). Open it and work through 1.1–1.6 — it applies almost as written. The tips
+below cover the only differences: one for everyone, plus a few if you're on a VPS.
 
 <LinkCard
   title="Open MiniBolt: System"
@@ -104,3 +73,25 @@ for why). Work through it start to finish, with a few Orchard-specific adjustmen
   rel="noopener noreferrer"
   description="The step-by-step system setup we recommend. Work through 1.1–1.6, then come back here for Bitcoin."
 />
+
+## General guide tips
+
+Follow MiniBolt's steps as written. The one addition: in
+**[1.1 Preparations](https://minibolt.minibolt.info/system/system/preparations)**,
+when you write down your passwords, add an **Orchard setup key** to the list.
+
+## VPS guide tips
+
+A VPS arrives as a running Linux box with SSH already enabled, so a few steps shift:
+
+- **Skip [1.2 Operating system](https://minibolt.minibolt.info/system/system/operating-system).**
+  Your provider already installed Linux.
+- **[1.3 Remote access](https://minibolt.minibolt.info/system/system/remote-access):**
+  ssh at the public IP your provider gives you as there is no machine to find on
+  your local network.
+- **[1.4 Configuration](https://minibolt.minibolt.info/system/system/configuration):**
+  its first task, "Add the admin user," creates the `admin` account the rest of the
+  guide runs as — MiniBolt builds it from the throwaway `temp` user made during the
+  OS install. You skipped that install, so run those same steps from the `root` or
+  `ubuntu` login your provider gave you. That login stands in for `temp`: retire it
+  once `admin` works (delete the spare `ubuntu` user, or disable root SSH).

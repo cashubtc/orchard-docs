@@ -125,7 +125,7 @@ export default defineConfig({
         {
           label: 'New Mint',
           items: [
-            { label: 'Guide', slug: 'new-mint' },
+            { label: 'New Mint', slug: 'new-mint' },
             { label: 'System', slug: 'new-mint/system' },
             { label: 'Bitcoin Node', slug: 'new-mint/bitcoin-node' },
             { label: 'Lightning Node', slug: 'new-mint/lightning-node' },
@@ -135,7 +135,7 @@ export default defineConfig({
         {
           label: 'Install',
           items: [
-            { label: 'Guide', slug: 'install' },
+            { label: 'Install', slug: 'install' },
             { label: 'Orchard', slug: 'install/orchard' },
             { label: 'Bitcoin', slug: 'install/bitcoin' },
             { label: 'Lightning', slug: 'install/lightning' },
@@ -147,7 +147,7 @@ export default defineConfig({
         {
           label: 'Using Orchard',
           items: [
-            { label: 'Guide', slug: 'orchard' },
+            { label: 'Using Orchard', slug: 'orchard' },
             { label: 'The Dashboard', slug: 'orchard/dashboard' },
             { label: 'Monitoring & Health', slug: 'orchard/monitoring' },
             { label: 'Configuration', slug: 'orchard/configuration' },

@@ -37,7 +37,11 @@ are optional. The tips below cover which pages matter and which you can skip.
 ## General guide tips
 
 - **[3.1 Lightning client: LND](https://minibolt.minibolt.info/lightning/lightning/lightning-client)** (follow):
-  Install and configure LND on top of your Bitcoin node.
+  Install and configure LND on top of your Bitcoin node. When this page offers a
+  database backend, choose **PostgreSQL**, not the default bbolt: the Cashu mint in
+  the next step reuses this same Postgres instance, so installing it now (via
+  MiniBolt's [PostgreSQL guide](https://minibolt.minibolt.info/bonus-guides/system/postgresql))
+  saves a step later.
 - **[3.2 Channel backup for LND](https://minibolt.minibolt.info/lightning/lightning/channel-backup)** (follow):
   Set up static channel backups. Do not skip this. It is how you recover funds if
   the node is lost.

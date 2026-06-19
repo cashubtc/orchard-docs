@@ -1,0 +1,59 @@
+---
+title: Backup & Restore
+description: Back up and restore your Cashu mint's database from Orchard — the dashboard half of the seed-plus-database recovery that brings a mint back after hardware loss.
+---
+
+import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+A mint's state lives in its database: the keysets it has issued and the ecash still
+outstanding against it. Orchard backs that database up from the dashboard, so keeping a
+current copy does not mean dropping to the command line.
+
+## The recovery model
+
+A mint is restored from two things together:
+
+- **The seed phrase**, which derives the mint's signing keys. It never changes, so you
+  back it up once, offline. The seed lives in the mint daemon's config, not its
+  database, so Orchard does not hold it: this half stays your responsibility (see the
+  mint's [seed step](/new-mint/mint/#generate-the-mint-seed)).
+- **The database**, which changes every time the mint issues or redeems ecash. This is
+  the half Orchard backs up for you.
+
+With both, a mint lost to a dead disk comes back fully operational, with the same
+keysets and the same outstanding ecash. With only one, it does not.
+
+## Backing up
+
+Orchard exports a backup of the mint database from the dashboard. Take one on a schedule
+so the copy never lags far behind the live mint, and store it off the machine, separate
+from your seed backup.
+
+## Restoring
+
+Restoring loads a saved database backup back into a mint. Pair it with the **same seed**
+the mint was created with, and the mint returns to the state captured in that backup.
+
+<Aside type="caution" title="Exact backup and restore steps are on the way">
+  Orchard is under active development, and the in-dashboard backup and restore flow is
+  still settling, so the click-by-click steps land here as it stabilizes. Until then you
+  can back up the database directly with `pg_dump` (see the mint's
+  [Back up the mint](/new-mint/mint/#back-up-the-mint) step). The
+  [Orchard repository](https://github.com/cashubtc/orchard) has the source code in the
+  meantime.
+</Aside>
+
+## Next
+
+<CardGrid>
+  <LinkCard
+    title="Monitoring & Health"
+    href="/orchard/monitoring/"
+    description="Stay informed — activity and health surfaced where you already are."
+  />
+  <LinkCard
+    title="The Dashboard"
+    href="/orchard/dashboard/"
+    description="Operate your mint — keys, balances, and mint info from a single view."
+  />
+</CardGrid>

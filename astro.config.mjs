@@ -81,7 +81,7 @@ export default defineConfig({
             {
               label: 'Using Orchard',
               description:
-                'Operate Orchard day to day: the dashboard, monitoring & health, and configuration.',
+                'Operate Orchard day to day: the dashboard, monitoring & health, configuration, and database backup and restore.',
               paths: ['orchard', 'orchard/**'],
             },
           ],
@@ -151,6 +151,7 @@ export default defineConfig({
             { label: 'The Dashboard', slug: 'orchard/dashboard' },
             { label: 'Monitoring & Health', slug: 'orchard/monitoring' },
             { label: 'Configuration', slug: 'orchard/configuration' },
+            { label: 'Backup & Restore', slug: 'orchard/backups' },
           ],
         },
       ],

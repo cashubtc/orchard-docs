@@ -484,7 +484,7 @@ sudo -u postgres pg_dump cdk_mintd | gzip > cdk_mintd-$(date +%F).sql.gz
 
 <Aside type="note" title="Backups from Orchard">
   Once Orchard is connected to this mint, you can run these database backups from its
-  dashboard instead of the command line: see [Backup & Restore](/orchard/backups/).
+  dashboard instead of the command line: see [Backup and restore](/orchard/mint/#backup-and-restore).
   Either way the seed stays your responsibility, kept offline.
 </Aside>
 
@@ -628,7 +628,7 @@ curl https://mint.yourdomain.com/v1/info
 - **Mint information.** `name`, `description`, `contact_email`, `motd`, and `icon_url`
   in `[mint_info]` are what wallets show before someone trusts your mint. Keep them
   accurate. Once Orchard is connected you manage these from the dashboard; see
-  [Configuration](/orchard/configuration/).
+  [Mint information](/orchard/mint/#mint-information).
 - **Fees and limits.** Set `input_fee_ppk` under `[info]` to charge a per-input fee,
   `fee_percent` and `reserve_fee_min` under `[lnd]` to tune the Lightning fee reserve,
   and `max_inputs` / `max_outputs` under `[limits]` to cap transaction size.

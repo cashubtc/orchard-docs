@@ -1,16 +1,16 @@
 ---
-title: Using Orchard
-description: Operate your Cashu mint with Orchard — the dashboard, monitoring, and optional configuration that turn a running mint into one you can tend at a glance.
+title: Your Orchard
+description: Operate your Cashu mint with Orchard — set up your instance, then tend the dashboard, crew, settings, and the Bitcoin, Lightning, and Mint services it manages, all from one place.
 ---
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-Once Orchard is installed and pointed at your mint, this is where you live. Orchard
-is the **groundskeeper** for your mint — it surfaces keys, balances, and health in
-one place so you can tend the mint instead of babysitting a terminal.
+Once Orchard is installed and running, these guides give you an overview of the application.
+Orchard is an all-in-one manager that gives you a full view of your services — Bitcoin,
+Lightning, and a Cashu mint — and the tools to operate them from a single dashboard.
 
 <Aside type="note" title="Not set up yet?">
-  These pages assume Orchard is already running against your mint. If you haven't
+  These pages assume Orchard is already running. If you haven't
   reached that point, [install Orchard and connect your services](/install/), or
   build the whole stack from scratch with the [New Mint](/new-mint/) walkthrough.
 </Aside>
@@ -19,30 +19,48 @@ one place so you can tend the mint instead of babysitting a terminal.
 
 <CardGrid>
   <LinkCard
-    title="The Dashboard"
+    title="Setup"
+    href="/orchard/setup/"
+    description="Create your admin account and unlock the dashboard."
+  />
+  <LinkCard
+    title="Settings"
+    href="/orchard/settings/"
+    description="Settings for the application and user preferences."
+  />
+  <LinkCard
+    title="Crew"
+    href="/orchard/crew/"
+    description="Invite other users to the application."
+  />
+  <LinkCard
+    title="Change Log"
+    href="/orchard/changelog/"
+    description="A running record of actions and changes."
+  />
+  <LinkCard
+    title="Dashboard"
     href="/orchard/dashboard/"
-    description="Operate your mint — keys, balances, and mint info from a single view."
+    description="The complete overview of your running services."
   />
   <LinkCard
-    title="Monitoring & Health"
-    href="/orchard/monitoring/"
-    description="Stay informed — activity and health surfaced where you already are."
+    title="Bitcoin"
+    href="/orchard/bitcoin/"
+    description="The dedicated view for the Bitcoin node."
   />
   <LinkCard
-    title="Configuration & Optional Features"
-    href="/orchard/configuration/"
-    description="Turn on what you need, leave the rest — mint metadata and optional features."
+    title="Lightning"
+    href="/orchard/lightning/"
+    description="The dedicated view for the Lightning node."
   />
   <LinkCard
-    title="Backup & Restore"
-    href="/orchard/backups/"
-    description="Keep a current copy of the mint database, and restore it when you need to."
+    title="Mint"
+    href="/orchard/mint/"
+    description="The dedicated view for the Cashu Mint."
+  />
+  <LinkCard
+    title="AI"
+    href="/orchard/ai/"
+    description="Overview of the optional AI integration."
   />
 </CardGrid>
-
-<Aside type="caution" title="Feature-level guides are on the way">
-  Orchard is under active development, and its feature set is still growing. The
-  per-feature walkthroughs land here as features settle. The
-  [Orchard repository](https://github.com/cashubtc/orchard) has the source code in
-  the meantime.
-</Aside>

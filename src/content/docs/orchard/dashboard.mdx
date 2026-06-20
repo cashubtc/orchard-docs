@@ -1,23 +1,31 @@
 ---
-title: The Dashboard
-description: Operate your Cashu mint from Orchard's dashboard — keys, balances, and mint info in one view, so the day-to-day is a glance instead of a terminal session.
+title: Dashboard
+description: Operate your Cashu mint from Orchard's dashboard — keys, balances, health, and mint info in one view, so the day-to-day is a glance instead of a terminal session.
 ---
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 The dashboard is Orchard's home screen — the single view where the state of your
 mint comes together. Instead of querying the mint and reading logs by hand, you
-see keys, balances, and mint info at a glance.
+see keys, balances, health, and mint info at a glance.
 
 ## What it surfaces
 
 - **Balances** — what the mint holds and what's outstanding in ecash.
 - **Keys** — the active keysets your mint issues against.
 - **Mint info** — the public metadata wallets read when they connect.
+- **Health & activity** — whether the mint and the backends it depends on are
+  responding, and operations as they happen.
 
 <Aside type="tip" title="Tend, don't babysit">
   The point of the dashboard is to make the healthy case boring: a quick look
   tells you the mint is fine, and anything that needs attention stands out.
+</Aside>
+
+<Aside type="note" title="Health runs deeper than the mint">
+  A mint is only as healthy as the layers under it. A problem at the
+  [Lightning](/orchard/lightning/) or [Bitcoin](/orchard/bitcoin/) layer shows up as
+  mint trouble — keep those backends in view too.
 </Aside>
 
 <Aside type="caution" title="A guided tour is on the way">
@@ -30,8 +38,8 @@ see keys, balances, and mint info at a glance.
 
 <CardGrid>
   <LinkCard
-    title="Monitoring & Health"
-    href="/orchard/monitoring/"
-    description="Go beyond a glance — keep watch on activity and health over time."
+    title="Bitcoin"
+    href="/orchard/bitcoin/"
+    description="Watch the Bitcoin node behind your mint — sync, chain height, and health."
   />
 </CardGrid>

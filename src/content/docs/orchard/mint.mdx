@@ -1,15 +1,40 @@
 ---
-title: Backup & Restore
-description: Back up and restore your Cashu mint's database from Orchard — the dashboard half of the seed-plus-database recovery that brings a mint back after hardware loss.
+title: Mint
+description: Operate the Cashu mint itself from Orchard — its public info, keysets, configuration, and database backup and restore, all from the dashboard.
 ---
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+The Mint view is where you operate the Cashu mint at the center of your stack: the public
+face wallets see, the keys it issues against, how it behaves, and the database that holds
+its state. It's the part of Orchard you'll reach for when the question is about the mint
+itself rather than the layers under it.
+
+## What you'll find
+
+- **Mint information** — the public metadata wallets read when they connect.
+- **Keysets** — the active keys your mint issues ecash against.
+- **Configuration** — fees, limits, and behavior that shape how the mint operates.
+- **Backup and restore** — keep a current copy of the mint database, and load it back when you need to.
+
+## Mint information
+
+The metadata wallets read when they connect to your mint — its public face. Typically:
+
+- **Name and description** — how your mint introduces itself.
+- **Contact details** — how users reach you.
+- **Icon and message of the day** — the finishing touches a wallet can display.
+
+Keep it accurate: this is what a wallet shows someone before they trust your mint. If you
+set these in the mint's own config at setup, Orchard lets you manage them here instead.
+
+## Backup and restore
 
 A mint's state lives in its database: the keysets it has issued and the ecash still
 outstanding against it. Orchard backs that database up from the dashboard, so keeping a
 current copy does not mean dropping to the command line.
 
-## The recovery model
+### The recovery model
 
 A mint is restored from two things together:
 
@@ -23,13 +48,13 @@ A mint is restored from two things together:
 With both, a mint lost to a dead disk comes back fully operational, with the same
 keysets and the same outstanding ecash. With only one, it does not.
 
-## Backing up
+### Backing up
 
 Orchard exports a backup of the mint database from the dashboard. Take one on a schedule
 so the copy never lags far behind the live mint, and store it off the machine, separate
 from your seed backup.
 
-## Restoring
+### Restoring
 
 Restoring loads a saved database backup back into a mint. Pair it with the **same seed**
 the mint was created with, and the mint returns to the state captured in that backup.
@@ -47,13 +72,8 @@ the mint was created with, and the mint returns to the state captured in that ba
 
 <CardGrid>
   <LinkCard
-    title="Monitoring & Health"
-    href="/orchard/monitoring/"
-    description="Stay informed — activity and health surfaced where you already are."
-  />
-  <LinkCard
-    title="The Dashboard"
-    href="/orchard/dashboard/"
-    description="Operate your mint — keys, balances, and mint info from a single view."
+    title="AI"
+    href="/orchard/ai/"
+    description="Orchard's built-in assistant — ask about your mint and let it help you operate."
   />
 </CardGrid>

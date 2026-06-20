@@ -1,0 +1,39 @@
+---
+title: Bitcoin
+description: Keep an eye on the Bitcoin node behind your mint from Orchard — sync status, chain height, and the health Orchard reads straight from your node.
+---
+
+import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+Every mint sits on top of a Bitcoin node, and Orchard surfaces that node so you don't
+have to drop to the command line to check on it. The Bitcoin view tells you whether the
+base layer under your mint is healthy and current.
+
+## What it surfaces
+
+- **Sync status** — whether the node is caught up to the chain tip or still catching up.
+- **Chain height** — the block the node is currently at.
+- **Health** — whether the node is reachable and responding to Orchard.
+
+<Aside type="note" title="Connecting your node">
+  Which Bitcoin node Orchard talks to, and how, is set at install time with environment
+  variables — see [Installation & Configuration](/install/configuration/). This page is
+  about watching it once it's connected.
+</Aside>
+
+<Aside type="caution" title="A field-by-field tour is on the way">
+  Orchard is under active development, and the Bitcoin view is still settling, so the
+  detailed walkthrough lands here as it stabilizes. The
+  [Orchard repository](https://github.com/cashubtc/orchard) has the source code in the
+  meantime.
+</Aside>
+
+## Next
+
+<CardGrid>
+  <LinkCard
+    title="Lightning"
+    href="/orchard/lightning/"
+    description="Watch the Lightning node that settles your ecash — balances and connectivity."
+  />
+</CardGrid>

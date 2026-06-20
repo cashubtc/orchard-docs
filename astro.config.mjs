@@ -51,7 +51,13 @@ export default defineConfig({
     '/install/lightning': '/install/configuration',
     '/install/taproot-assets': '/install/configuration',
     '/install/mint': '/install/configuration',
-    '/install/ai': '/orchard',
+    '/install/ai': '/orchard/ai',
+    // "Your Orchard" was reorganized to mirror the app's own navigation. The
+    // standalone Monitoring and Configuration pages were retired: health/activity
+    // now lives on the Dashboard, and mint metadata/config (plus database backup)
+    // folded into the Mint page. Redirect the deployed URLs so they don't 404.
+    '/orchard/monitoring': '/orchard/dashboard',
+    '/orchard/configuration': '/orchard/mint',
   },
   integrations: [
     starlight({
@@ -86,9 +92,9 @@ export default defineConfig({
               paths: ['install', 'install/**'],
             },
             {
-              label: 'Using Orchard',
+              label: 'Your Orchard',
               description:
-                'Operate Orchard day to day: the dashboard, monitoring & health, configuration, and database backup and restore.',
+                'Operate Orchard day to day: set up the instance, settings, crew, the change log, the dashboard, the Bitcoin/Lightning/Mint service views (including mint database backup and restore), and the built-in AI assistant.',
               paths: ['orchard', 'orchard/**'],
             },
           ],
@@ -149,13 +155,18 @@ export default defineConfig({
           ],
         },
         {
-          label: 'Using Orchard',
+          label: 'Your Orchard',
           items: [
-            { label: 'Using Orchard', slug: 'orchard' },
-            { label: 'The Dashboard', slug: 'orchard/dashboard' },
-            { label: 'Monitoring & Health', slug: 'orchard/monitoring' },
-            { label: 'Configuration', slug: 'orchard/configuration' },
-            { label: 'Backup & Restore', slug: 'orchard/backups' },
+            { label: 'Your Orchard', slug: 'orchard' },
+            { label: 'Setup', slug: 'orchard/setup' },
+            { label: 'Settings', slug: 'orchard/settings' },
+            { label: 'Crew', slug: 'orchard/crew' },
+            { label: 'Change Log', slug: 'orchard/changelog' },
+            { label: 'Dashboard', slug: 'orchard/dashboard' },
+            { label: 'Bitcoin', slug: 'orchard/bitcoin' },
+            { label: 'Lightning', slug: 'orchard/lightning' },
+            { label: 'Mint', slug: 'orchard/mint' },
+            { label: 'AI', slug: 'orchard/ai' },
           ],
         },
       ],

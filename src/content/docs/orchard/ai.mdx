@@ -1,0 +1,38 @@
+---
+title: AI
+description: Orchard's built-in AI assistant — ask about your mint in plain language and let it help you operate, right from the dashboard.
+---
+
+import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+Orchard ships with a built-in AI assistant: a chat panel that understands your mint and
+can answer questions about it in plain language. Instead of hunting across views, you can
+ask what's going on and let the assistant pull the answer together.
+
+## What it does
+
+- **Answer questions** — ask about balances, keysets, health, and recent activity.
+- **Help you operate** — surface the right view or action for what you're trying to do.
+
+<Aside type="note" title="Bring your own model">
+  The assistant talks to a model provider you configure — that lives in
+  [Settings](/orchard/settings/). Until a provider and model are set, the assistant
+  stays out of your way.
+</Aside>
+
+<Aside type="caution" title="The assistant is still evolving">
+  Orchard is under active development, and what the assistant can see and do is still
+  expanding, so the specifics land here as they stabilize. The
+  [Orchard repository](https://github.com/cashubtc/orchard) has the source code in the
+  meantime.
+</Aside>
+
+## Next
+
+<CardGrid>
+  <LinkCard
+    title="Back to Your Orchard"
+    href="/orchard/"
+    description="Revisit setup, the dashboard, your services, and settings at a glance."
+  />
+</CardGrid>

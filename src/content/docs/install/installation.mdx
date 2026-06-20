@@ -48,7 +48,7 @@ nano .env
 
 At minimum set `SETUP_KEY`; everything else has a sensible default or is optional.
 The [Configuration](/install/configuration/) page walks through every option,
-including how to point Orchard at your Bitcoin, Lightning, and mint services.
+including how to point Orchard at your Bitcoin, Lightning, and Cashu mint services.
 
 ## Install
 
@@ -81,24 +81,15 @@ including how to point Orchard at your Bitcoin, Lightning, and mint services.
     docker compose -f docker-compose.yml -f compose.image.yml up -d
     ```
 
-    The image defaults to `latest`. Pin a release by setting `VERSION` in `.env`
-    (or inline), for example <code>VERSION={latestVersion}</code>.
+    The image defaults to `latest`. Pin a release by setting `VERSION` in `.env`,
+    or prefix it onto the command:
+
+    <Code
+      lang="bash"
+      code={`VERSION=${latestVersion} docker compose -f docker-compose.yml -f compose.image.yml up -d`}
+    />
   </TabItem>
 </Tabs>
-
-<Aside type="note" title="Docker rewrites localhost for you">
-  Inside a container, `localhost` no longer means the host machine. Orchard runs
-  with `DOCKER_ENV=true` in Docker and automatically rewrites `localhost` and
-  `127.0.0.1` in your host and URL settings to `host.docker.internal`, so you can
-  keep using `localhost` in `.env`.
-</Aside>
-
-<Aside type="note" title="Pointing Docker at your mint database">
-  Orchard reads the mint's database directly. In Docker, give it access in `.env`:
-  set `MINT_DATABASE` to a Postgres URL, or for SQLite set `MINT_DATANAME` (the
-  database filename) and `MINT_DATADIR` (the host directory that holds it) so the
-  file is mounted into the container.
-</Aside>
 
 ## Updating
 
@@ -116,17 +107,3 @@ npm run start`}
 For Docker, check out the new tag and rebuild (`docker compose build && docker
 compose up -d`), or bump `VERSION` and re-up when running the registry image.
 
-## Next
-
-<CardGrid>
-  <LinkCard
-    title="Next: Configuration"
-    href="/install/configuration/"
-    description="Set SETUP_KEY and point Orchard at your Bitcoin, Lightning, and mint services."
-  />
-  <LinkCard
-    title="Orchard on GitHub"
-    href="https://github.com/cashubtc/orchard"
-    description="The source code, releases, and issue tracker for the project."
-  />
-</CardGrid>

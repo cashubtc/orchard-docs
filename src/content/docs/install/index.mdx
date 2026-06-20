@@ -5,11 +5,11 @@ description: Install Orchard and point it at the services it manages — Bitcoin
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-Get Orchard running on a box you control, then point it at the services you operate.
+Get Orchard running on your machine of choice, then point it at the services you operate.
 Orchard *manages* a mint rather than replacing one, so this section is two steps:
 **install** the app, then **configure** it to reach each piece — whether you just
 built the stack with [New Mint](/new-mint/) or already run your own Bitcoin,
-Lightning, and mint.
+Lightning, or Cashu mint.
 
 <CardGrid>
   <LinkCard
@@ -21,25 +21,5 @@ Lightning, and mint.
     title="Configuration"
     href="/install/configuration/"
     description="Every .env option — core settings, plus connecting Bitcoin, Lightning, and your mint."
-  />
-</CardGrid>
-
-<Aside type="tip" title="Already have a stack?">
-  If your Bitcoin, Lightning, and mint are already running, you only need these two
-  pages: install the app, then set the matching service variables in `.env`.
-</Aside>
-
-## After install
-
-<CardGrid>
-  <LinkCard
-    title="Then: Using Orchard"
-    href="/orchard/"
-    description="Once Orchard is installed and configured, operate your mint from the dashboard."
-  />
-  <LinkCard
-    title="Starting from scratch?"
-    href="/new-mint/"
-    description="The New Mint walkthrough stands up Bitcoin, Lightning, and your mint first."
   />
 </CardGrid>

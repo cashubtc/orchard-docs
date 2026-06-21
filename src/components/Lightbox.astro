@@ -1,0 +1,72 @@
+---
+import type { Props } from '@astrojs/starlight/props';
+import Default from '@astrojs/starlight/components/Footer.astro';
+
+// Wired as Starlight's `Footer` override (astro.config.mjs) so this renders once
+// on every page — a single shared <dialog> that any `.screenshot` figure expands
+// into. The default Footer is re-rendered untouched; we just append the modal and
+// the script that wires up the clickable screenshots. Styling for both the
+// hover affordance and the dialog lives next to the `.screenshot` rules in
+// src/styles/orchard.css. Uses a native <dialog> for free focus-trapping,
+// Escape-to-close, and backdrop — no library, stays static and lean.
+---
+
+<Default {...Astro.props} />
+
+<dialog class="lightbox" aria-label="Expanded screenshot">
+  <button type="button" class="lightbox__close" aria-label="Close (Esc)">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M18 6 6 18M6 6l12 12" />
+    </svg>
+  </button>
+  <figure class="lightbox__figure">
+    <img class="lightbox__img" alt="" />
+    <figcaption class="lightbox__caption" hidden></figcaption>
+  </figure>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('.lightbox');
+  const shots = document.querySelectorAll<HTMLImageElement>('.sl-markdown-content .screenshot img');
+
+  if (dialog && shots.length) {
+    const img = dialog.querySelector<HTMLImageElement>('.lightbox__img')!;
+    const caption = dialog.querySelector<HTMLElement>('.lightbox__caption')!;
+    const closeBtn = dialog.querySelector<HTMLButtonElement>('.lightbox__close')!;
+    let trigger: HTMLElement | null = null;
+
+    const open = (source: HTMLImageElement, captionText: string) => {
+      img.src = source.currentSrc || source.src;
+      img.alt = source.alt;
+      caption.textContent = captionText;
+      caption.hidden = captionText === '';
+      trigger = source;
+      dialog.showModal();
+    };
+
+    for (const shot of shots) {
+      const captionText = shot.closest('figure')?.querySelector('figcaption')?.textContent?.trim() ?? '';
+      shot.setAttribute('role', 'button');
+      shot.setAttribute('tabindex', '0');
+      shot.setAttribute('aria-label', `Expand image${shot.alt ? `: ${shot.alt}` : ''}`);
+      shot.addEventListener('click', () => open(shot, captionText));
+      shot.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          open(shot, captionText);
+        }
+      });
+    }
+
+    closeBtn.addEventListener('click', () => dialog.close());
+    // Click on the dialog's own backdrop area (not the image/caption/button) closes it.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    // Return focus to the screenshot that opened the lightbox (Escape included).
+    dialog.addEventListener('close', () => {
+      trigger?.focus();
+      trigger = null;
+    });
+  }
+</script>

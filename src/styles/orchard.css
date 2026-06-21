@@ -291,13 +291,16 @@
 }
 .sl-markdown-content .screenshot p {
   margin: 0;
+  position: relative;
 }
 .sl-markdown-content .screenshot img {
   display: block;
   width: 100%;
   height: auto;
   margin: 0;
-  border: 1px solid var(--sl-color-hairline, var(--sl-color-gray-5));
+  /* Dashed hairline frame: reads as a wireframe/under-construction placeholder,
+   * reinforcing that the docs are an active build. */
+  border: 1px dashed var(--sl-color-hairline, var(--sl-color-gray-5));
   border-radius: 0.75rem;
 }
 .sl-markdown-content .screenshot figcaption {
@@ -305,4 +308,154 @@
   text-align: center;
   font-size: var(--sl-text-sm);
   color: var(--sl-color-gray-3);
+}
+
+/* Click-to-expand affordance. Each screenshot opens the shared lightbox <dialog>
+ * (wired in src/components/Lightbox.astro). The image gains the zoom cursor; on
+ * pointer hover the dashed frame itself brightens to accent — a single line, in
+ * place — and on keyboard focus a single dashed accent ring appears, offset from
+ * the frame. A magnifier badge fades in for both. Keyed off :focus-visible rather
+ * than :focus-within so that focus returned to the trigger after the lightbox
+ * closes (a pointer-driven flow) doesn't leave the figure stuck in its active
+ * state. */
+.sl-markdown-content .screenshot img {
+  cursor: zoom-in;
+  transition:
+    filter 0.2s ease,
+    border-color 0.2s ease;
+}
+.sl-markdown-content .screenshot p:hover img {
+  filter: brightness(1.04);
+  border-color: var(--sl-color-accent);
+}
+.sl-markdown-content .screenshot img:focus-visible {
+  filter: brightness(1.04);
+  outline: 1px dashed var(--sl-color-accent);
+  outline-offset: 4px;
+}
+/* Magnifier badge, top-right of the frame; fades in with the hover/focus state. */
+.sl-markdown-content .screenshot p::after {
+  content: '';
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 1.1rem;
+  opacity: 0;
+  transform: translateY(-0.15rem);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  pointer-events: none;
+}
+.sl-markdown-content .screenshot p:hover::after,
+.sl-markdown-content .screenshot p:has(img:focus-visible)::after {
+  opacity: 1;
+  transform: none;
+}
+
+/* Lightbox — the modal a screenshot expands into. Native <dialog> fills the
+ * viewport with a dark, blurred backdrop and centres the enlarged image; close
+ * via the corner button, Escape, or a click on the surrounding backdrop. */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: none;
+  background: rgba(0, 0, 0, 0.82);
+  align-items: center;
+  justify-content: center;
+}
+.lightbox[open] {
+  display: flex;
+}
+.lightbox::backdrop {
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(2px);
+}
+.lightbox__figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 100%;
+  max-height: 100%;
+}
+.lightbox__img {
+  display: block;
+  max-width: 100%;
+  max-height: 85dvh;
+  width: auto;
+  height: auto;
+  /* Dashed frame matches the in-page figures so the expanded view stays on the
+   * same wireframe footing. */
+  border: 1px dashed var(--sl-color-hairline, var(--sl-color-gray-5));
+  border-radius: 0.75rem;
+  background: var(--sl-color-bg);
+}
+.lightbox__caption {
+  margin: 0;
+  max-width: 48rem;
+  text-align: center;
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-2);
+}
+.lightbox__close {
+  position: absolute;
+  top: clamp(0.75rem, 3vw, 1.5rem);
+  right: clamp(0.75rem, 3vw, 1.5rem);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--sl-color-white) 30%, transparent);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: var(--sl-color-white);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+.lightbox__close:hover {
+  border-color: var(--sl-color-white);
+  background: rgba(0, 0, 0, 0.75);
+}
+.lightbox__close:focus-visible {
+  outline: 2px solid var(--sl-color-accent);
+  outline-offset: 2px;
+}
+/* Gentle fade-in; suppressed for reduced-motion. */
+.lightbox[open],
+.lightbox[open]::backdrop {
+  animation: lightbox-in 0.2s ease;
+}
+@keyframes lightbox-in {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sl-markdown-content .screenshot img,
+  .sl-markdown-content .screenshot p::after {
+    transition: none;
+  }
+  .lightbox[open],
+  .lightbox[open]::backdrop {
+    animation: none;
+  }
 }

@@ -120,6 +120,9 @@ export default defineConfig({
         // Adds a <link rel="alternate" type="text/markdown"> per page pointing at
         // its `<slug>.md` variant, so agents can auto-discover the raw Markdown.
         Head: './src/components/Head.astro',
+        // Re-renders the default Footer and appends a shared lightbox <dialog>
+        // so `.screenshot` figures expand on click. (Footer renders once per page.)
+        Footer: './src/components/Lightbox.astro',
       },
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/cashubtc/orchard' },

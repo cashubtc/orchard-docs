@@ -279,6 +279,130 @@
   }
 }
 
+/* ---------------------------------------------------------------------------
+ * Footer colophon — a tarot-style page marker closing every page (rendered by
+ * the Footer override, src/components/Lightbox.astro). A tapered hairline rule,
+ * then the section + page name set in an oval flanked by sunburst "shine" rays
+ * — echoing an occult book's page mark (suit · card) — with the last-updated
+ * stamp beneath. Kept deliberately recessive so it reads as a quiet page anchor
+ * and never competes with content: the decorative ink (--colophon-ink) is a
+ * muted warm gray carrying only a faint ember tint, and the text sits on the
+ * muted gray tier — held there because gray-3 is the AA contrast floor on the
+ * dark background; dimmer would drop the label below legibility.
+ * ------------------------------------------------------------------------- */
+
+/* Relocate the stamp: the default footer's last-updated row is hidden here
+ * because its date is re-rendered inside the colophon. No editLink is
+ * configured, so this row is last-updated only; if one is added later, re-home
+ * the link rather than hiding the whole row. */
+footer .meta {
+  display: none;
+}
+
+.colophon {
+  --colophon-ink: color-mix(in srgb, var(--sl-color-accent) 18%, var(--sl-color-gray-4));
+  margin-top: 3rem;
+  text-align: center;
+}
+/* The same hairline Starlight draws between the page title and body (the
+ * .content-panel divider, 1px var(--sl-color-hairline)), reused here to part
+ * the body from the footer — and bled out to the full panel width so it touches
+ * the nav on both sides, exactly like that divider.
+ *
+ * That divider is a border on the full-width .content-panel; this rule instead
+ * lives inside the max-width, sometimes-offset content container, so it has to
+ * break out by the panel padding PLUS whatever the container's max-width and
+ * alignment leave over. We make the panel an inline-size container (`:has` keeps
+ * it scoped to the one panel that holds the colophon — Starlight ships no
+ * container queries of its own, so nothing collides), then measure:
+ *   100cqi → the panel's inner width;  100% → this rule's own container width.
+ * Their difference is the leftover to absorb. Starlight aligns the content
+ * column three different ways, so the leftover lands differently in each: */
+.content-panel:has(.colophon) {
+  container-type: inline-size;
+}
+.colophon__rule {
+  height: 1px;
+  border: 0;
+  margin-block: 0 1.75rem;
+  background: var(--sl-color-hairline);
+  /* A — narrow / single column: content is left-aligned and fills the panel,
+     so any max-width leftover sits on the right. */
+  margin-left: calc(-1 * var(--sl-content-pad-x));
+  margin-right: calc(100% - 100cqi - var(--sl-content-pad-x));
+}
+@media (min-width: 72rem) {
+  /* C — wide default: Starlight centres the content column. */
+  .colophon__rule {
+    margin-inline: calc((100% - 100cqi) / 2 - var(--sl-content-pad-x));
+  }
+  /* B — wide with both the nav sidebar and a TOC: content is pushed flush-right
+     (Starlight's --sl-content-margin-inline: auto 0), so the leftover is on the
+     left. Mirrors Starlight's own [data-has-sidebar][data-has-toc] condition. */
+  :root[data-has-sidebar][data-has-toc] .colophon__rule {
+    margin-left: calc(100% - 100cqi - var(--sl-content-pad-x));
+    margin-right: calc(-1 * var(--sl-content-pad-x));
+  }
+}
+.colophon__marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  margin: 0;
+}
+.colophon__rays {
+  flex: none;
+  width: 40px;
+  height: auto;
+  stroke: var(--colophon-ink);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+.colophon__rays--flip {
+  transform: scaleX(-1);
+}
+/* The oval (a stadium border) holding "Section ◦ Page" in the nav's own casing —
+ * the colophon's single focal flourish. */
+.colophon__oval {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.4rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--colophon-ink) 72%, transparent);
+  border-radius: 999px;
+  font-size: var(--sl-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--sl-color-gray-3);
+  white-space: nowrap;
+}
+/* The separator between section and page — a little ring, per the brief. */
+.colophon__sep {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border: 1px solid var(--colophon-ink);
+  border-radius: 50%;
+}
+.colophon__stamp {
+  margin: 1rem 0 0;
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-3);
+}
+
+/* Narrow viewports: tighten the marker so a longer "section · page" still fits
+ * on one line beside its rays. */
+@media (max-width: 30rem) {
+  .colophon__oval {
+    padding: 0.35rem 0.85rem;
+    letter-spacing: 0.12em;
+  }
+  .colophon__rays {
+    width: 30px;
+  }
+}
+
 /* Screenshots — UI captures dropped into the body. A raw markdown image renders
  * edge-to-edge and dominates the column; this contains it: centred, width-capped,
  * with a hairline frame and rounded corners (matching the panel radius) so it

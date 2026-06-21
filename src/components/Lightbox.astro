@@ -1,17 +1,81 @@
 ---
-import type { Props } from '@astrojs/starlight/props';
 import Default from '@astrojs/starlight/components/Footer.astro';
 
 // Wired as Starlight's `Footer` override (astro.config.mjs) so this renders once
-// on every page — a single shared <dialog> that any `.screenshot` figure expands
-// into. The default Footer is re-rendered untouched; we just append the modal and
-// the script that wires up the clickable screenshots. Styling for both the
-// hover affordance and the dialog lives next to the `.screenshot` rules in
-// src/styles/orchard.css. Uses a native <dialog> for free focus-trapping,
-// Escape-to-close, and backdrop — no library, stays static and lean.
+// on every page. Two jobs:
+//  1. A decorative "colophon" page marker — a tarot-style oval reading
+//     "Section · Page" with sunburst shine rays, plus the last-updated stamp.
+//  2. A single shared lightbox <dialog> that any `.screenshot` figure expands
+//     into (the script below wires up the clickable screenshots).
+// The default Footer is re-rendered untouched (pagination etc.); its own
+// last-updated row is hidden in src/styles/orchard.css since the stamp is
+// relocated into the colophon. Styling for the colophon, the screenshot hover
+// affordance, and the dialog all live in src/styles/orchard.css. The dialog is
+// a native <dialog> for free focus-trapping, Escape-to-close, and backdrop —
+// no library, stays static and lean.
+
+const { t } = Astro.locals;
+const { sidebar, entry, lastUpdated, lang } = Astro.locals.starlightRoute;
+
+// The marker mirrors the sidebar nav. The page name is the current entry's nav
+// label (not the page's H1/frontmatter title); the section is the top-level
+// group that entry sits in (e.g. "Your Orchard"). Top-level links like Overview
+// belong to no group, so section stays undefined and the marker shows just the
+// page name. Falls back to the page title if the page isn't listed in the nav.
+const containsCurrent = (item) =>
+  item.type === 'link' ? item.isCurrent : item.entries.some(containsCurrent);
+const findCurrent = (items) => {
+  for (const item of items) {
+    const found = item.type === 'link' ? (item.isCurrent ? item : undefined) : findCurrent(item.entries);
+    if (found) return found;
+  }
+};
+const section = sidebar.find((item) => item.type === 'group' && containsCurrent(item))?.label;
+const pageName = findCurrent(sidebar)?.label ?? entry.data.title;
+
+const stamp = lastUpdated?.toLocaleDateString(lang, { dateStyle: 'medium', timeZone: 'UTC' });
 ---
 
-<Default {...Astro.props} />
+<Default />
+
+<div class="colophon">
+  <hr class="colophon__rule" />
+  <p class="colophon__marker">
+    {/* Sunburst "shine" rays flanking the oval — five thin lines radiating from
+        the oval's centre (off-frame right), so their inner ends share a
+        concentric arc that hugs the oval's curve; cascading lengths keep the
+        middle longest, tapering top and bottom. Mirrored on the right. */}
+    <svg class="colophon__rays" width="48" height="44" viewBox="0 0 48 44" fill="none" aria-hidden="true">
+      <path d="M43.3 8.9 29.2 1.3" />
+      <path d="M40.8 15.2 13.7 8.5" />
+      <path d="M40 22 4 22" />
+      <path d="M40.8 28.8 13.7 35.5" />
+      <path d="M43.3 35.1 29.2 42.7" />
+    </svg>
+    <span class="colophon__oval">
+      {section && (
+        <>
+          <span class="colophon__section">{section}</span>
+          <span class="colophon__sep" aria-hidden="true"></span>
+        </>
+      )}
+      <span class="colophon__page">{pageName}</span>
+    </span>
+    <svg class="colophon__rays colophon__rays--flip" width="48" height="44" viewBox="0 0 48 44" fill="none" aria-hidden="true">
+      <path d="M43.3 8.9 29.2 1.3" />
+      <path d="M40.8 15.2 13.7 8.5" />
+      <path d="M40 22 4 22" />
+      <path d="M40.8 28.8 13.7 35.5" />
+      <path d="M43.3 35.1 29.2 42.7" />
+    </svg>
+  </p>
+  {stamp && (
+    <p class="colophon__stamp">
+      {t('page.lastUpdated')}{' '}
+      <time datetime={lastUpdated!.toISOString()}>{stamp}</time>
+    </p>
+  )}
+</div>
 
 <dialog class="lightbox" aria-label="Expanded screenshot">
   <button type="button" class="lightbox__close" aria-label="Close (Esc)">

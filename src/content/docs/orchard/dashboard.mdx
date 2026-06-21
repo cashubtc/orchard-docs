@@ -1,45 +1,52 @@
 ---
 title: Dashboard
-description: Operate your Cashu mint from Orchard's dashboard — keys, balances, health, and mint info in one view, so the day-to-day is a glance instead of a terminal session.
+description: Operate your Cashu mint from Orchard's dashboard — a summary of Bitcoin, Lightning, and the mint side by side, so the day-to-day is a glance instead of a terminal session.
 ---
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-The dashboard is Orchard's home screen — the single view where the state of your
-mint comes together. Instead of querying the mint and reading logs by hand, you
-see keys, balances, health, and mint info at a glance.
+The dashboard is Orchard's home screen — the single view where the state of your mint comes
+together. Instead of querying each service by hand, you see Bitcoin, Lightning, and the mint
+summarised one below the other, each block appearing once that service is configured.
 
-## What it surfaces
+<figure class="screenshot">
 
-- **Balances** — what the mint holds and what's outstanding in ecash.
-- **Keys** — the active keysets your mint issues against.
-- **Mint info** — the public metadata wallets read when they connect.
-- **Health & activity** — whether the mint and the backends it depends on are
-  responding, and operations as they happen.
+![Orchard's dashboard stacking a summary of each service. The Bitcoin section shows an Info card with the node online, peer count, a block height of 954,732, and chain weight, beside a Hot Wallet balance and live mempool fee rates. The Lightning section shows an Info card for the node "bob" — the mint backend, online — beside a Channel Summary with total capacity split into local and remote.](../../../assets/your-orchard-dashboard.png)
+
+<figcaption>Every service, summarised in one place — open any one for the full view.</figcaption>
+
+</figure>
 
 <Aside type="tip" title="Tend, don't babysit">
-  The point of the dashboard is to make the healthy case boring: a quick look
-  tells you the mint is fine, and anything that needs attention stands out.
+  The point of the dashboard is to make the healthy case boring: a quick look tells you the
+  mint is fine, and anything that needs attention stands out.
 </Aside>
+
+## Bitcoin
+
+An **Info** card covers the node — online status, connected peers, block height, and chain
+weight — and a **Hot Wallet** card shows the on-chain balance backing your mint, with live
+mempool fee rates alongside. Open it for the full [Bitcoin view](/orchard/bitcoin/).
+
+## Lightning
+
+An **Info** card shows the node, its online status, peers, and open channels, and a
+**Channel Summary** totals your capacity and splits it into local and remote. Open it for
+the full [Lightning view](/orchard/lightning/).
+
+## Mint
+
+An **Info** card shows the mint name, status, and description; an **Activity** card tracks
+operations and volume over a day, week, month, or year — mints, melts, and swaps, with
+completion rates; and a **Balance Sheet** weighs assets against liabilities per unit, with
+liability coverage and fee revenue. Open it for the full [Mint view](/orchard/mint/).
+
+## Ecash
+
+Ecash has a reserved spot on the dashboard — a wallet view is coming soon.
 
 <Aside type="note" title="Health runs deeper than the mint">
   A mint is only as healthy as the layers under it. A problem at the
-  [Lightning](/orchard/lightning/) or [Bitcoin](/orchard/bitcoin/) layer shows up as
-  mint trouble — keep those backends in view too.
+  [Lightning](/orchard/lightning/) or [Bitcoin](/orchard/bitcoin/) layer shows up as mint
+  trouble — keep those backends in view too.
 </Aside>
-
-<Aside type="caution" title="A guided tour is on the way">
-  Screenshots and a field-by-field walkthrough land here as the interface settles.
-  The [Orchard repository](https://github.com/cashubtc/orchard) has the source code
-  in the meantime.
-</Aside>
-
-## Next
-
-<CardGrid>
-  <LinkCard
-    title="Bitcoin"
-    href="/orchard/bitcoin/"
-    description="Watch the Bitcoin node behind your mint — sync, chain height, and health."
-  />
-</CardGrid>

@@ -1,79 +1,82 @@
 ---
 title: Mint
-description: Operate the Cashu mint itself from Orchard — its public info, keysets, configuration, and database backup and restore, all from the dashboard.
+description: Operate the Cashu mint itself from Orchard — its dashboard, public info, configuration, keysets, and database backup and restore, across five tabs.
 ---
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 The Mint view is where you operate the Cashu mint at the center of your stack: the public
 face wallets see, the keys it issues against, how it behaves, and the database that holds
-its state. It's the part of Orchard you'll reach for when the question is about the mint
-itself rather than the layers under it.
+its state. It's organised into five tabs — **Dashboard**, **Info**, **Config**, **Keysets**,
+and **Database**.
 
-## What you'll find
+<figure class="screenshot">
 
-- **Mint information** — the public metadata wallets read when they connect.
-- **Keysets** — the active keys your mint issues ecash against.
-- **Configuration** — fees, limits, and behavior that shape how the mint operates.
-- **Backup and restore** — keep a current copy of the mint database, and load it back when you need to.
+![Orchard's Mint view on the Info tab, beside Dashboard, Config, Keysets, and Database tabs, for "Demo Dayz Mint". Editable fields show the mint's name, description, icon URL, and a long description, alongside connection URLs, contact methods for X and Nostr, and a Message of the Day.](../../../assets/your-orchard-mint.png)
 
-## Mint information
+<figcaption>The Mint view — here on the Info tab, the public face wallets see.</figcaption>
 
-The metadata wallets read when they connect to your mint — its public face. Typically:
+</figure>
 
-- **Name and description** — how your mint introduces itself.
-- **Contact details** — how users reach you.
-- **Icon and message of the day** — the finishing touches a wallet can display.
+## Dashboard
 
-Keep it accurate: this is what a wallet shows someone before they trust your mint. If you
-set these in the mint's own config at setup, Orchard lets you manage them here instead.
+The mint's overview, read-only: cards for its info, supported nuts and limits, keysets, and
+an **Activity** panel tracking operations and volume — mints, melts, and swaps over a day,
+week, month, or year — plus a **Balance Sheet**. Below them, deeper "Nutalytics" charts plot
+balances, mints, melts, swaps, fee revenue, and ecash counts across a date range you choose.
 
-## Backup and restore
+## Info
 
-A mint's state lives in its database: the keysets it has issued and the ecash still
-outstanding against it. Orchard backs that database up from the dashboard, so keeping a
-current copy does not mean dropping to the command line.
+The public metadata wallets read when they connect — edited here rather than in the mint's
+own config:
+
+- **Name**, **description**, and a longer **description**.
+- **Icon** — the image a wallet displays for your mint.
+- **Connection URLs** — where wallets reach the mint.
+- **Contacts** — how users get in touch (email, X, Nostr, and so on).
+- **Message of the Day** — a short broadcast note.
+
+Keep it accurate: this is what a wallet shows someone before they trust your mint.
+
+## Config
+
+How the mint behaves:
+
+- **Minting (NUT-04)** and **Melting (NUT-05)** — switch each on or off, set the per-unit
+  minimum and maximum amounts for BOLT11 and BOLT12, and the quote expiry (TTL).
+- **Supported nuts** — a reference list of the rest of the protocol features your mint
+  supports (token state checks, fee return, signature restore, P2PK, HTLCs, and more); some
+  are toggled here, others are set in the mint's own config file.
+
+## Keysets
+
+The keys your mint issues ecash against. The table lists every keyset — its ID, unit,
+active state, fee rate (ppk), balance, fee revenue, and proof and promise counts — with a
+chart of activity over time. Run a **keyset rotation** to start issuing against fresh keys,
+choosing the unit, input fee, and amounts.
+
+## Database
+
+Back up and restore the mint database straight from the dashboard, so keeping a current copy
+doesn't mean dropping to the command line:
+
+- **Create Backup** downloads a copy of the database.
+- **Restore Backup** loads one back in — shut the mint down first, match the backup to the
+  mint's version, restore, then start it again.
+
+The same screen also browses the underlying mint, melt, and swap records, filterable by
+date, unit, and state.
 
 ### The recovery model
 
 A mint is restored from two things together:
 
-- **The seed phrase**, which derives the mint's signing keys. It never changes, so you
-  back it up once, offline. The seed lives in the mint daemon's config, not its
-  database, so Orchard does not hold it: this half stays your responsibility (see the
-  mint's [seed step](/new-mint/mint/#generate-the-mint-seed)).
-- **The database**, which changes every time the mint issues or redeems ecash. This is
-  the half Orchard backs up for you.
+- **The seed phrase**, which derives the mint's signing keys. It never changes, lives in the
+  mint daemon's config rather than its database, and Orchard never holds it — so this half
+  stays your responsibility (see the mint's [seed step](/new-mint/mint/#generate-the-mint-seed)).
+- **The database**, which changes every time the mint issues or redeems ecash — the half
+  Orchard backs up for you.
 
-With both, a mint lost to a dead disk comes back fully operational, with the same
-keysets and the same outstanding ecash. With only one, it does not.
-
-### Backing up
-
-Orchard exports a backup of the mint database from the dashboard. Take one on a schedule
-so the copy never lags far behind the live mint, and store it off the machine, separate
-from your seed backup.
-
-### Restoring
-
-Restoring loads a saved database backup back into a mint. Pair it with the **same seed**
-the mint was created with, and the mint returns to the state captured in that backup.
-
-<Aside type="caution" title="Exact backup and restore steps are on the way">
-  Orchard is under active development, and the in-dashboard backup and restore flow is
-  still settling, so the click-by-click steps land here as it stabilizes. Until then you
-  can back up the database directly with `pg_dump` (see the mint's
-  [Back up the mint](/new-mint/mint/#back-up-the-mint) step). The
-  [Orchard repository](https://github.com/cashubtc/orchard) has the source code in the
-  meantime.
-</Aside>
-
-## Next
-
-<CardGrid>
-  <LinkCard
-    title="AI"
-    href="/orchard/ai/"
-    description="Orchard's built-in assistant — ask about your mint and let it help you operate."
-  />
-</CardGrid>
+With both, a mint lost to a dead disk comes back fully operational, with the same keysets and
+the same outstanding ecash. With only one, it doesn't. Take backups on a schedule and store
+them off the machine, separate from your seed backup.

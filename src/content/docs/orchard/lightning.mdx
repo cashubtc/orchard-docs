@@ -1,6 +1,6 @@
 ---
 title: Lightning
-description: Watch the Lightning node that settles your mint's ecash from Orchard — balances, connectivity, and health, without leaving the dashboard.
+description: Watch the Lightning node that settles your mint's ecash from Orchard. A dedicated Lightning view is on the way; today the home dashboard summarises the node's balances and connectivity.
 ---
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
@@ -9,31 +9,24 @@ Your mint settles real value over Lightning, so the Lightning node is the layer 
 ecash and bitcoin on the wire. Orchard surfaces that node so you can see, at a glance,
 whether your mint can actually pay and get paid.
 
-## What it surfaces
+<figure class="screenshot">
 
-- **Balances** — what's available to send and receive across your channels.
-- **Connectivity** — whether the node is online and reachable by Orchard.
-- **Health** — signals that the node is keeping up with the mint's activity.
+![Orchard's Lightning view for the node "bob", with a single Dashboard tab and a centered lightning-bolt icon above the message "Lightning Dashboard Coming Soon!".](../../../assets/your-orchard-lightning.png)
+
+<figcaption>The dedicated Lightning view — a full node dashboard is on the way.</figcaption>
+
+</figure>
+
+## Dashboard
+
+A dedicated Lightning dashboard is coming soon. In the meantime, the
+[home dashboard](/orchard/dashboard/) already summarises the node: an **Info** card with the
+node alias, online status, connected peers, and open channels, and a **Channel Summary**
+that totals your capacity and splits it into local (what you can send) and remote (what you
+can receive).
 
 <Aside type="note" title="Connecting your node">
   Which Lightning node Orchard talks to, and how, is set at install time with environment
   variables — see [Installation & Configuration](/install/configuration/). This page is
   about watching it once it's connected.
 </Aside>
-
-<Aside type="caution" title="A field-by-field tour is on the way">
-  Orchard is under active development, and the Lightning view is still settling, so the
-  detailed walkthrough lands here as it stabilizes. The
-  [Orchard repository](https://github.com/cashubtc/orchard) has the source code in the
-  meantime.
-</Aside>
-
-## Next
-
-<CardGrid>
-  <LinkCard
-    title="Mint"
-    href="/orchard/mint/"
-    description="Operate the Cashu mint — info, keysets, configuration, and database backup."
-  />
-</CardGrid>

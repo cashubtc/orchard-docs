@@ -1,19 +1,21 @@
 ---
 title: Bitcoin
-description: Keep an eye on the Bitcoin node behind your mint from Orchard — sync status, chain height, and the health Orchard reads straight from your node.
+description: Keep an eye on the Bitcoin node behind your mint from Orchard — and run the sovereign, node-only USD price oracle from the Oracle tab.
 ---
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-Every mint sits on top of a Bitcoin node, and Orchard surfaces that node so you don't
-have to drop to the command line to check on it. The Bitcoin view tells you whether the
-base layer under your mint is healthy and current.
+Every mint sits on top of a Bitcoin node, and Orchard surfaces that node so you don't have
+to drop to the command line to check on it. The Bitcoin view has two tabs — a **Dashboard**
+overview and the **Oracle**, Orchard's sovereign price feed.
 
-## What it surfaces
+<figure class="screenshot">
 
-- **Sync status** — whether the node is caught up to the chain tip or still catching up.
-- **Chain height** — the block the node is currently at.
-- **Health** — whether the node is reachable and responding to Orchard.
+![Orchard's Bitcoin view on the Oracle tab, beside a Dashboard tab, for the node "main". A UTC date-range picker and the latest price of $76,729 sit above a UTXOracle backfill form and a chart plotting USD price history over the past months; a backfill is in progress, reporting 13 successful and 0 failed.](../../../assets/your-orchard-bitcoin.png)
+
+<figcaption>The Oracle tab — a node-only USD price feed you can chart and backfill.</figcaption>
+
+</figure>
 
 <Aside type="note" title="Connecting your node">
   Which Bitcoin node Orchard talks to, and how, is set at install time with environment
@@ -21,19 +23,26 @@ base layer under your mint is healthy and current.
   about watching it once it's connected.
 </Aside>
 
-<Aside type="caution" title="A field-by-field tour is on the way">
-  Orchard is under active development, and the Bitcoin view is still settling, so the
-  detailed walkthrough lands here as it stabilizes. The
-  [Orchard repository](https://github.com/cashubtc/orchard) has the source code in the
-  meantime.
+## Dashboard
+
+A full node overview — info, hot wallet, and a live look at the mempool — is coming soon to
+this tab. In the meantime, the [home dashboard](/orchard/dashboard/) already summarises the
+node: online status, peers, block height, chain weight, the on-chain balance backing your
+mint, and current fee rates.
+
+## Oracle
+
+The Oracle tab is home to the **Sovereign USD Price Oracle** — a US-dollar price for bitcoin
+derived from your own node's on-chain data, using the open-source
+[UTXOracle](https://utxo.live/oracle/) method. No exchange APIs, no third-party feeds,
+nothing that leaks what you're holding.
+
+It shows the **latest price**, a chart of price history across a date range you choose, and
+a **Backfill Prices** control to fill in history for any span back to 2020 — the progress
+panel tracks how many days succeeded or failed as it works.
+
+<Aside type="tip" title="Enable it first">
+  The Oracle tab only appears once you've switched on the oracle under
+  [Settings → Application → Bitcoin](/orchard/settings/#bitcoin). Off by default, it then
+  derives the previous day's price once daily at 00:00 UTC.
 </Aside>
-
-## Next
-
-<CardGrid>
-  <LinkCard
-    title="Lightning"
-    href="/orchard/lightning/"
-    description="Watch the Lightning node that settles your ecash — balances and connectivity."
-  />
-</CardGrid>

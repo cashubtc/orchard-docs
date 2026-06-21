@@ -1,6 +1,6 @@
 ---
 title: Settings
-description: Configure Orchard at runtime — switch on the sovereign Bitcoin price oracle and the AI integration (agents, scheduled jobs, and Telegram messaging), all from the dashboard rather than environment variables.
+description: Tune Orchard while it's running — Application features like the sovereign Bitcoin price oracle and AI agents, Device preferences for theme, currency, and locale, and your own User account, all from the dashboard rather than environment variables.
 ---
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
@@ -10,111 +10,77 @@ variables you set when you [installed it](/install/configuration/). Those define
 Orchard connects to your services; these are the features you switch on and shape from
 inside the dashboard, while it's running.
 
-Settings groups into **Application** preferences that apply to the whole instance,
-**Device** preferences scoped to the browser you're signed in from, and **User**
-preferences for your own account. The features you'll reach for most live under
-Application — covered below.
-
-## Bitcoin
-
-Orchard can put a US-dollar figure next to your balances without asking anyone what
-bitcoin is worth. Under Bitcoin settings, enabling the **Sovereign USD Price Oracle**
-has Orchard derive the price from your own node's on-chain data once a day, at 00:00 UTC —
-no exchange APIs, no third-party price feeds, nothing that leaks what you're holding. It's
-the open-source [UTXOracle](https://utxo.live/oracle/) method, adapted for Orchard.
+Everything is organised under three top-level tabs: **Application** preferences that
+apply to the whole instance, **Device** preferences scoped to the browser you're signed
+in from, and **User** preferences for your own account.
 
 <figure class="screenshot">
 
-![Orchard's Bitcoin settings: a Disabled / Enabled toggle for the Sovereign USD Price Oracle, with the most recent price calculated from the operator's own node.](../../../assets/your-orchard-bitcoin.png)
+![Orchard's Settings page on the Application tab, with top-level tabs for Application, Device, and User. Bitcoin settings show a Disabled / Enabled toggle for the Sovereign USD Price Oracle alongside the latest price derived from the operator's own node, and AI settings show the integration toggle with a choice of Ollama (local) or OpenRouter (cloud) provider and a Connected status.](../../../assets/your-orchard-settings.png)
 
-<figcaption>Bitcoin settings — the sovereign, node-only price oracle.</figcaption>
-
-</figure>
-
-Leave it **Disabled** and amounts stay denominated in bitcoin; switch it to **Enabled**
-and a daily task fills in the previous day's price, with zero trusted third parties.
-
-## AI
-
-Turning on the **AI integration** adds agents to Orchard — in the app and running on your
-server. First you choose where the model runs: **Ollama** for local models on your own
-hardware (point the API endpoint at your Ollama server, keeping everything in-house), or
-**OpenRouter** for cloud routing to hosted models (which needs an API key). The status
-light tells you whether Orchard can reach the provider you picked.
-
-<figure class="screenshot">
-
-![Orchard's AI settings: a Disabled / Enabled toggle, a choice between the Ollama (local) and OpenRouter (cloud) providers, an API endpoint field, and a Connected status indicator.](../../../assets/your-orchard-ai.png)
-
-<figcaption>AI settings — enable the integration and choose a local or cloud provider.</figcaption>
+<figcaption>Settings, organised into Application, Device, and User tabs.</figcaption>
 
 </figure>
 
-### Agents
+## Application
 
-An agent is a named assistant with a model, a description, and a system prompt that sets
-its role and tone. You grant it **tools** — scoped capabilities across Bitcoin, Lightning,
-the mint, and more (the chips show how many it holds in each group) — so it can actually
-answer questions about your stack and act on them, not just chat.
+Application settings apply to the whole instance — every user, every device.
 
-<figure class="screenshot">
+### Bitcoin
 
-![An Orchard AI agent named "Groundskeeper" running on a local model, with a description, a system prompt defining its personality, and a row of tool chips counting its granted capabilities.](../../../assets/your-orchard-ai-agent.png)
+The **Sovereign USD Price Oracle** lives here. Enable it and Orchard derives a US-dollar
+price from your own node's on-chain data once a day, at 00:00 UTC — no exchange APIs, no
+third-party feeds, nothing that leaks what you're holding. It's the open-source
+[UTXOracle](https://utxo.live/oracle/) method, adapted for Orchard. Leave it disabled and
+amounts stay denominated in bitcoin.
 
-<figcaption>An agent: a model, a system prompt, and a scoped set of tools.</figcaption>
+### AI
 
-</figure>
+Turn on the optional AI integration — in the app and running on your server. You pick
+where the model runs (**Ollama** for local models on your own hardware, or **OpenRouter**
+for cloud-hosted models with an API key), then build out the rest:
 
-### Scheduled jobs
+- **Agents** — named assistants, each with a model, a system prompt that sets its role,
+  and a scoped set of **tools** across Bitcoin, Lightning, and the mint, so they can
+  answer questions about your stack and act on it.
+- **Jobs** — an agent paired with a schedule, running unattended and reporting back; for
+  example, a mint-health monitor that runs every morning.
+- **Messaging** — connect a **Telegram** bot so your agents can reach you on your phone,
+  pushing alerts and answering questions wherever you are.
 
-Agents don't have to wait for you to ask. A **job** pairs an agent with a schedule so it
-runs unattended and reports back. The example below — a Mint Health Monitor — checks URL
-availability, Lightning payment failures, and anomalous activity every day at 01:00. Flip
-a job Active or Inactive, and the next run time tells you when it'll fire.
+## Device
 
-<figure class="screenshot">
+Device settings are scoped to the browser you're signed in from, so each device you use
+can display Orchard the way you like without changing anything for anyone else.
 
-![An Orchard scheduled AI job called "Mint Health Monitor" set to run daily at 01:00, with an Active / Inactive toggle, its granted tools, and the time until its next run.](../../../assets/your-orchard-ai-job.png)
+### Location
 
-<figcaption>A scheduled job: an agent on a cron, here watching mint health daily.</figcaption>
+Set your **timezone** and **locale** so dates, times, and numbers read the way you expect,
+or sync them from the device automatically.
 
-</figure>
+### Theme
+
+Switch between a **dark** and **light** appearance, or follow your system preference.
+
+### Currency
+
+Choose how amounts are shown — both the bitcoin unit (BTC, mBTC, sat) and the fiat
+currency (USD, EUR, and so on).
+
+### AI
+
+Pick which model the in-app assistant uses, from the models your chosen provider offers.
+
+## User
+
+User settings cover your own account.
+
+### Profile
+
+Change your **username**, and update your **password**.
 
 ### Messaging
 
-Connect a messaging client and your agents can reach you on your phone — pushing alerts
-and answering questions in chat, wherever you are. Orchard speaks **Telegram**: create a
-bot with [@BotFather](https://t.me/BotFather) using `/newbot`, paste the token it gives you
-(Orchard stores it encrypted), and your agents — including scheduled jobs like the health
-monitor — can send and respond to messages through it.
+Add your personal **Telegram chat ID** so the agent can message you directly. Open a chat
+with the configured bot and send `/start` to get your ID.
 
-<figure class="screenshot">
-
-![Orchard's AI messaging settings: a Disabled / Enabled toggle for a Telegram client, with an encrypted bot-token field and instructions for creating a bot with BotFather.](../../../assets/your-orchard-ai-msg.png)
-
-<figcaption>Messaging — wire up a Telegram bot so agents can reach you on mobile.</figcaption>
-
-</figure>
-
-<Aside type="note" title="Install config vs. settings">
-  Connection details — where your Bitcoin, Lightning, and mint backends live — stay in
-  environment variables, covered under [Installation & Configuration](/install/configuration/).
-  Settings covers what you switch on and tune while Orchard is running.
-</Aside>
-
-<Aside type="caution" title="Device and user settings are on the way">
-  This page covers the application settings that are furthest along. The device and account
-  preferences get the same treatment as they settle — the
-  [Orchard repository](https://github.com/cashubtc/orchard) has the source code in the
-  meantime.
-</Aside>
-
-## Next
-
-<CardGrid>
-  <LinkCard
-    title="Crew"
-    href="/orchard/crew/"
-    description="Decide who can operate your mint — the accounts with access to Orchard."
-  />
-</CardGrid>

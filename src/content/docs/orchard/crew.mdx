@@ -1,32 +1,49 @@
 ---
 title: Crew
-description: Manage who can operate your mint — the crew of accounts with access to Orchard, so you don't have to share a single login.
+description: Manage who can operate your mint — the crew of accounts with access to Orchard. Invite members, set their role, and control who can do what, so you don't have to share a single login.
 ---
 
-import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 Your crew is the set of accounts that can sign in to Orchard and operate the mint. Running
 a mint is rarely a one-person job forever, and Crew lets you bring in additional operators
 without handing out the account you created at [setup](/orchard/setup/).
 
-## What you'll find
+<figure class="screenshot">
 
-- **Members** — the accounts that can sign in to this Orchard instance.
-- **Access** — who can do what, so not everyone needs the keys to everything.
+![Orchard's Crew page: a table of accounts with User, Label, Created, State, and Actions columns and an Invite User button. Rows show role badges (Reader, Admin, Manager) and states (Active, Pending), and an expanded pending invite reveals a QR code alongside a copyable invite link and invite key.](../../../assets/your-orchard-crew.png)
 
-<Aside type="caution" title="Roles and permissions are on the way">
-  Orchard is under active development, and exactly how crew members and their permissions
-  are managed is still settling, so the specifics land here as they stabilize. The
-  [Orchard repository](https://github.com/cashubtc/orchard) has the source code in the
-  meantime.
-</Aside>
+<figcaption>Crew lists your members and pending invites, each with a role and a state.</figcaption>
 
-## Next
+</figure>
 
-<CardGrid>
-  <LinkCard
-    title="Change Log"
-    href="/orchard/changelog/"
-    description="Review what's happened — a running record of events across your stack."
-  />
-</CardGrid>
+## Members
+
+Crew lists every account that can sign in to this Orchard instance, alongside any invites
+you've sent that haven't been claimed yet. Each row shows the member, an optional **label**
+to note who they are, when they were created, and a **state** — **Active** or **Inactive**
+for members, **Pending** for an invite that's still open. Search and filter by state or
+role to find people quickly.
+
+## Roles
+
+Every member holds one role that decides what they can do:
+
+- **Admin** — full control of the instance. This is the account you created at setup; it
+  can't be reassigned or removed from here.
+- **Manager** — can manage the mint.
+- **Reader** — can only view the application.
+
+You invite new people as a **Manager** or **Reader**, and you can change a member's role
+or switch them between Active and Inactive later. You can't edit your own account or other
+admins from this page.
+
+## Inviting people
+
+**Invite User** opens a short form: pick a role, add an optional label, and set when the
+invite **expires** (it defaults to a few hours out, or you can turn expiry off). Orchard
+then generates an **invite link**, an **invite key**, and a **QR code** — share whichever
+is easiest, and the new operator signs up through it to activate their account.
+
+Until an invite is claimed it sits in the table as **Pending** with a countdown, and you
+can edit it or revoke it at any time.

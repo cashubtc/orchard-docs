@@ -1,32 +1,43 @@
 ---
 title: Change Log
-description: Review a running log of what's happened in your Orchard — events and changes across your services over time, so nothing important goes unnoticed.
+description: Review a running log of what's happened in your Orchard — who changed what, across which service, and when, with a field-level record of every event so nothing important goes unnoticed.
 ---
 
-import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 The change log is Orchard's record of what's happened across your stack — a running
-timeline of events and changes you can scroll back through. When something looks off on
-the [dashboard](/orchard/dashboard/), this is where you find out what led up to it.
+timeline of events you can scroll back through. When something looks off on the
+[dashboard](/orchard/dashboard/), this is where you find out what led up to it.
 
-## What you'll find
+<figure class="screenshot">
 
-- **Events** — notable activity across Bitcoin, Lightning, and the mint as it occurs.
-- **Changes** — configuration and state changes, so you can see what changed and when.
+![Orchard's event log: a date-range filter, a Filters button, and a count of events, above a table with User, Section, Event, Details, and Time columns. Rows show an admin updating Settings, and an expanded row reveals the changed setting ai.enabled with a Success badge and its before-and-after values. Pagination reads 1–25 of 197.](../../../assets/your-orchard-changes.png)
 
-<Aside type="caution" title="The event detail is still taking shape">
-  Orchard is under active development, and which events are logged — and how you filter
-  and read them — is still settling, so the specifics land here as they stabilize. The
-  [Orchard repository](https://github.com/cashubtc/orchard) has the source code in the
-  meantime.
-</Aside>
+<figcaption>Every event, attributed to who did it, where, and when.</figcaption>
 
-## Next
+</figure>
 
-<CardGrid>
-  <LinkCard
-    title="Dashboard"
-    href="/orchard/dashboard/"
-    description="Operate your mint — keys, balances, health, and mint info in one view."
-  />
-</CardGrid>
+## Entries
+
+Each entry records who did what, where, and when:
+
+- **User** — the actor behind the event: a crew member, the **System**, or an AI **Agent**.
+- **Section** — which service it touched: Bitcoin, Lightning, Mint, Ecash, AI, or Settings.
+- **Event** — what happened, like a setting updated, a keyset created, or an agent executed.
+- **Time** — when it occurred.
+
+Expand a row to see the **details** — each field that changed, its value before and after,
+and whether the change came through as **Success** or **Error**.
+
+## Timeline
+
+Above the table, a chart plots events across the range you're viewing. Each bubble groups
+the events in a slice of time, sized by how many it holds and coloured by how they went —
+all succeeded, all failed, or a mix. Hover one for the count and the breakdown.
+
+## Filtering
+
+The log grows quickly, so you can narrow it down. Set a **date range** (it starts on the
+last 30 days), then filter by **section**, **event type** (created, updated, deleted,
+executed), **status** (success, error, partial), or **user**. Page through the results and
+choose how many to show at a time.

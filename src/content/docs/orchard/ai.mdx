@@ -1,31 +1,73 @@
 ---
 title: AI
-description: Orchard's built-in AI assistant — ask about your mint in plain language and let it help you operate, right from the dashboard.
+description: Orchard's optional AI layer — enable a provider, then get a context-aware assistant throughout the app plus a background agent that runs scheduled jobs and reaches you over Telegram.
 ---
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-Orchard ships with a built-in AI assistant: a chat panel that understands your mint and
-can answer questions about it in plain language. Instead of hunting across views, you can
-ask what's going on and let the assistant pull the answer together.
+AI in Orchard is optional, and off by default. Turn it on and it does two things: it powers
+a context-aware **assistant** on the pages themselves, and it adds a background **agent** that
+can run scheduled jobs and reach you over Telegram. You switch it on and shape it under
+[Settings → Application → AI](/orchard/settings/#ai).
 
-## What it does
+<figure class="screenshot">
 
-- **Answer questions** — ask about balances, keysets, health, and recent activity.
-- **Help you operate** — surface the right view or action for what you're trying to do.
+![Orchard's AI settings on the Application tab: the AI section with a Telegram messaging integration and agent cards, and an open "New agent job" dialog defining a "Lightning Node Watcher" — its model, description, and system prompt. On the right, an "Agent Settings Assistant" chat log shows the assistant applying changes through tool calls like agent name, description, system-message, and schedule updates.](../../../assets/your-orchard-ai.png)
 
-<Aside type="note" title="Bring your own model">
-  The assistant talks to a model provider you configure — that lives in
-  [Settings](/orchard/settings/). Until a provider and model are set, the assistant
-  stays out of your way.
+<figcaption>Configuring an agent job — with the in-app assistant building it through tool calls.</figcaption>
+
+</figure>
+
+## The integration
+
+Enable AI, then point Orchard at a model provider:
+
+- **Ollama** — local models on your own hardware. Set the **API Endpoint** (it defaults to
+  `http://localhost:11434`), and everything stays in-house.
+- **OpenRouter** — cloud-hosted models reached through a single **API key**.
+
+**Test connection** confirms Orchard can reach the provider, showing **Connected** or
+**Error**. Until you enable AI and set a provider, Orchard runs as a standard application
+with the AI features out of the way.
+
+<Aside type="tip" title="Local or cloud">
+  Ollama keeps prompts on your own machine; OpenRouter sends them to a third party. If
+  keeping your operations private matters, prefer a local model.
 </Aside>
 
-<Aside type="caution" title="The assistant is still evolving">
-  Orchard is under active development, and what the assistant can see and do is still
-  expanding, so the specifics land here as they stabilize. The
-  [Orchard repository](https://github.com/cashubtc/orchard) has the source code in the
-  meantime.
-</Aside>
+## The agent
+
+Enabling AI adds a built-in agent — the **Groundskeeper** — running on your server. An agent
+is defined by a **model**, a **description**, a **system prompt** that sets its role and tone,
+and a set of **tools**: scoped capabilities across Bitcoin, Lightning, and the mint, shown as
+chips that count how many it holds in each group. The tools are what let it actually answer
+questions about your stack and act on them, not just chat.
+
+## Messaging (Telegram)
+
+Connect a messaging client and your agent can reach you on your phone. Orchard speaks
+**Telegram**: create a bot with [@BotFather](https://t.me/BotFather) using `/newbot`, paste
+the token it gives you (Orchard stores it encrypted), and the agent — including scheduled
+jobs — can send and answer messages through it. To receive direct messages, add your personal
+**Telegram Chat ID** under [Settings → User → Messaging](/orchard/settings/#messaging) — open
+a chat with the bot and send `/start` to get it.
+
+## Agent jobs
+
+A **job** pairs an agent with a schedule so it runs unattended and reports back. **New Agent
+Job** opens a form: give it a name, pick a model, write a description and system prompt, grant
+tools, and set a schedule. Flip it **Active** or **Inactive**, see the next run time, or
+**Execute now** to run it on demand — for example, a Lightning Node Watcher that checks node
+health every morning and alerts you on failures.
+
+## In-app assistants
+
+Beyond the background agent, Orchard puts a context-aware assistant on the pages
+themselves — the **Message assistant…** box at the bottom of every view. Each section has its
+own assistant that can read the current view and act on it: adjust the crew table's filters,
+fill in mint info or config, narrow the change log, or — as in the screenshot above — build an
+agent job for you. When it makes a change, it does so through **tool calls**, and the chat log
+shows exactly what it did.
 
 ## Next
 

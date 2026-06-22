@@ -5,15 +5,14 @@ description: Review a running log of what's happened in your Orchard — who cha
 
 import { CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-The change log is Orchard's record of what's happened across your stack — a running
-timeline of events you can scroll back through. When something looks off on the
-[dashboard](/orchard/dashboard/), this is where you find out what led up to it.
+Orchard keeps a log of all change actions taken by the users so you
+have a complete record of what happened, when, and by who.
 
 <figure class="screenshot">
 
 ![Orchard's event log: a date-range filter, a Filters button, and a count of events, above a table with User, Section, Event, Details, and Time columns. Rows show an admin updating Settings, and an expanded row reveals the changed setting ai.enabled with a Success badge and its before-and-after values. Pagination reads 1–25 of 197.](../../../assets/your-orchard-changes.png)
 
-<figcaption>Every event, attributed to who did it, where, and when.</figcaption>
+<figcaption>Track every change made to your Orchard.</figcaption>
 
 </figure>
 
@@ -23,21 +22,18 @@ Each entry records who did what, where, and when:
 
 - **User** — the actor behind the event: a crew member, the **System**, or an AI **Agent**.
 - **Section** — which service it touched: Bitcoin, Lightning, Mint, Ecash, AI, or Settings.
-- **Event** — what happened, like a setting updated, a keyset created, or an agent executed.
+- **Event** — what happened, like a setting updated or a keyset created.
 - **Time** — when it occurred.
 
 Expand a row to see the **details** — each field that changed, its value before and after,
 and whether the change came through as **Success** or **Error**.
 
-## Timeline
-
-Above the table, a chart plots events across the range you're viewing. Each bubble groups
-the events in a slice of time, sized by how many it holds and coloured by how they went —
-all succeeded, all failed, or a mix. Hover one for the count and the breakdown.
-
 ## Filtering
 
-The log grows quickly, so you can narrow it down. Set a **date range** (it starts on the
-last 30 days), then filter by **section**, **event type** (created, updated, deleted,
-executed), **status** (success, error, partial), or **user**. Page through the results and
-choose how many to show at a time.
+As the log grows, you can narrow it down with a rich set of filters:
+
+- **Date range** — starts on the last 30 days.
+- **Section** — the part of Orchard the event came from.
+- **Event type** — created, updated, deleted, or executed.
+- **Status** — success, error, or partial.
+- **User** — the account that made the change.

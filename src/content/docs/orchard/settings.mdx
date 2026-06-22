@@ -5,48 +5,61 @@ description: Tune Orchard while it's running — Application features like the s
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-Settings is where you tune Orchard the application — separate from the environment
-variables you set when you [installed it](/install/configuration/). Those define how
-Orchard connects to your services; these are the features you switch on and shape from
-inside the dashboard, while it's running.
+The settings pages let you personalize your user and the application. 
+Everything is organised under three top-level tabs:
 
-Everything is organised under three top-level tabs: **Application** preferences that
-apply to the whole instance, **Device** preferences scoped to the browser you're signed
-in from, and **User** preferences for your own account.
+- **Application** — preferences that apply to the whole instance.
+- **Device** — preferences scoped to the browser you're signed in from.
+- **User** — preferences for your own account.
+
+{/* separate from the environmentvariables you set when you [installed it](/install/configuration/) */}
+
+
 
 <figure class="screenshot">
 
 ![Orchard's Settings page on the Application tab, with top-level tabs for Application, Device, and User. Bitcoin settings show a Disabled / Enabled toggle for the Sovereign USD Price Oracle alongside the latest price derived from the operator's own node, and AI settings show the integration toggle with a choice of Ollama (local) or OpenRouter (cloud) provider and a Connected status.](../../../assets/your-orchard-settings.png)
 
-<figcaption>Settings, organised into Application, Device, and User tabs.</figcaption>
+<figcaption>Settings for the Application, Device, and User.</figcaption>
 
 </figure>
 
 ## Application
 
-Application settings apply to the whole instance — every user, every device.
+Application settings enable optional features that apply to the whole instance for every user and every device.
 
 ### Bitcoin
 
 The **Sovereign USD Price Oracle** lives here. Enable it and Orchard derives a US-dollar
-price from your own node's on-chain data once a day, at 00:00 UTC — no exchange APIs, no
-third-party feeds, nothing that leaks what you're holding. It's the open-source
+price from your own node's on-chain data once a day, at 00:00 UTC. There is no exchange API involved, no
+third-party feeds at all to preserve your privacy. It uses the open-source
 [UTXOracle](https://utxo.live/oracle/) method, adapted for Orchard. Leave it disabled and
-amounts stay denominated in bitcoin.
+conversions will be hidden.
+
+<Aside type="note" title="Requires a connected mainnet node">
+  The oracle only works when the [Bitcoin service](/install/configuration/#bitcoin)
+  is connected and the node is on **mainnet**. Price is derived from real
+  on-chain activity, which testnet and signet don't provide.
+</Aside>
 
 ### AI
 
-Turn on the optional AI integration — in the app and running on your server. You pick
-where the model runs (**Ollama** for local models on your own hardware, or **OpenRouter**
-for cloud-hosted models with an API key), then build out the rest:
+Turn on the optional AI integration to get in app assistants and a background agent running on your server.
+Orchard supports two model providers:
 
-- **Agents** — named assistants, each with a model, a system prompt that sets its role,
-  and a scoped set of **tools** across Bitcoin, Lightning, and the mint, so they can
-  answer questions about your stack and act on it.
-- **Jobs** — an agent paired with a schedule, running unattended and reporting back; for
+- **Ollama** — local models on your own hardware.
+- **OpenRouter** — cloud-hosted models with an API key.
+
+The agent is completly customizable. You can define:
+
+- **AI Agent** — The response agent that answers questions over Telegram and answers 
+  follow up questions about alerts. You configure a model, a system prompt,
+  and a scoped set of **tools** across Bitcoin, Lightning, and the mint.
+- **Agent Jobs** — a custom prompt paired with a schedule, running unattended and reporting back; for
   example, a mint-health monitor that runs every morning.
-- **Messaging** — connect a **Telegram** bot so your agents can reach you on your phone,
-  pushing alerts and answering questions wherever you are.
+- **Messaging** — connect a **Telegram** bot to interact with this agent.
+  This allows you to receive alerts on your phone,
+  and answer questions wherever you are.
 
 ## Device
 
@@ -69,7 +82,7 @@ currency (USD, EUR, and so on).
 
 ### AI
 
-Pick which model the in-app assistant uses, from the models your chosen provider offers.
+Pick which model the in-app assistants use, from the models your chosen provider offers.
 
 ## User
 

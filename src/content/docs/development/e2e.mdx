@@ -1,0 +1,119 @@
+---
+title: End-to-end testing
+description: Run Orchard's Playwright end-to-end tests against full Docker stacks (Bitcoin, Lightning, a Cashu mint, and Orchard built from source) across five backend configurations.
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+The end-to-end tests drive a real, running Orchard with [Playwright](https://playwright.dev).
+Each test runs against a full stack brought up with Docker: a regtest Bitcoin
+node, Lightning nodes, a Cashu mint, and Orchard built from the repository source.
+
+<Aside type="caution" title="Run locally, not in CI">
+  Unlike the [unit tests](/development/testing/), the end-to-end tests are not run
+  in CI. They need Docker and take time to bring up, so you run them on your own
+  machine.
+</Aside>
+
+## Prerequisites
+
+- **Docker** with the Compose plugin.
+- **Playwright's browsers**, installed once with `npx playwright install`.
+- For the AI tests only: **[Ollama](https://ollama.com)** reachable at
+  `host.docker.internal:11434`.
+
+## The stacks
+
+The tests run against five backend configurations, each a different combination of
+Lightning node, mint implementation, and database:
+
+| Config | Bitcoin | Lightning | Mint | Database |
+| --- | --- | --- | --- | --- |
+| `lnd-nutshell-sqlite` | core | lnd | nutshell | SQLite |
+| `cln-nutshell-postgres` | core | cln | nutshell | Postgres |
+| `lnd-cdk-sqlite` | core | lnd | cdk | SQLite |
+| `cln-cdk-postgres` | core | cln | cdk | Postgres |
+| `fake-cdk-postgres` | none | none (fake) | cdk | Postgres |
+
+`fake-cdk-postgres` runs without Bitcoin or Lightning, to exercise Orchard when
+those services are absent.
+
+## Run the tests
+
+<Steps>
+
+1. Bring up a stack (or `all` for every stack). This blocks until the stack is
+   healthy:
+
+   ```bash
+   npm run e2e:up lnd-nutshell-sqlite
+   ```
+
+2. Run the test suite:
+
+   ```bash
+   npm run e2e:test
+   ```
+
+   To target a single stack, filter by project. Each project is named
+   `<config>:<port>`:
+
+   ```bash
+   npm run e2e:test -- --project=cln-cdk-postgres:3323
+   ```
+
+3. Tear the stack down when you are done. This removes its volumes:
+
+   ```bash
+   npm run e2e:down lnd-nutshell-sqlite
+   ```
+
+</Steps>
+
+To watch a stack while it runs, use `npm run e2e:logs <config>`; to list its
+services, `npm run e2e:ps <config>`.
+
+## AI tests
+
+The AI tests use a separate config and need Ollama running:
+
+```bash
+npm run e2e:test:ai
+```
+
+## API harness
+
+A Supertest-based API harness runs separately from the Playwright suite:
+
+```bash
+npm run test:server:e2e
+```
+
+## Generating activity
+
+A cadence simulator can drive sustained, repeating traffic against a stack while
+you run tests, including fault injection:
+
+```bash
+npm run e2e:sim:up cln-cdk-postgres      # start
+npm run e2e:sim:status cln-cdk-postgres  # check
+npm run e2e:sim:logs cln-cdk-postgres    # follow
+npm run e2e:sim:down cln-cdk-postgres    # stop
+```
+
+## Mainchain overlay
+
+One stack (`cln-nutshell-postgres`) can run against a real mainnet Bitcoin node to
+exercise chain features. It needs a one-time snapshot, built with
+`npm run e2e:bootstrap-mainchain`, and a `bitcoind` running on your host. See the
+repository's e2e README for the host requirements.
+
+## Writing specs
+
+Every spec under `e2e/specs` must carry at least one tag (for example `@canary`,
+`@lightning`, `@cdk`, `@postgres`) declaring which stacks it is meaningful for. A
+spec with no tag matches no stack and silently does not run.
+
+For the full configuration matrix, network topologies, exposed ports, and tag
+reference, see [`e2e/README.md`](https://github.com/cashubtc/orchard/blob/master/e2e/README.md)
+in the repository.

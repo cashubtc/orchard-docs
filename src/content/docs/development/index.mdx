@@ -1,0 +1,84 @@
+---
+title: Development
+description: "Set up Orchard for local development: run the client and server, apply development-only configuration, and run the unit, CI, and end-to-end tests. For people building on or contributing to Orchard's source."
+---
+
+import { Aside, CardGrid, LinkCard, Steps } from '@astrojs/starlight/components';
+
+This section is for working on **Orchard's source code**: running it from a clone,
+making changes, and testing them. It is separate from the [Install](/install/)
+guide, which is for operators running a released build against their own services.
+
+## What Orchard is built from
+
+Orchard is a single repository with the client and server side by side:
+
+| Part | Location | Stack |
+| --- | --- | --- |
+| Client | `src/client` | Angular, Angular Material |
+| Server | `src/server` | NestJS, GraphQL (Apollo) |
+| Shared | `src/shared` | GraphQL types generated from the server schema |
+
+The server stores its data with TypeORM, using SQLite by default.
+
+## Prerequisites
+
+- **[Node.js](https://nodejs.org) v22** (the version pinned in `.nvmrc`), which includes npm.
+- **git**, to clone the repository.
+- **Docker** with the Compose plugin, for the [end-to-end tests](/development/e2e/).
+
+<Aside type="caution" title="Develop against master, not a release tag">
+  The [Install](/install/installation/) guide pins a release tag because that is
+  what operators should run. Development is different: work from `master` or a
+  feature branch, where the latest changes live.
+</Aside>
+
+## Quick start
+
+<Steps>
+
+1. Clone the repository and install dependencies:
+
+   ```bash
+   git clone https://github.com/cashubtc/orchard.git
+   cd orchard
+   npm install
+   ```
+
+2. Create your `.env` from the example and set `SETUP_KEY`:
+
+   ```bash
+   cp .env.example .env
+   nano .env
+   ```
+
+3. Start the server and client in two terminals, then open `http://localhost:4200`:
+
+   ```bash
+   npm run start:server   # terminal 1
+   npm run start:client   # terminal 2
+   ```
+
+</Steps>
+
+[Running locally](/development/running-locally/) walks through each step in detail.
+
+## In this section
+
+<CardGrid>
+  <LinkCard
+    title="Running locally"
+    href="/development/running-locally/"
+    description="Run the client and server dev processes, plus the configuration specific to development."
+  />
+  <LinkCard
+    title="Testing & CI"
+    href="/development/testing/"
+    description="Run the server and client unit tests, formatting, and linting: the same checks CI runs."
+  />
+  <LinkCard
+    title="End-to-end testing"
+    href="/development/e2e/"
+    description="Run Playwright against full Docker stacks: Bitcoin, Lightning, a mint, and Orchard from source."
+  />
+</CardGrid>

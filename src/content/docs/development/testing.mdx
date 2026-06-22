@@ -1,0 +1,93 @@
+---
+title: Testing & CI
+description: Run Orchard's server and client unit tests, formatting, and linting locally, and understand the CI pipeline that runs the same checks on every pull request.
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+Orchard has unit tests for both the server and the client, plus formatting and
+linting. The same checks run in CI on every pull request.
+
+## Unit tests
+
+Run everything at once:
+
+```bash
+npm run test
+```
+
+This runs the server tests, then the client tests. You can also run each side on
+its own.
+
+### Server (Jest)
+
+Server tests use Jest. Specs live next to the code they cover, as `*.spec.ts`
+files under `src/server`.
+
+| Command | What it does |
+| --- | --- |
+| `npm run test:server` | Run the server tests once. |
+| `npm run test:server:watch` | Re-run on change. |
+| `npm run test:server:cov` | Run with a coverage report. |
+| `npm run test:debug` | Run with the Node inspector attached. |
+
+### Client (Karma)
+
+Client tests use Karma with Jasmine, run in headless Chrome. Specs are `*.spec.ts`
+files under `src/client`.
+
+```bash
+npm run test:client
+```
+
+<Aside type="note" title="Chrome required">
+  The client tests launch headless Chrome, so a Chrome or Chromium install must be
+  available. CI installs it as a step; locally you need it on your machine.
+</Aside>
+
+## Formatting and linting
+
+```bash
+npm run format        # format with Prettier
+npm run format:check  # check formatting without writing changes
+npm run lint          # lint with ESLint
+npm run lint:fix      # lint and auto-fix
+```
+
+CI runs `format:check` and `lint`, so run them before pushing.
+
+## Continuous integration
+
+CI is a GitHub Actions workflow at `.github/workflows/ci.yml`. It runs on every
+push and pull request to `master`, and can also be triggered manually. There is
+one job, `quality-check`, on `ubuntu-latest`, which runs these steps in order:
+
+<Steps>
+
+1. Install dependencies with `npm ci`.
+2. Install Chrome (for the client tests).
+3. `npm run format:check`
+4. `npm run lint`
+5. `npm run generate:types`
+6. `npm run test`
+7. `npm run build`
+8. Upload the built `dist` as an artifact.
+
+</Steps>
+
+The Node version comes from `.nvmrc`. Running `format:check`, `lint`, and `test`
+locally before you push mirrors what CI checks.
+
+<Aside type="caution" title="End-to-end tests are not in CI">
+  The Playwright [end-to-end tests](/development/e2e/) are not part of this
+  pipeline. They run against full Docker stacks, so you run them locally.
+</Aside>
+
+## Other workflows
+
+Two more workflows build Docker images rather than run tests:
+
+| Workflow | Trigger | What it does |
+| --- | --- | --- |
+| `image-release.yml` | A published GitHub release | Builds and pushes multi-architecture images to the GitHub Container Registry. |
+| `image-snapshot.yml` | Manual dispatch | Builds snapshot images on demand. |

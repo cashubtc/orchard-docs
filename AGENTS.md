@@ -31,6 +31,15 @@ for source code, releases, and issues; don't cast the README as the authority on
 how to run Orchard. When a page's exact steps aren't written yet, say so and let
 them land *here* — never redirect the reader to the README for the "real" steps.
 
+**One scoped exception — the Development section.** There is a contributor-facing
+**Development** section (`src/content/docs/development/`) covering how to run
+Orchard from source: the dev client/server, development-only config, the unit
+tests and CI, and the Playwright e2e setup. It is the deliberate exception to
+"product docs, not developer docs" — keep it narrow to what helps someone build on
+or contribute to Orchard, and keep the operator pages free of contributor detail.
+Unlike the operator install guides, it develops against `master`/a feature branch,
+not a pinned release tag.
+
 **Stack:** [Astro 6](https://astro.build) + [Starlight](https://starlight.astro.build)
 + [Tailwind CSS v4](https://tailwindcss.com) (via `@tailwindcss/vite`) +
 [astro-icon](https://github.com/natemoo-re/astro-icon). Fully static, deployed

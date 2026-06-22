@@ -97,6 +97,12 @@ export default defineConfig({
                 'Operate Orchard day to day: set up the instance, settings, crew, the change log, the dashboard, the Bitcoin/Lightning/Mint service views (including mint database backup and restore), and the built-in AI assistant.',
               paths: ['orchard', 'orchard/**'],
             },
+            {
+              label: 'Development',
+              description:
+                'Develop Orchard from source: run the client and server locally, development-only configuration, the unit tests and CI pipeline, and the Playwright end-to-end stacks.',
+              paths: ['development', 'development/**'],
+            },
           ],
         }),
       ],
@@ -174,6 +180,18 @@ export default defineConfig({
             { label: 'Lightning', slug: 'orchard/lightning' },
             { label: 'Mint', slug: 'orchard/mint' },
             { label: 'AI', slug: 'orchard/ai' },
+          ],
+        },
+        {
+          // Contributor-facing section: running Orchard from source, dev config,
+          // testing/CI, and the e2e setup. The one scoped exception to the
+          // "product docs, not developer docs" rule (see AGENTS.md).
+          label: 'Development',
+          items: [
+            { label: 'Overview', slug: 'development' },
+            { label: 'Running locally', slug: 'development/running-locally' },
+            { label: 'Testing & CI', slug: 'development/testing' },
+            { label: 'End-to-end testing', slug: 'development/e2e' },
           ],
         },
       ],

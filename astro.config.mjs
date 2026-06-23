@@ -155,6 +155,7 @@ export default defineConfig({
             { label: 'Bitcoin', slug: 'orchard/bitcoin' },
             { label: 'Lightning', slug: 'orchard/lightning' },
             { label: 'Mint', slug: 'orchard/mint' },
+            { label: 'Ecash', slug: 'orchard/ecash' },
             { label: 'AI', slug: 'orchard/ai' },
           ],
         },

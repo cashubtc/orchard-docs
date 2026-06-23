@@ -5,9 +5,8 @@ description: Watch the Lightning node that settles your mint's ecash from Orchar
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-Your mint settles real value over Lightning, so the Lightning node is the layer between
-ecash and bitcoin on the wire. Orchard surfaces that node so you can see, at a glance,
-whether your mint can actually pay and get paid.
+Connecting your Lightning node to Orchard gives you a dedicated view of the node.
+It also feeds the assets side of your mint's balance sheet, the bitcoin backing your ecash.
 
 <figure class="screenshot">
 
@@ -17,16 +16,29 @@ whether your mint can actually pay and get paid.
 
 </figure>
 
-## Dashboard
-
-A dedicated Lightning dashboard is coming soon. In the meantime, the
-[Home view](/orchard/home/) already summarises the node: an **Info** card with the
-node alias, online status, connected peers, and open channels, and a **Channel Summary**
-that totals your capacity and splits it into local (what you can send) and remote (what you
-can receive).
-
 <Aside type="note" title="Connecting your node">
-  Which Lightning node Orchard talks to, and how, is set at install time with environment
-  variables — see [Installation & Configuration](/install/configuration/). This page is
-  about watching it once it's connected.
+  Which Lightning node Orchard connects to, and how, is set with environment
+  variables. See [Installation & Configuration](/install/configuration/#lightning).
 </Aside>
+
+## Lightning Dashboard
+
+Today, the [home page](/orchard/home/#lightning) summarises your Lightning node.
+A dedicated dashboard is coming soon.
+
+## Mint Assets
+
+Your mint's [balance sheet](/orchard/mint/#dashboard) weighs it's liabilities(the ecash in
+circulation) against the real bitcoin that backs it (your outbound lightning liquidity). 
+A connected Lightning node fills in the assets side of the sheet, and lets Orchard
+track how your coverage shifts over time.
+
+## AI
+
+Connecting a Lightning node also gives the [AI agent](/orchard/settings/#ai) read-only tools
+for knowing what's happening on your node:
+
+- **Lightning Info** — node identity, sync status, and channel counts.
+- **Channels** — open and closed channels with balances and peer info.
+- **Peers** — connected peers and traffic.
+- **Lightning Analytics** — payments, routing, and balance trends over time.

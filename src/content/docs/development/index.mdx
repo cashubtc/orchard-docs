@@ -5,13 +5,13 @@ description: "Set up Orchard for local development: run the client and server, a
 
 import { Aside, CardGrid, LinkCard, Steps } from '@astrojs/starlight/components';
 
-This section is for working on **Orchard's source code**: running it from a clone,
+This section is for contributing to **Orchard's source code**: running it from a clone,
 making changes, and testing them. It is separate from the [Install](/install/installation/)
 guide, which is for operators running a released build against their own services.
 
 ## What Orchard is built from
 
-Orchard is a single repository with the client and server side by side:
+Orchard is a monorepo with the client and server in their own directories:
 
 | Part | Location | Stack |
 | --- | --- | --- |
@@ -19,49 +19,62 @@ Orchard is a single repository with the client and server side by side:
 | Server | `src/server` | NestJS, GraphQL (Apollo) |
 | Shared | `src/shared` | GraphQL types generated from the server schema |
 
-The server stores its data with TypeORM, using SQLite by default.
+The server stores its data with TypeORM in an SQLite database.
 
 ## Prerequisites
 
 - **[Node.js](https://nodejs.org) v22** (the version pinned in `.nvmrc`), which includes npm.
 - **git**, to clone the repository.
 - **Docker** with the Compose plugin, for the [end-to-end tests](/development/e2e/).
+- **Bitcoin Fullnode** for the Oracle and [end-to-end tests](/development/e2e/).
+- **Bitcoin, Lightning and Cashu Mint** on regtest for local development. [Polar](https://lightningpolar.com) is useful for setting up a regtest environment.
+- **[Ollama](https://ollama.com)** for the AI development and [end-to-end tests](/development/e2e/).
 
-<Aside type="caution" title="Develop against master, not a release tag">
-  The [Install](/install/installation/) guide pins a release tag because that is
-  what operators should run. Development is different: work from `master` or a
-  feature branch, where the latest changes live.
-</Aside>
-
-## Quick start
+## Contributing changes
 
 <Steps>
 
-1. Clone the repository and install dependencies:
+1. Fork [`cashubtc/orchard`](https://github.com/cashubtc/orchard) on GitHub, then clone
+   your fork:
 
    ```bash
-   git clone https://github.com/cashubtc/orchard.git
+   git clone https://github.com/<you>/orchard.git
    cd orchard
-   npm install
    ```
 
-2. Create your `.env` from the example and set `SETUP_KEY`:
+2. Add the canonical repository as `upstream` so you can keep your fork in sync:
 
    ```bash
-   cp .env.example .env
-   nano .env
+   git remote add upstream https://github.com/cashubtc/orchard.git
    ```
 
-3. Start the server and client in two terminals, then open `http://localhost:4200`:
+3. Create a branch for your change:
 
    ```bash
-   npm run start:server   # terminal 1
-   npm run start:client   # terminal 2
+   git checkout -b my-change
+   ```
+
+4. Make your changes and run the [tests and checks](/development/testing/) before pushing.
+
+5. Push to your fork and open a pull request against `cashubtc/orchard`:
+
+   ```bash
+   git push -u origin my-change
    ```
 
 </Steps>
 
-[Running locally](/development/running-locally/) walks through each step in detail.
+## Updating your fork
+
+Before starting new work, pull in the latest changes so your branch stays current:
+
+```bash
+git fetch upstream
+git rebase upstream/master
+```
+
+New to the codebase? [Running locally](/development/running-locally/) walks through getting
+Orchard running from source.
 
 ## In this section
 

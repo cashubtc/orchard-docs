@@ -1,6 +1,6 @@
 ---
 title: Configuration
-description: Every Orchard configuration option, set in your .env file — the core server settings plus how to point Orchard at your Bitcoin, Lightning, Taproot Assets, and Cashu mint services.
+description: "Every Orchard configuration option, set in your .env file: the core server settings plus how to point Orchard at your Bitcoin, Lightning, Taproot Assets, and Cashu mint services."
 ---
 
 import { Aside, CardGrid, LinkCard, Tabs, TabItem } from '@astrojs/starlight/components';
@@ -49,7 +49,7 @@ Orchard uses these settings, falling back to the defaults shown when they're uns
 BASE_PATH=api         # URL path prefix for the API
 THROTTLE_TTL=60000    # rate-limit window, in milliseconds
 THROTTLE_LIMIT=20     # requests allowed per window
-DATABASE_DIR=data     # directory for Orchard's database 
+DATABASE_DIR=data     # directory for Orchard's database
 ```
 
 | Variable | Description | Default |
@@ -76,8 +76,6 @@ CRYPTO_KEY=                 # encryption key for app settings
 | `TOR_PROXY_SERVER` | SOCKS proxy for outbound connections, e.g. `socks://127.0.0.1:9050`. | unset |
 | `SERVER_COMPRESSION` | Enable HTTP response compression. Set to `true` only if nothing upstream (a reverse proxy or CDN) already compresses responses. | `false` |
 | `CRYPTO_KEY` | Key that encrypts stored settings. Auto-generated and saved if unset; set it to control the value yourself. | auto |
-
-
 
 ## Services
 
@@ -189,7 +187,7 @@ Connect your Cashu Mint to Orchard. Orchard reaches the mint three ways:
 - **Management RPC** — for management actions.
 
 Set the implementation in **Connection**; the **Database** and **Management RPC**
-each is configured a little differently depending on the implementation and how it's configured.
+are each configured a little differently, depending on the implementation.
 
 **Connection**
 
@@ -281,7 +279,7 @@ Orchard's settings to how the mint serves the RPC.
 | `MINT_DATABASE_KEY` | Client key, for mutual TLS to Postgres. | — |
 | `MINT_RPC_HOST` | Mint management gRPC host. | `localhost` |
 | `MINT_RPC_PORT` | Mint management gRPC port. | `8086` |
-| `MINT_RPC_MTLS` | Force mutual TLS on the RPC on (`true`) or off (`false`). Auto-on when the key, cert, and CA are all set. | auto |
+| `MINT_RPC_MTLS` | Force the RPC's mutual TLS on (`true`) or off (`false`). Auto-on when the key, cert, and CA are all set. | auto |
 | `MINT_RPC_KEY` | Path to the RPC client key. | — |
 | `MINT_RPC_CERT` | Path to the RPC client certificate. | — |
 | `MINT_RPC_CA` | Path to the RPC CA certificate. | — |

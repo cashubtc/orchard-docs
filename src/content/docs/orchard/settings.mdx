@@ -1,20 +1,18 @@
 ---
 title: Settings
-description: Tune Orchard while it's running — Application features like the sovereign Bitcoin price oracle and AI agents, Device preferences for theme, currency, and locale, and your own User account, all from the dashboard rather than environment variables.
+description: "Tune Orchard while it's running: Application features like the sovereign Bitcoin price oracle and AI agents, Device preferences such as theme, currency, and locale, and your own User account, all from the dashboard rather than environment variables."
 ---
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-The settings pages let you personalize your user and the application. 
-Everything is organised under three top-level tabs:
+The settings pages let you personalize your user and the application.
+Everything is organized under three top-level tabs:
 
 - **Application** — preferences that apply to the whole instance.
 - **Device** — preferences scoped to the browser you're signed in from.
 - **User** — preferences for your own account.
 
-{/* separate from the environmentvariables you set when you [installed it](/install/configuration/) */}
-
-
+{/* separate from the environment variables you set when you [installed it](/install/configuration/) */}
 
 <figure class="screenshot">
 
@@ -31,8 +29,7 @@ Application settings enable optional features that apply to the whole instance f
 ### Bitcoin
 
 The **Sovereign USD Price Oracle** lives here. Enable it and Orchard derives a US-dollar
-price from your own node's on-chain data once a day, at 00:00 UTC. There is no exchange API involved, no
-third-party feeds at all to preserve your privacy. It uses the open-source
+price from your own node's on-chain data once a day, at 00:00 UTC. There is no exchange API and no third-party feeds at all, so your activity stays private. It uses the open-source
 [UTXOracle](https://utxo.live/oracle/) method, adapted for Orchard. Leave it disabled and
 conversions will be hidden.
 
@@ -44,15 +41,15 @@ conversions will be hidden.
 
 ### AI
 
-Turn on the optional AI integration to get in app assistants and a background agent running on your server.
+Turn on the optional AI integration to get in-app assistants and a background agent running on your server.
 Orchard supports two model providers:
 
 - **Ollama** — local models on your own hardware.
 - **OpenRouter** — cloud-hosted models with an API key.
 
-The agent is completly customizable. You can define:
+The agent is completely customizable. You can define:
 
-- **AI Agent** — The response agent that answers questions over Telegram and answers 
+- **AI Agent** — The response agent that answers questions over Telegram and answers
   follow up questions about alerts. You configure a model, a system prompt,
   and a scoped set of **tools** across Bitcoin, Lightning, and the mint.
 - **Agent Jobs** — a custom prompt paired with a schedule, running unattended and reporting back; for
@@ -80,7 +77,7 @@ Switch between a **dark** and **light** appearance, or follow your system prefer
 Choose how amounts are shown — both the bitcoin unit (BTC, mBTC, sat) and the fiat
 currency (USD, EUR, and so on).
 
-### AI
+### AI model
 
 Pick which model the in-app assistants use, from the models your chosen provider offers.
 

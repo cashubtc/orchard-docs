@@ -1,13 +1,13 @@
 ---
 title: Run a Cashu Mint
-description: Install a CDK Cashu mint (cdk-mintd) from the official prebuilt binary, backed by your own LND node — with Postgres, Redis, a hardened systemd service, and a Cloudflare Tunnel to put it online. Part of the New Mint walkthrough.
+description: Install a CDK Cashu mint (cdk-mintd) from the official prebuilt binary, backed by your own LND node, with Postgres, Redis, a hardened systemd service, and a Cloudflare Tunnel to put it online. Part of the New Mint walkthrough.
 ---
 
 import { Aside, Code, CardGrid, LinkCard } from '@astrojs/starlight/components';
 import { latestCdkVersion } from '../../../data/latest-releases';
 
 The mint. This is the service that issues and redeems ecash using your Lightning node as a backend
-for deposits and withdrawals. Mints are elegent in their operational simplicity, once you've gotten
+for deposits and withdrawals. Mints are elegant in their operational simplicity, once you've gotten
 the setup right.
 
 This is the full walkthrough. It uses [CDK](https://github.com/cashubtc/cdk), the Cashu
@@ -220,7 +220,7 @@ rm cdk-mintd-$VERSION-$ARCH SHA256SUMS
 
 ### Create the data directory
 
-The mint keeps its configuration and seed in a work directory. Following
+The mint keeps its configuration and seed in a work directory. Following the same
 layout, put it under `/data`.
 
 * With user `admin`, create the work directory and give it to the `cdk-mintd` user
@@ -325,7 +325,7 @@ exit
   With `[mint_management_rpc]` enabled, the mint reads `[mint_info]` from this file only
   on first start. After that, info can be managed over the
   gRPC by Orchard, not by editing `config.toml`. It runs insecurely here because Orchard
-  shares this machine and the port is reachable only from within the network. If Orchard runs on a
+  shares this machine, and the port is reachable only from it. If Orchard runs on a
   different host, secure it with
   [mutual TLS](#secure-the-management-api-with-mutual-tls) instead.
 </Aside>
@@ -430,7 +430,7 @@ curl http://127.0.0.1:8085/v1/info
 
 **Example** of expected output (truncated):
 
-<Code code={`{"name":"Your Mint","version":"cdk-mintd/${latestCdkVersion}","description":"A Cashu mint backed by my own Lightning node","contact":[...],"nuts":{...}}`} />
+<Code code={`{"name":"Your Mint","version":"cdk-mintd/${latestCdkVersion}","description":"Sovereign bank in cyberspace","contact":[...],"nuts":{...}}`} />
 
 <Aside type="tip" title="Mint is up">
   A JSON response from `/v1/info` means the mint is running and serving its API.
@@ -505,7 +505,7 @@ curl https://mint.yourdomain.com/v1/info
 ### Secure the management API with mutual TLS
 
 The management gRPC runs insecurely in the main setup because Orchard shares this machine
-and the port is reachable only from the local network. If Orchard runs on a different host, or you want
+and the port is reachable only from the machine itself. If Orchard runs on a different host, or you want
 authentication once the connection leaves this machine, give the interface mutual TLS instead.
 `cdk-mintd` does not generate these certificates: you create a small private CA that
 signs one certificate for the mint and one for Orchard.

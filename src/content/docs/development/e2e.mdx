@@ -1,5 +1,5 @@
 ---
-title: End-to-end testing
+title: End-to-End Testing
 description: Run Orchard's Playwright end-to-end tests against full Docker stacks (Bitcoin, Lightning, a Cashu mint, and Orchard built from source) across five backend configurations.
 ---
 
@@ -36,7 +36,7 @@ Lightning node, mint implementation, and database:
 | `cln-nutshell-postgres` | core | cln | nutshell | Postgres |
 | `lnd-cdk-sqlite` | core | lnd | cdk | SQLite |
 | `cln-cdk-postgres` | core | cln | cdk | Postgres |
-| `fake-cdk-postgres` | - | - | cdk | Postgres |
+| `fake-cdk-postgres` | — | — | cdk | Postgres |
 
 `fake-cdk-postgres` runs without Bitcoin or Lightning, to exercise Orchard when
 those services are absent.
@@ -50,7 +50,7 @@ template to `e2e/.env` (gitignored) and uncomment what you need:
 cp e2e/.env.example e2e/.env
 ```
 
-### AI tests
+### AI model
 
 | Variable | Default | Description |
 | --- | --- | --- |

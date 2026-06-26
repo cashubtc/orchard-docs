@@ -1,13 +1,13 @@
 ---
 title: AI
-description: Orchard's optional AI layer — enable a provider, then get a context-aware assistant throughout the app plus a background agent that runs scheduled jobs and reaches you over Telegram.
+description: "Orchard's optional AI layer: enable a provider, then get a context-aware assistant throughout the app plus a background agent that runs scheduled jobs and reaches you over Telegram."
 ---
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 Orchard contains some built-in AI features, but they are optional and off by default.
 Enabled and configured, it gives two things:
-- Background **agent** — run scheduled jobs and reach you over Telegram. 
+- Background **agent** — run scheduled jobs and reach you over Telegram.
 - Context-aware **assistants** — help you in specific contexts inside the UI.
 
 You switch it on and customize it under [Settings → Application → AI](/orchard/settings/#ai).
@@ -44,7 +44,7 @@ It can:
 - Run scheduled jobs.
 - Send and answer messages through Telegram.
 
-<Aside type="note" title="Secutity model">
+<Aside type="note" title="Security model">
   The agent is sandboxed by the application and cannot access your system or network.
   It can only access the data and services that you grant it access to.
 </Aside>

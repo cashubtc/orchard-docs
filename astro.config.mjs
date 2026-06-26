@@ -40,7 +40,7 @@ export default defineConfig({
     starlight({
       title: 'Orchard Docs',
       description:
-        'Documentation for Orchard — the all-in-one Cashu mint manager. Guides for setting up and running your own sovereign bank in cyberspace.',
+        'Documentation for Orchard, the all-in-one Cashu mint manager. Guides for setting up and running your own sovereign bank in cyberspace.',
       // Emits /llms.txt (a curated map), /llms-full.txt (the whole corpus),
       // /llms-small.txt (a trimmed variant), and one subset per journey — all
       // static files generated at build for AI agents. Pairs with the per-page
@@ -51,7 +51,7 @@ export default defineConfig({
           description:
             'Operator documentation for Orchard, the free, self-hosted, all-in-one Cashu mint manager. Written for people running their own Bitcoin + Lightning + Cashu mint, not for API consumers.',
           details: [
-            'Orchard is a free, open-source, self-hosted web app that manages a complete Cashu mint stack — Bitcoin Core, a Lightning node, the mint, and the machine they run on — from one dashboard.',
+            'Orchard is a free, open-source, self-hosted web app that manages a complete Cashu mint stack (Bitcoin Core, a Lightning node, the mint, and the machine they run on) from one dashboard.',
             'These are product/operator docs for self-hosters setting up and running their own mint, not developer API docs. The source code lives at https://github.com/cashubtc/orchard; this site is canonical for how to install, run, and operate Orchard.',
             'Append `.md` to any page URL (for example https://docs.orchard.space/new-mint/system.md) to fetch that page as raw Markdown.',
           ].join('\n\n'),
@@ -166,9 +166,9 @@ export default defineConfig({
           label: 'Development',
           items: [
             { label: 'Development', slug: 'development' },
-            { label: 'Running locally', slug: 'development/running-locally' },
+            { label: 'Running Locally', slug: 'development/running-locally' },
             { label: 'Testing & CI', slug: 'development/testing' },
-            { label: 'End-to-end testing', slug: 'development/e2e' },
+            { label: 'End-to-End Testing', slug: 'development/e2e' },
           ],
         },
       ],

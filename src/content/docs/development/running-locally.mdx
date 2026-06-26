@@ -3,21 +3,36 @@ title: Running locally
 description: "Run Orchard's client and server dev processes from a clone, and apply the configuration specific to development: the dev auth bypass, verbose logging, the development database, and GraphQL type generation."
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Aside, Steps } from '@astrojs/starlight/components';
 
 In development the client and server run as two separate processes. The server
-serves the GraphQL API, and the Angular dev server serves the UI with live reload
-and forwards API calls to the server.
+hosts the GraphQL API, and the Angular dev server hosts the UI with live reload
+and proxies API calls to the server.
 
 ## Get the code
 
-```bash
-git clone https://github.com/cashubtc/orchard.git
-cd orchard
-npm install
-```
+<Steps>
 
-Then create your `.env` from the example and set at least `SETUP_KEY`:
+1. Fork [`cashubtc/orchard`](https://github.com/cashubtc/orchard) on GitHub.
+
+2. Clone your fork:
+
+   ```bash
+   git clone https://github.com/<you>/orchard.git
+   cd orchard
+   ```
+
+3. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+</Steps>
+
+### Configure the environment
+
+Next create your `.env` from the example.
 
 ```bash
 cp .env.example .env
@@ -44,6 +59,17 @@ Two variants are available:
 | `npm run start:server:nowatch` | Single run, no watching. |
 | `npm run start:server:debug` | Watch mode with the Node inspector attached. |
 
+### GraphQL Playground
+
+The development server also exposes a GraphQL playground at **`http://localhost:3321/api`** (default).
+Here you can browse the schema and run queries, mutations, and subscriptions against your local server.
+
+<Aside type="note" title="Running queries without logging in">
+  Requests from the explorer go through the same auth as the app. Set
+  [`DEV_AUTH_BYPASS=true`](#skip-authentication) so unauthenticated requests are granted
+  admin access while you work.
+</Aside>
+
 ## Start the client
 
 In a second terminal:
@@ -53,17 +79,11 @@ npm run start:client
 ```
 
 This generates the runtime config, regenerates the GraphQL types, then starts the
-Angular dev server on **`http://localhost:4200`**. Open that address to use
-Orchard. The dev server reloads the page as you change client code.
+Angular dev server on **`http://localhost:4200`**. Open that address to see
+Orchard's UI. The dev server reloads the page as you change client code.
 
 The client reaches the server through a proxy: requests to `/proxy` are forwarded
-to `SERVER_HOST:SERVER_PORT` (set in `proxy.conf.js`), so during development you
-only open the `4200` address. The `3321` server does not need to be opened directly.
-
-<Aside type="note" title="Building the client without serving">
-  `npm run watch:client` rebuilds the client to disk on each change without
-  running the dev server. For normal development, `start:client` is what you want.
-</Aside>
+to `SERVER_HOST:SERVER_PORT` (set in `proxy.conf.js`).
 
 ## GraphQL types
 
@@ -86,7 +106,8 @@ DEV_AUTH_BYPASS=true
 ```
 
 With this set, unauthenticated requests are granted admin access, so you can work
-on the UI without logging in. The server logs a warning on startup when it is on.
+on the codebase without authentication.
+The server logs a warning on startup when it is on.
 
 <Aside type="caution" title="Never enable this in production">
   `DEV_AUTH_BYPASS` removes authentication entirely. It is for local development
@@ -103,21 +124,13 @@ Raises the log level so you see the detailed output that helps while debugging.
 The full range, quietest to loudest, is `fatal`, `error`, `warn`, `info`,
 `debug`, `verbose`.
 
-### The development database
+### The database
 
-In development the server uses SQLite, stored at `DATABASE_DIR` (default
-`data/orchard.db`). The file is created automatically on first run, and the schema
+In development the database is created (default
+`data/orchard.db`) automatically on first run, and the schema
 is kept in step with the code automatically, so you do not run migrations for
 routine development.
 
 The `migration:generate`, `migration:run`, `migration:revert`, and
 `migration:show` scripts are there for working on schema changes that ship to
 production, where the schema is not synced automatically.
-
-### Non-production examples
-
-The repository also includes `.env.regtest` and `.env.testnet`, example
-environment files for local, non-production setups. They turn logging up to
-`debug` and point the mint database at a local path. Treat them as references to
-adapt to your own machine rather than drop-in files: the paths in them are
-specific to the author's setup.

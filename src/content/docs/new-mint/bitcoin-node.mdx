@@ -1,43 +1,56 @@
 ---
 title: Run a Bitcoin Node
-description: Stand up your own Bitcoin Core node — the base layer your Lightning node and Cashu mint settle down to. Part of the New Mint walkthrough.
+description: Stand up your own Bitcoin Core node — the base layer your Lightning node and Cashu mint settle down to. Follows the MiniBolt Bitcoin guide. Part of the New Mint walkthrough.
 ---
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-The base layer. A Bitcoin full node validates the chain independently, so your
+The roots. A Bitcoin full node validates the chain independently, so your
 Lightning node trusts your own copy of the ledger rather than someone else's.
 Running your own node is what makes the rest of the stack genuinely sovereign.
 
-## What you'll set up
+## What this step covers
 
-- **Bitcoin Core (`bitcoind`)** — the reference full node. Install it, let it
+- **Bitcoin Core (`bitcoind`)**: the reference full node. You install it, let it
   perform its initial block download, and keep it online.
 - **An RPC connection** your Lightning node can reach, so Lightning can watch the
   chain and broadcast transactions.
 
-Plan for the initial sync to take time and disk: a full node needs several hundred
-gigabytes and can take a day or more to validate from genesis.
+Plan for the initial sync to take time and disk: a full node needs almost 1TB of disk 
+and can take a day or more to validate from genesis.
 
 <Aside type="note" title="Pruned vs. full">
-  Lightning backends differ in what they need from Bitcoin Core. Check your chosen
-  Lightning node's requirements before committing to a pruned node — some features
-  expect an unpruned chain or a transaction index.
+  LND runs fine against a pruned `bitcoind`, fetching any blocks it lacks from your
+  node's peers. But some of Orchard's Bitcoin features work best with a full node,
+  so that is what this guide sets up.
 </Aside>
 
-<Aside type="caution" title="Exact commands are on the way">
-  Until the step-by-step setup lands here, follow the official
-  [Bitcoin Core documentation](https://bitcoincore.org/en/doc/) and the
-  [bitcoin/bitcoin repository](https://github.com/bitcoin/bitcoin) as the source of
-  truth for installing and configuring `bitcoind`.
-</Aside>
+## Follow MiniBolt's Bitcoin guide
 
-## Next
+We do not reproduce these steps. [MiniBolt's Bitcoin section](https://minibolt.minibolt.info/bitcoin/bitcoin)
+is the guide we recommend (see [the guides we build on](/new-mint/#the-guides-we-build-on)
+for why). Only the first page is required for an Orchard mint; the rest are optional
+add-ons. The install is the same whether you are on a home server or a VPS — the tips
+below just cover which pages matter and which you can skip.
 
-<CardGrid>
-  <LinkCard
-    title="Next: Lightning Node"
-    href="/new-mint/lightning-node/"
-    description="With the chain in place, stand up LND or Core Lightning on top of it."
-  />
-</CardGrid>
+<LinkCard
+  title="Open MiniBolt: Bitcoin"
+  href="https://minibolt.minibolt.info/bitcoin/bitcoin"
+  target="_blank"
+  rel="noopener noreferrer"
+  description="Install Bitcoin Core and let it sync, then come back here for Lightning."
+/>
+
+## General guide tips
+
+- **[2.1 Bitcoin client: Bitcoin Core](https://minibolt.minibolt.info/bitcoin/bitcoin/bitcoin-client)** (follow):
+  Install and configure `bitcoind`. The RPC connection you set up here is what your
+  Lightning node connects to in the next step.
+- **[2.3 Blockchain explorer: BTC RPC Explorer](https://minibolt.minibolt.info/bitcoin/bitcoin/blockchain-explorer)** (optional, nice to have):
+  Orchard does not have rich block exploration yet, so a local
+  explorer like this or mempool.space are useful add-ons in the meantime.
+- **[2.2 Electrum server](https://minibolt.minibolt.info/bitcoin/bitcoin/electrum-server)**
+  and **[2.4 Desktop signing app: Sparrow](https://minibolt.minibolt.info/bitcoin/bitcoin/desktop-signing-app-sparrow)** (optional):
+  Set these up only if you plan to also use this Bitcoin node as the backend for your own
+  signing wallets. Fulcrum or Electrs are the Electrum server, Sparrow the desktop wallet that
+  connects to it. The mint and Lightning node do not need either, so skip both otherwise.

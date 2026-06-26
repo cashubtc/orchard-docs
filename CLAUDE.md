@@ -21,6 +21,9 @@ is Claude-specific or worth surfacing for quick recall.
   the product — write for the self-hoster, not a contributor. The README is being
   trimmed to a pointer **to this site**, so the docs (not the README) are
   canonical; link the repo for code, not as the how-to-run authority. (See AGENTS.md.)
+- **One exception: the Development section.** [src/content/docs/development/](src/content/docs/development/)
+  is contributor-facing (run from source, dev config, testing/CI, e2e) — the one
+  deliberate carve-out from "product docs, not developer docs." Keep it narrow; see AGENTS.md.
 - **Content lives in** [src/content/docs/](src/content/docs/) as `.md`/`.mdx`;
   the file path is the URL.
 - **Theme & fonts:** [src/styles/orchard.css](src/styles/orchard.css) maps the

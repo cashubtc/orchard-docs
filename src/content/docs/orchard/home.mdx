@@ -1,0 +1,49 @@
+---
+title: Home
+description: Operate your Cashu mint from Orchard's Home screen — a summary of Bitcoin, Lightning, and the mint side by side, so the day-to-day is a glance instead of a terminal session.
+---
+
+import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+A sovereign Cashu mint runs every layer of the Bitcoin stack. They all converge here.
+Your home page gives you an operational overview of all the services you run in a single place.
+
+<figure class="screenshot">
+
+![Orchard's Home view stacking a summary of each service. The Bitcoin section shows an Info card with the node online, peer count, a block height of 954,732, and chain weight, beside a Hot Wallet balance and live mempool fee rates. The Lightning section shows an Info card for the node "bob" — the mint backend, online — beside a Channel Summary with total capacity split into local and remote.](../../../assets/your-orchard-dashboard.png)
+
+<figcaption>Information, balances, and activity all in one place.</figcaption>
+
+</figure>
+
+<Aside type="note">
+Errors with your configurations or connections will be signaled on the home page.
+</Aside>
+
+## Bitcoin
+
+A connected Bitcoin node populates this section.
+
+- **Info** — node status, peers, block height, and chain weight.
+- **Hot Wallet** — the Lightning node's on-chain balances.
+- **Mempool** — live fee rates, or sync progress while the chain catches up.
+
+## Lightning
+
+A connected Lightning node populates this section.
+
+- **Info** — node, online status, peers, and open channels.
+- **Channel Summary** — total capacity, split into local and remote.
+- **Taproot Assets** — per-asset channel summaries, if connected.
+
+## Mint
+
+A connected mint populates this section.
+
+- **Info** — mint name, status, and description.
+- **Activity** — mints, melts, and swaps over a day, week, month, or year, with completion rates.
+- **Balance Sheet** — assets against liabilities per unit, with liability coverage and fee revenue.
+
+## Ecash
+
+Admin ecash wallet coming soon.

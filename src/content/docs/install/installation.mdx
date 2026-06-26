@@ -1,0 +1,155 @@
+---
+title: Installing Orchard
+description: Install Orchard the way that suits your box — a standard Node.js install from source, or Docker from source or the prebuilt registry image. Always pinned to a release tag.
+---
+
+import { Aside, Code, CardGrid, LinkCard, Tabs, TabItem } from '@astrojs/starlight/components';
+import { latestTag, latestVersion } from '../../../data/latest-releases';
+
+There are three ways to install Orchard. Choose whichever suits your setup:
+
+1. **Standard** — built from source.
+2. **Docker** — a container built from source.
+3. **Docker** — a container from the published image.
+
+## Prerequisites
+
+- **A host machine** — One you control, that is able to reach the services you
+  manage (Bitcoin, Lightning, Cashu Mint).
+- **For the standard install** — [Node.js](https://nodejs.org) **v22**, which
+  includes npm.
+- **For the Docker install** — Docker with the Compose plugin.
+
+<Aside type="note" title="Choosing a host machine">
+  Orchard can run on a home server or a cloud-hosted machine. 
+  The more reliable the network and power the better.
+  At least **4 GB of RAM** is required when building from source.
+</Aside>
+
+## Get the code
+
+All install paths start from a checked-out release tag. Clone the repository and
+check out the latest release.
+
+<Code
+  lang="bash"
+  code={`git clone https://github.com/cashubtc/orchard.git
+cd orchard
+git fetch --tags
+git checkout ${latestTag}   # latest release tag`}
+/>
+
+<Aside type="caution" title="Always run a release tag">
+  Running from `master` is unsupported and may leave your database in a state that
+  can't be cleanly upgraded. Check out the latest tag from the
+  [releases page](https://github.com/cashubtc/orchard/releases) before installing or
+  updating.
+</Aside>
+
+## Configure
+
+Before starting Orchard, create your `.env` from the example and fill it in:
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+At minimum set `SETUP_KEY`; everything else has a sensible default or is optional.
+The [Configuration](/install/configuration/) page walks through every option,
+including how to point Orchard at your Bitcoin, Lightning, and Cashu Mint services.
+
+## Install
+
+<Tabs>
+  <TabItem label="Standard (Node.js)">
+    Install dependencies, build the app, and start it:
+
+    ```bash
+    npm install
+    npm run build
+    npm run start
+    ```
+
+    Orchard now serves on `SERVER_HOST:SERVER_PORT` (`localhost:3321` by default).
+    Open that address to reach the dashboard.
+  </TabItem>
+  <TabItem label="Docker (from source)">
+    Build the image from the checked-out source and start it in the background:
+
+    ```bash
+    docker compose build
+    docker compose up -d
+    ```
+  </TabItem>
+  <TabItem label="Docker (registry image)">
+    Skip the build and pull the prebuilt image from
+    [GitHub Container Registry](https://github.com/cashubtc/orchard/pkgs/container/orchard):
+
+    ```bash
+    docker compose -f docker-compose.yml -f compose.image.yml up -d
+    ```
+
+    The image defaults to `latest`. Pin a release by setting `VERSION` in `.env`,
+    or prefix it onto the command:
+
+    <Code
+      lang="bash"
+      code={`VERSION=${latestVersion} docker compose -f docker-compose.yml -f compose.image.yml up -d`}
+    />
+  </TabItem>
+</Tabs>
+
+## Updating
+
+To update, start by checking out the new release tag. 
+Pick the tab that matches your setup.
+
+<Tabs>
+  <TabItem label="Standard (Node.js)">
+    Check out the new release tag, then rebuild and restart:
+
+    <Code
+      lang="bash"
+      code={`git fetch --tags
+git checkout ${latestTag}   # the latest release tag
+npm install
+npm run build
+npm run start`}
+    />
+  </TabItem>
+  <TabItem label="Docker (from source)">
+    Check out the new release tag, then rebuild the image and re-up:
+
+    <Code
+      lang="bash"
+      code={`git fetch --tags
+git checkout ${latestTag}   # the latest release tag
+docker compose build
+docker compose up -d`}
+    />
+  </TabItem>
+  <TabItem label="Docker (registry image)">
+    Check out the new release tag too — the prebuilt image ships in the registry,
+    but `docker-compose.yml` and `.env.example` still come from the checkout and
+    can change between releases. Then re-up to pull the matching image:
+
+    <Code
+      lang="bash"
+      code={`git fetch --tags
+git checkout ${latestTag}   # the latest release tag
+VERSION=${latestVersion} docker compose -f docker-compose.yml -f compose.image.yml up -d`}
+    />
+
+    Or set `VERSION` in `.env` to match the tag and run the plain
+    `docker compose … up -d`.
+  </TabItem>
+</Tabs>
+
+<Aside type="tip" title="Check the release notes">
+  Before updating, read the
+  [release notes](https://github.com/cashubtc/orchard/releases) for the version
+  you're moving to. They call out any migration steps or config changes you need
+  to apply.
+</Aside>
+

@@ -1,0 +1,74 @@
+---
+title: AI
+description: Orchard's optional AI layer — enable a provider, then get a context-aware assistant throughout the app plus a background agent that runs scheduled jobs and reaches you over Telegram.
+---
+
+import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+Orchard contains some built-in AI features, but they are optional and off by default.
+Enabled and configured, it gives two things:
+- Background **agent** — run scheduled jobs and reach you over Telegram. 
+- Context-aware **assistants** — help you in specific contexts inside the UI.
+
+You switch it on and customize it under [Settings → Application → AI](/orchard/settings/#ai).
+
+<figure class="screenshot">
+
+![Orchard's AI settings on the Application tab: the AI section with a Telegram messaging integration and agent cards, and an open "New agent job" dialog defining a "Lightning Node Watcher" — its model, description, and system prompt. On the right, an "Agent Settings Assistant" chat log shows the assistant applying changes through tool calls like agent name, description, system-message, and schedule updates.](../../../assets/your-orchard-ai.png)
+
+<figcaption>Every Orchard needs a groundskeeper.</figcaption>
+
+</figure>
+
+## The integration
+
+Enable AI, then point Orchard at a model provider:
+
+- **[Ollama](https://ollama.com)** — local models on your own hardware. Set the **API Endpoint** (Ollama
+  defaults to `http://localhost:11434`), and everything stays local and private.
+- **[OpenRouter](https://openrouter.ai)** — cloud-hosted models, payable with Bitcoin, reached through a single **API key**.
+
+<Aside type="tip" title="Local or cloud">
+  Ollama keeps prompts on your own machine; OpenRouter sends them to a third party. If
+  keeping your operations private matters, local models win.
+</Aside>
+
+## The agent
+
+Enabling AI adds a built-in agent: the **Groundskeeper**.
+You can configure how it behaves and what it can do in [Settings → Application → AI](/orchard/settings/#ai).
+
+It can:
+
+- Answer questions about your stack.
+- Run scheduled jobs.
+- Send and answer messages through Telegram.
+
+<Aside type="note" title="Secutity model">
+  The agent is sandboxed by the application and cannot access your system or network.
+  It can only access the data and services that you grant it access to.
+</Aside>
+
+## Messaging (Telegram)
+
+The agent can send and answer messages through Telegram. This allows you to receive alerts on your phone,
+and answer questions wherever you are.
+
+- Configure the Telegram bot at [Settings → Application → AI](/orchard/settings/#ai).
+- Add your personal Telegram Chat ID under [Settings → User → Messaging](/orchard/settings/#messaging).
+
+## Agent jobs
+
+You can define custom jobs for the agent to run. This allows you to run scheduled tasks, such as:
+- Monitoring the health of your services.
+- Monitoring the status of your system resources.
+- Regular reports on activity / performance.
+- Alerts on critical issues and events.
+
+## In-app assistants
+
+Beyond the agent system, enabling AI puts context-aware assistants into the UI
+itself. These assistants are designed to help in specific contexts:
+- Adjust filters on tables and charts.
+- Complete forms.
+- Answer questions about the app.

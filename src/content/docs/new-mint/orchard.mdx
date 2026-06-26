@@ -1,43 +1,462 @@
 ---
-title: Set Up Orchard
-description: Point Orchard at the Bitcoin, Lightning, and mint stack you just built and manage your sovereign Cashu mint from a single dashboard.
+title: Install Orchard
+description: Install Orchard from source with its own user and point it at the Bitcoin, Lightning, and Cashu mint you just built. The final step of the New Mint walkthrough, after which you manage the whole stack from one private dashboard.
 ---
 
-import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { Aside, Code, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { latestTag } from '../../../data/latest-releases';
 
-The last step. With Bitcoin, Lightning, and your mint all running, Orchard ties
-them together — keys, balances, and mint health in one dashboard, so you tend the
-mint instead of babysitting a terminal.
+Orchard itself: the web app that manages the stack you just built. It connects to your
+Bitcoin node, your Lightning node, and your Cashu mint, and surfaces them in one
+dashboard so you tend the mint instead of watching a terminal. This is the last step.
 
-## What you'll set up
+Like every other service, Orchard runs under its own user and points at endpoints you
+already configured, so the values in this step come straight from the ones before it.
+It is a private admin dashboard, so unlike the mint it is never exposed to the public
+internet.
 
-- **Somewhere to run Orchard** — a VPS, home server, or any box you keep online.
-- **A connection to your mint**, so Orchard can read and manage it.
-- **The dashboard**, where balances, keys, and mint info come together.
+## What this step covers
 
-<Aside type="tip" title="The groundskeeper">
-  Orchard watches the mint so you don't have to refresh a log all day — health and
-  activity surface where you already are.
+- **An isolated `orchard` user** that runs the app and reads only what it needs.
+- **Orchard built from source** and run as a service.
+- **Connections to the stack you built** — your mint (its API, database, and management
+  gRPC), plus your Lightning and Bitcoin nodes.
+- **Private access to the dashboard** over an SSH tunnel or a Tor hidden service.
+
+## Requirements
+
+- **The full stack from this walkthrough running**: [system](/new-mint/system/),
+  [Bitcoin](/new-mint/bitcoin-node/), [Lightning](/new-mint/lightning-node/), and the
+  [Cashu mint](/new-mint/mint/), with the mint's management gRPC enabled (it is, in the
+  mint step's `config.toml`).
+- **Node.js 22**, which Orchard requires.
+- **The Orchard setup key** you wrote down in the [System step](/new-mint/system/#general-guide-tips).
+
+## Preparations
+
+### Check Node + NPM
+
+* With user `admin`, check that Node.js 22 is installed
+
+```bash
+node -v
+```
+
+**Example** of expected output:
+
+```
+v22.14.0
+```
+
+If the version is below 22 or Node is missing, install it with MiniBolt's
+[Node + NPM guide](https://minibolt.minibolt.info/bonus/system/nodejs-npm), then come
+back here.
+
+### Create the Orchard database role
+
+Orchard reads the mint's database and can back it up, but it never writes to it: changes
+go through the management gRPC. Give it a dedicated role with read-only access to the
+`cdk_mintd` database, scoped so it cannot read your Lightning node's database on the same
+instance.
+
+* With user `admin`, create the role and grant it read access. The mint created its
+  tables on first start in the previous step, so the grants apply to them
+
+```bash
+sudo -u postgres psql <<'SQL'
+CREATE ROLE orchard WITH LOGIN PASSWORD 'your-orchard-db-password';
+GRANT CONNECT ON DATABASE cdk_mintd TO orchard;
+\c cdk_mintd
+GRANT USAGE ON SCHEMA public TO orchard;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO orchard;
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO orchard;
+ALTER DEFAULT PRIVILEGES FOR ROLE cdk_mintd IN SCHEMA public GRANT SELECT ON TABLES TO orchard;
+ALTER DEFAULT PRIVILEGES FOR ROLE cdk_mintd IN SCHEMA public GRANT SELECT ON SEQUENCES TO orchard;
+SQL
+```
+
+A read-only role is all `pg_dump` needs, so the same grant both feeds the dashboard and
+lets Orchard back the mint up.
+
+## Installation
+
+### Create the orchard user & group
+
+Give Orchard its own unprivileged user, the same as every other service in the stack.
+
+* With user `admin`, create the `orchard` user and group
+
+```bash
+sudo adduser --disabled-password --gecos "" orchard
+```
+
+* Add it to the `lnd` group so it can read your Lightning node's certificate and
+  macaroon for health checks
+
+```bash
+sudo usermod -aG lnd orchard
+```
+
+### Create the data directory
+
+Keep Orchard's data under `/data`, the same place the rest of the stack stores its data.
+
+* With user `admin`, create the directory and give it to the `orchard` user
+
+```bash
+sudo mkdir -p /data/orchard
+sudo chown -R orchard:orchard /data/orchard
+```
+
+### Download and build Orchard
+
+Build as the `orchard` user so the app lives in its home.
+
+* Change to the `orchard` user
+
+```bash
+sudo su - orchard
+```
+
+* Clone Orchard and check out the latest release. Do not run from `master`: it is
+  unsupported and can leave the database in a state that will not upgrade cleanly
+
+<Code
+  lang="bash"
+  code={`git clone https://github.com/cashubtc/orchard.git && cd orchard
+git fetch --tags
+git checkout ${latestTag}`}
+/>
+
+* Install the dependencies and build the app
+
+```bash
+npm install
+npm run build
+```
+
+The build takes a few minutes on first run. Stay as the `orchard` user for the next
+step.
+
+## Configuration
+
+Orchard is configured through a `.env` file. Only Orchard's own settings are required;
+each service connection is optional and switched on by filling in its section.
+
+* As the `orchard` user, copy the template and open it
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+* Fill in the following. Only the Orchard section is required; the Bitcoin, Lightning,
+  and mint sections are each optional, switched on by filling them in. The connection
+  values are the ones you set in earlier steps
+
+```ini title="/home/orchard/orchard/.env"
+# --------------------------------------------
+# Orchard Configs (required)
+# --------------------------------------------
+SETUP_KEY=your-saved-orchard-setup-key
+SERVER_HOST=localhost
+SERVER_PORT=3321
+LOG_LEVEL=warn
+
+# --------------------------------------------
+# Orchard Configs (optional)
+# --------------------------------------------
+# Keep Orchard's data under /data with the rest of the stack
+DATABASE_DIR=/data/orchard
+# Route Orchard's outbound traffic through the Tor service from your system setup
+TOR_PROXY_SERVER=socks://127.0.0.1:9050
+
+# --------------------------------------------
+# Bitcoin Configs (optional)
+# --------------------------------------------
+# valid types: core
+BITCOIN_TYPE=core
+BITCOIN_RPC_HOST=localhost
+BITCOIN_RPC_PORT=8332
+BITCOIN_RPC_USER=minibolt
+BITCOIN_RPC_PASSWORD=your-bitcoin-rpc-password
+
+# --------------------------------------------
+# Lightning Configs (optional)
+# --------------------------------------------
+# valid types: lnd | cln
+LIGHTNING_TYPE=lnd
+LIGHTNING_RPC_HOST=localhost
+LIGHTNING_RPC_PORT=10009
+LIGHTNING_MACAROON=/data/lnd/data/chain/bitcoin/mainnet/readonly.macaroon
+LIGHTNING_CERT=/data/lnd/tls.cert
+
+# --------------------------------------------
+# Cashu Configs (optional)
+# --------------------------------------------
+# valid types: cdk | nutshell
+MINT_TYPE=cdk
+MINT_API=http://localhost:8085
+MINT_DATABASE=postgres://orchard:your-orchard-db-password@127.0.0.1:5432/cdk_mintd
+MINT_RPC_HOST=localhost
+MINT_RPC_PORT=8086
+MINT_RPC_MTLS=false
+```
+
+* Save and exit, then make the Lightning macaroon readable by the `lnd` group and come
+  back to `admin`
+
+```bash
+exit
+```
+
+```bash
+sudo chmod g+r /data/lnd/data/chain/bitcoin/mainnet/readonly.macaroon
+```
+
+<Aside type="note" title="These are your Bitcoin step credentials">
+  MiniBolt's Bitcoin Core sets an `rpcauth` line in `bitcoin.conf` with the username
+  `minibolt` and a password you chose, which is exactly what Orchard needs here. If you
+  set a different username, match it. The Bitcoin connection is optional: leave its
+  section blank to skip it.
 </Aside>
 
-<Aside type="caution" title="Installation steps are on the way">
-  Orchard is under active development, and the step-by-step install guide is still
-  being written — it lands right here. The
-  [Orchard repository](https://github.com/cashubtc/orchard) has the source code in
-  the meantime.
+<Aside type="note" title="If you secured the mint's gRPC with TLS">
+  Setting `MINT_RPC_MTLS=false` matches the plaintext gRPC the mint step sets up for an
+  on-machine Orchard. If you took the
+  [mutual TLS](/new-mint/mint/#secure-the-management-api-with-mutual-tls) option instead,
+  leave `MINT_RPC_MTLS` at its default and point `MINT_RPC_KEY`, `MINT_RPC_CERT`, and
+  `MINT_RPC_CA` at the `client.key`, `client.pem`, and `ca.pem` you generated.
 </Aside>
 
-## Next steps
+<Aside type="note" title="Tor proxy">
+  `TOR_PROXY_SERVER` routes Orchard's outbound traffic through the Tor service your
+  system setup already runs on `127.0.0.1:9050`. If you did not set up Tor, comment that
+  line out.
+</Aside>
+
+### Create systemd service
+
+Run Orchard under its own user so it starts on boot and restarts on failure.
+
+* With user `admin`, create the service file
+
+```bash
+sudo nano /etc/systemd/system/orchard.service
+```
+
+* Paste the following configuration. Save and exit
+
+```ini title="/etc/systemd/system/orchard.service"
+# Orchard: systemd unit for Orchard
+# /etc/systemd/system/orchard.service
+
+[Unit]
+Description=Orchard
+Requires=cdk-mintd.service
+After=cdk-mintd.service lnd.service bitcoind.service
+
+[Service]
+WorkingDirectory=/home/orchard/orchard
+ExecStart=/usr/bin/npm run start
+
+User=orchard
+Group=orchard
+
+# Hardening Measures
+####################
+PrivateTmp=true
+ProtectSystem=full
+NoNewPrivileges=true
+PrivateDevices=true
+
+[Install]
+WantedBy=multi-user.target
+```
+
+* Reload systemd, then enable autoboot **(optional)**
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable orchard
+```
+
+* Prepare `orchard` monitoring by the systemd journal. You can exit at any time with
+  `Ctrl-C`
+
+```bash
+journalctl -fu orchard
+```
+
+## Run
+
+* With user `admin`, start the service
+
+```bash
+sudo systemctl start orchard
+```
+
+### Validation
+
+* Ensure Orchard is listening on its `3321` port, reachable only from this machine
+
+```bash
+sudo ss -tulpn | grep 3321
+```
+
+**Example** of expected output:
+
+```
+tcp   LISTEN 0   511   127.0.0.1:3321   0.0.0.0:*   users:(("node",pid=4242,fd=20))
+```
+
+* From your own computer, open an SSH tunnel to the dashboard. This forwards it to your
+  machine without opening any port to the network
+
+```bash
+ssh -L 8080:127.0.0.1:3321 admin@your-server
+```
+
+Then browse to `http://localhost:8080` and complete the first-run setup with your
+Orchard setup key.
+
+<Aside type="tip" title="Orchard is up">
+  A dashboard at `http://localhost:8080` means Orchard built, started, and is ready to
+  connect to the services you configured. Finish wiring it from the dashboard.
+</Aside>
+
+## Extras (optional)
+
+### Remote access over Tor
+
+For always-on access from anywhere without an SSH tunnel, add a Tor hidden service that
+points at Orchard, the same way MiniBolt does for ThunderHub.
+
+* With user `admin`, edit the `torrc` file
+
+```bash
+sudo nano +63 /etc/tor/torrc --linenumbers
+```
+
+* Add the following in the location-hidden-services section. Save and exit
+
+```
+# Hidden Service Orchard
+HiddenServiceDir /var/lib/tor/hidden_service_orchard/
+HiddenServiceVersion 3
+HiddenServicePort 80 127.0.0.1:3321
+```
+
+* Reload Tor and read your onion address
+
+```bash
+sudo systemctl reload tor
+sudo cat /var/lib/tor/hidden_service_orchard/hostname
+```
+
+Open that `.onion` address in the [Tor browser](https://www.torproject.org) from any
+device. Keep it to yourself: this is your admin dashboard.
+
+## Upgrade
+
+* With user `admin`, stop the service
+
+```bash
+sudo systemctl stop orchard
+```
+
+* Change to the `orchard` user, check out the new release, and rebuild (the tag
+  below is the latest; substitute another release tag to pin a specific version)
+
+<Code
+  lang="bash"
+  code={`sudo su - orchard
+cd orchard
+git fetch --tags
+git checkout ${latestTag}
+npm install
+npm run build
+exit`}
+/>
+
+* With user `admin`, start the service again
+
+```bash
+sudo systemctl start orchard
+```
+
+## Uninstall
+
+<Aside type="danger" title="This removes Orchard">
+  Warning: this section removes Orchard and its settings. Only run these commands if you
+  intend to uninstall.
+</Aside>
+
+### Uninstall service
+
+* With user `admin`, stop and disable the service, then remove the unit
+
+```bash
+sudo systemctl stop orchard
+sudo systemctl disable orchard
+sudo rm /etc/systemd/system/orchard.service
+sudo systemctl daemon-reload
+```
+
+### Delete user & group
+
+* Delete the `orchard` user. Do not worry about the
+  `userdel: orchard mail spool (/var/mail/orchard) not found` message
+
+```bash
+sudo userdel -rf orchard
+```
+
+* Remove Orchard's data directory
+
+```bash
+sudo rm -rf /data/orchard
+```
+
+* Drop Orchard's read-only database role
+
+```bash
+sudo -u postgres psql -d cdk_mintd -c "DROP OWNED BY orchard;"
+sudo -u postgres psql -c "DROP ROLE orchard;"
+```
+
+### Uninstall Tor hidden service
+
+* If you added one, comment out or delete the Orchard block in `torrc` and reload Tor
+
+```bash
+sudo nano +63 /etc/tor/torrc --linenumbers
+sudo systemctl reload tor
+```
+
+## Port reference
+
+| Port | Protocol | Use |
+| --- | --- | --- |
+| 3321 | TCP (localhost) | Orchard dashboard, reached over SSH or Tor |
+
+Orchard has no public port. It is your admin dashboard, so it stays off the Cloudflare
+Tunnel and reachable only over a private channel.
+
+## After new mint
+
+Your stack is complete and managed: Bitcoin, Lightning, a mint, and Orchard tending all
+of it. From here, you operate from the dashboard.
 
 <CardGrid>
   <LinkCard
-    title="Next: Using Orchard"
+    title="Your Orchard"
     href="/orchard/"
-    description="Your mint is up — now operate it from the dashboard and configure what you need."
+    description="Home, your crew, settings, and the services Orchard manages — at a glance."
   />
   <LinkCard
-    title="Orchard on GitHub"
-    href="https://github.com/cashubtc/orchard"
-    description="The source code, releases, and issue tracker for the project."
+    title="Backup & Restore"
+    href="/orchard/mint/#backup-and-restore"
+    description="Keep a current copy of the mint database, and restore it when you need to."
   />
 </CardGrid>

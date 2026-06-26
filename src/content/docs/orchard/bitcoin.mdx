@@ -1,0 +1,44 @@
+---
+title: Bitcoin
+description: Keep an eye on the Bitcoin node behind your mint from Orchard — and run the sovereign, node-only USD price oracle from the Oracle tab.
+---
+
+import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+Connecting your Bitcoin node to Orchard gives you a dedicated view of the node.
+The integration is also used throughout app to quietly power features across the application.
+
+<figure class="screenshot">
+
+![Orchard's Bitcoin view on the Oracle tab, beside a Dashboard tab, for the node "main". A UTC date-range picker and the latest price of $76,729 sit above a UTXOracle backfill form and a chart plotting USD price history over the past months; a backfill is in progress, reporting 13 successful and 0 failed.](../../../assets/your-orchard-bitcoin.png)
+
+<figcaption>The Oracle tab — a node-only USD price feed you can chart and backfill.</figcaption>
+
+</figure>
+
+<Aside type="note" title="Connecting your node">
+  Which Bitcoin node Orchard connects to, and how, is set with environment
+  variables. See [Installation & Configuration](/install/configuration/#bitcoin).
+</Aside>
+
+## Bitcoin Dashboard
+
+Today, the [home page](/orchard/home/#bitcoin) contains information about your bitcoin node.
+A dedicated dashboard is coming soon.
+
+## Oracle
+
+The Oracle is an optional feature that allows you to add in-app USD
+conversions alonside Bitcoin values using only your own node's on-chain data.
+
+You can backfill price history all the way back to 2020 in order to get acurate conversions 
+on historical transactions. To learn more about the Oracle and how to enable it, see [Settings → Application → Bitcoin](/orchard/settings/#bitcoin).
+
+## AI
+
+Connecting a Bitcoin node also gives the [AI agent](/orchard/settings/#ai) read-only tools for knowing
+what's happening on your node:
+
+- **Network Info** — peer connections and network status.
+- **Blockchain Info** — sync progress and chain state.
+- **Bitcoin Analytics** — on-chain payment activity and fees over time.

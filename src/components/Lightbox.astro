@@ -1,0 +1,123 @@
+---
+import Default from '@astrojs/starlight/components/Footer.astro';
+
+// Wired as Starlight's `Footer` override (astro.config.mjs) so this renders once
+// on every page. Two jobs:
+//  1. A decorative "colophon" page marker — a name plate reading "Section · Page"
+//     in a pill, framed by a dashed box, plus the last-updated stamp.
+//  2. A single shared lightbox <dialog> that any `.screenshot` figure expands
+//     into (the script below wires up the clickable screenshots).
+// The default Footer is re-rendered untouched (pagination etc.); its own
+// last-updated row is hidden in src/styles/orchard.css since the stamp is
+// relocated into the colophon. Styling for the colophon, the screenshot hover
+// affordance, and the dialog all live in src/styles/orchard.css. The dialog is
+// a native <dialog> for free focus-trapping, Escape-to-close, and backdrop —
+// no library, stays static and lean.
+
+const { t } = Astro.locals;
+const { sidebar, entry, lastUpdated, lang } = Astro.locals.starlightRoute;
+
+// The marker mirrors the sidebar nav. The page name is the current entry's nav
+// label (not the page's H1/frontmatter title); the section is the top-level
+// group that entry sits in (e.g. "Your Orchard"). Top-level links like Overview
+// belong to no group, so section stays undefined and the marker shows just the
+// page name. Falls back to the page title if the page isn't listed in the nav.
+const containsCurrent = (item) =>
+  item.type === 'link' ? item.isCurrent : item.entries.some(containsCurrent);
+const findCurrent = (items) => {
+  for (const item of items) {
+    const found = item.type === 'link' ? (item.isCurrent ? item : undefined) : findCurrent(item.entries);
+    if (found) return found;
+  }
+};
+const section = sidebar.find((item) => item.type === 'group' && containsCurrent(item))?.label;
+const pageName = findCurrent(sidebar)?.label ?? entry.data.title;
+
+const stamp = lastUpdated?.toLocaleDateString(lang, { dateStyle: 'medium', timeZone: 'UTC' });
+---
+
+<Default />
+
+<div class="colophon">
+  <hr class="colophon__rule" />
+  <p class="colophon__marker">
+    {/* Name plate: a dashed box framing a pill. The box sits behind the pill and
+        is decorative only (aria-hidden). */}
+    <span class="colophon__badge">
+      <span class="colophon__box" aria-hidden="true"></span>
+      <span class="colophon__oval">
+        {section && (
+          <>
+            <span class="colophon__section">{section}</span>
+            <span class="colophon__sep" aria-hidden="true"></span>
+          </>
+        )}
+        <span class="colophon__page">{pageName}</span>
+      </span>
+    </span>
+  </p>
+  {stamp && (
+    <p class="colophon__stamp">
+      {t('page.lastUpdated')}{' '}
+      <time datetime={lastUpdated!.toISOString()}>{stamp}</time>
+    </p>
+  )}
+</div>
+
+<dialog class="lightbox" aria-label="Expanded screenshot">
+  <button type="button" class="lightbox__close" aria-label="Close (Esc)">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M18 6 6 18M6 6l12 12" />
+    </svg>
+  </button>
+  <figure class="lightbox__figure">
+    <img class="lightbox__img" alt="" />
+    <figcaption class="lightbox__caption" hidden></figcaption>
+  </figure>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('.lightbox');
+  const shots = document.querySelectorAll<HTMLImageElement>('.sl-markdown-content .screenshot img');
+
+  if (dialog && shots.length) {
+    const img = dialog.querySelector<HTMLImageElement>('.lightbox__img')!;
+    const caption = dialog.querySelector<HTMLElement>('.lightbox__caption')!;
+    const closeBtn = dialog.querySelector<HTMLButtonElement>('.lightbox__close')!;
+    let trigger: HTMLElement | null = null;
+
+    const open = (source: HTMLImageElement, captionText: string) => {
+      img.src = source.currentSrc || source.src;
+      img.alt = source.alt;
+      caption.textContent = captionText;
+      caption.hidden = captionText === '';
+      trigger = source;
+      dialog.showModal();
+    };
+
+    for (const shot of shots) {
+      const captionText = shot.closest('figure')?.querySelector('figcaption')?.textContent?.trim() ?? '';
+      shot.setAttribute('role', 'button');
+      shot.setAttribute('tabindex', '0');
+      shot.setAttribute('aria-label', `Expand image${shot.alt ? `: ${shot.alt}` : ''}`);
+      shot.addEventListener('click', () => open(shot, captionText));
+      shot.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          open(shot, captionText);
+        }
+      });
+    }
+
+    closeBtn.addEventListener('click', () => dialog.close());
+    // Click on the dialog's own backdrop area (not the image/caption/button) closes it.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    // Return focus to the screenshot that opened the lightbox (Escape included).
+    dialog.addEventListener('close', () => {
+      trigger?.focus();
+      trigger = null;
+    });
+  }
+</script>

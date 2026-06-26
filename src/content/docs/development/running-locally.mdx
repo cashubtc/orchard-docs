@@ -1,0 +1,136 @@
+---
+title: Running locally
+description: "Run Orchard's client and server dev processes from a clone, and apply the configuration specific to development: the dev auth bypass, verbose logging, the development database, and GraphQL type generation."
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+In development the client and server run as two separate processes. The server
+hosts the GraphQL API, and the Angular dev server hosts the UI with live reload
+and proxies API calls to the server.
+
+## Get the code
+
+<Steps>
+
+1. Fork [`cashubtc/orchard`](https://github.com/cashubtc/orchard) on GitHub.
+
+2. Clone your fork:
+
+   ```bash
+   git clone https://github.com/<you>/orchard.git
+   cd orchard
+   ```
+
+3. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+</Steps>
+
+### Configure the environment
+
+Next create your `.env` from the example.
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+The [Configuration](/install/configuration/) page documents every `.env` option,
+including how to point Orchard at your Bitcoin, Lightning, and Cashu mint services.
+
+## Start the server
+
+```bash
+npm run start:server
+```
+
+This runs the NestJS server in watch mode, so it restarts when you change server
+code. It listens on `SERVER_HOST:SERVER_PORT` (`localhost:3321` by default).
+
+Two variants are available:
+
+| Command | What it does |
+| --- | --- |
+| `npm run start:server` | Watch mode, restarts on change. |
+| `npm run start:server:nowatch` | Single run, no watching. |
+| `npm run start:server:debug` | Watch mode with the Node inspector attached. |
+
+### GraphQL Playground
+
+The development server also exposes a GraphQL playground at **`http://localhost:3321/api`** (default).
+Here you can browse the schema and run queries, mutations, and subscriptions against your local server.
+
+<Aside type="note" title="Running queries without logging in">
+  Requests from the explorer go through the same auth as the app. Set
+  [`DEV_AUTH_BYPASS=true`](#skip-authentication) so unauthenticated requests are granted
+  admin access while you work.
+</Aside>
+
+## Start the client
+
+In a second terminal:
+
+```bash
+npm run start:client
+```
+
+This generates the runtime config, regenerates the GraphQL types, then starts the
+Angular dev server on **`http://localhost:4200`**. Open that address to see
+Orchard's UI. The dev server reloads the page as you change client code.
+
+The client reaches the server through a proxy: requests to `/proxy` are forwarded
+to `SERVER_HOST:SERVER_PORT` (set in `proxy.conf.js`).
+
+## GraphQL types
+
+The types in `src/shared` are generated from the server's GraphQL schema.
+`start:client` regenerates them on startup, so most of the time you do not run
+this yourself. After changing the server's GraphQL schema, regenerate them with:
+
+```bash
+npm run generate:types
+```
+
+## Development configuration
+
+A few settings are useful in development that you would not use in production.
+
+### Skip authentication
+
+```ini
+DEV_AUTH_BYPASS=true
+```
+
+With this set, unauthenticated requests are granted admin access, so you can work
+on the codebase without authentication.
+The server logs a warning on startup when it is on.
+
+<Aside type="caution" title="Never enable this in production">
+  `DEV_AUTH_BYPASS` removes authentication entirely. It is for local development
+  only. Leave it unset (or `false`) anywhere reachable by anyone else.
+</Aside>
+
+### Verbose logging
+
+```ini
+LOG_LEVEL=debug
+```
+
+Raises the log level so you see the detailed output that helps while debugging.
+The full range, quietest to loudest, is `fatal`, `error`, `warn`, `info`,
+`debug`, `verbose`.
+
+### The database
+
+In development the database is created (default
+`data/orchard.db`) automatically on first run, and the schema
+is kept in step with the code automatically, so you do not run migrations for
+routine development.
+
+The `migration:generate`, `migration:run`, `migration:revert`, and
+`migration:show` scripts are there for working on schema changes that ship to
+production, where the schema is not synced automatically.

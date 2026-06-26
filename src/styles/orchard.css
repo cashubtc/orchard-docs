@@ -120,6 +120,28 @@
   --sl-color-hairline-shade: #e6d9b4;
 }
 
+/* Page-title sparkle — the marketing site's four-point star (orchard-space
+ * Sparkles.astro, same concave-diamond path) set at the start of every page's
+ * H1. Drawn as a mask filled with currentColor so it tracks the title colour in
+ * both themes. The 80:100 viewBox gives the star its slightly-taller-than-wide
+ * proportions; sized in em so it scales with the heading. The H1 is a two-column
+ * grid — star, then text — aligned centre, so the star stays vertically centred
+ * against the whole title even when it wraps to multiple lines. */
+#_top {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.34em;
+}
+#_top::before {
+  content: '';
+  width: 0.64em;
+  height: 0.8em;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 100'%3E%3Cpath d='M40 0 Q45 47 80 50 Q45 53 40 100 Q35 53 0 50 Q35 47 40 0 Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 100'%3E%3Cpath d='M40 0 Q45 47 80 50 Q45 53 40 100 Q35 53 0 50 Q35 47 40 0 Z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
 /* Logo mark sized to match the marketing header (2rem-wide mark ≈ 1.625rem tall
  * at the orchard glyph's aspect ratio); Starlight defaults it taller. The
  * "ORCHARD DOCS" wordmark beside it is rendered by the SiteTitle override. */
@@ -145,6 +167,62 @@
 .sidebar a[aria-current='page']:focus {
   color: var(--sl-color-white);
   background-color: color-mix(in srgb, var(--sl-color-accent) 15%, transparent);
+}
+
+/* Asides / callouts. Starlight maps each <Aside> type to a semantic color ramp
+ * (note→blue, tip→purple, caution→orange, danger→red) we never define, so they
+ * fall back to its stock cool defaults — off-brand against the warm palette.
+ * Re-skin the four variants onto a warm severity ramp: a neutral cream panel for
+ * note, then orange → gold → red as it escalates; the per-type icon carries the
+ * rest of the distinction. Un-layered so these beat Starlight's layered rules.
+ * Title, border, and inline-link colors all derive from --sl-color-asides-text-accent
+ * and are tuned to clear WCAG AA on each variant's tint in both themes. */
+.starlight-aside--note {
+  --sl-color-asides-text-accent: var(--sl-color-white);
+  --sl-color-asides-border: var(--sl-color-gray-3);
+  background-color: var(--sl-color-gray-6);
+}
+/* Note's title rides the body cream (calm, default), so lift its links to the
+ * gold accent — otherwise they'd vanish into the surrounding content text. */
+.starlight-aside--note .starlight-aside__content a {
+  color: var(--sl-color-accent-high);
+}
+.starlight-aside--tip {
+  --sl-color-asides-text-accent: var(--color-theme-3); /* orange */
+  --sl-color-asides-border: var(--color-theme-3);
+  background-color: var(--sl-color-accent-low);
+}
+.starlight-aside--caution {
+  --sl-color-asides-text-accent: var(--color-theme-2); /* gold */
+  --sl-color-asides-border: var(--color-theme-2);
+  background-color: color-mix(in srgb, var(--color-theme-2) 14%, var(--sl-color-black));
+}
+.starlight-aside--danger {
+  --sl-color-asides-text-accent: #ef6651; /* brand red lifted for AA on near-black */
+  --sl-color-asides-border: var(--color-theme-5);
+  background-color: color-mix(in srgb, var(--color-theme-5) 18%, var(--sl-color-black));
+}
+
+/* Light theme: titles/links need dark, saturated hues to clear AA on the cream
+ * tints (the dark-theme brights wash out). Backgrounds re-tint off the page cream
+ * via --sl-color-black, which flips to the light page color under this selector. */
+:root[data-theme='light'] .starlight-aside--note {
+  --sl-color-asides-border: var(--sl-color-gray-4);
+}
+:root[data-theme='light'] .starlight-aside--tip {
+  --sl-color-asides-text-accent: #a8430b; /* deep orange */
+  --sl-color-asides-border: var(--sl-color-accent);
+  background-color: color-mix(in srgb, var(--color-theme-3) 16%, var(--sl-color-black));
+}
+:root[data-theme='light'] .starlight-aside--caution {
+  --sl-color-asides-text-accent: #7d4d00; /* dark amber */
+  --sl-color-asides-border: var(--color-theme-3);
+  background-color: color-mix(in srgb, var(--color-theme-2) 18%, var(--sl-color-black));
+}
+:root[data-theme='light'] .starlight-aside--danger {
+  --sl-color-asides-text-accent: var(--color-theme-5); /* dark red reads AA on cream */
+  --sl-color-asides-border: var(--color-theme-5);
+  background-color: color-mix(in srgb, var(--color-theme-5) 16%, var(--sl-color-black));
 }
 
 /* Overview hero: lead subtitle + the Get started / Copy prompt CTA pair, echoing
@@ -220,5 +298,426 @@
 @media (prefers-reduced-motion: reduce) {
   * {
     scroll-behavior: auto;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Footer colophon — a tarot-style page marker closing every page (rendered by
+ * the Footer override, src/components/Lightbox.astro). A tapered hairline rule,
+ * then the section + page name set in a pill, framed by a dashed box — a "name
+ * plate" echoing the brand art — with the last-updated stamp beside or beneath
+ * it (see the grid layout below). Kept deliberately recessive so it reads
+ * as a quiet page anchor
+ * and never competes with content: the decorative ink (--colophon-ink) is a
+ * muted warm gray carrying only a faint ember tint, and the text sits on the
+ * muted gray tier — held there because gray-3 is the AA contrast floor on the
+ * dark background; dimmer would drop the label below legibility.
+ * ------------------------------------------------------------------------- */
+
+/* Relocate the stamp: the default footer's last-updated row is hidden here
+ * because its date is re-rendered inside the colophon. No editLink is
+ * configured, so this row is last-updated only; if one is added later, re-home
+ * the link rather than hiding the whole row. */
+footer .meta {
+  display: none;
+}
+
+.colophon {
+  /* Decorative ink shared by the whole name plate (box, pill, dots, separator):
+     a muted warm gray with a faint ember tint, then faded ~22% toward the page
+     background so the frame stays delicate. Dimming it here dims every part in
+     step; the label text rides --sl-color-gray-3 instead, so it isn't touched. */
+  --colophon-ink: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--sl-color-accent) 18%, var(--sl-color-gray-4)) 78%,
+    var(--sl-color-black)
+  );
+  margin-top: 3rem;
+  text-align: center;
+}
+/* The same hairline Starlight draws between the page title and body (the
+ * .content-panel divider, 1px var(--sl-color-hairline)), reused here to part
+ * the body from the footer — and bled out to the full panel width so it touches
+ * the nav on both sides, exactly like that divider.
+ *
+ * That divider is a border on the full-width .content-panel; this rule instead
+ * lives inside the max-width, sometimes-offset content container, so it has to
+ * break out by the panel padding PLUS whatever the container's max-width and
+ * alignment leave over. We make the panel an inline-size container (`:has` keeps
+ * it scoped to the one panel that holds the colophon — Starlight ships no
+ * container queries of its own, so nothing collides), then measure:
+ *   100cqi → the panel's inner width;  100% → this rule's own container width.
+ * Their difference is the leftover to absorb. Starlight aligns the content
+ * column three different ways, so the leftover lands differently in each: */
+.content-panel:has(.colophon) {
+  container-type: inline-size;
+}
+.colophon__rule {
+  height: 1px;
+  border: 0;
+  margin-block: 0 1.75rem;
+  background: var(--sl-color-hairline);
+  /* A — narrow / single column: content is left-aligned and fills the panel,
+     so any max-width leftover sits on the right. */
+  margin-left: calc(-1 * var(--sl-content-pad-x));
+  margin-right: calc(100% - 100cqi - var(--sl-content-pad-x));
+}
+@media (min-width: 72rem) {
+  /* C — wide default: Starlight centres the content column. */
+  .colophon__rule {
+    margin-inline: calc((100% - 100cqi) / 2 - var(--sl-content-pad-x));
+  }
+  /* B — wide with both the nav sidebar and a TOC: content is pushed flush-right
+     (Starlight's --sl-content-margin-inline: auto 0), so the leftover is on the
+     left. Mirrors Starlight's own [data-has-sidebar][data-has-toc] condition. */
+  :root[data-has-sidebar][data-has-toc] .colophon__rule {
+    margin-left: calc(100% - 100cqi - var(--sl-content-pad-x));
+    margin-right: calc(-1 * var(--sl-content-pad-x));
+  }
+}
+.colophon__marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  margin: 0;
+}
+/* Name plate: the pill (below) framed by a dashed box. The badge gets a little
+ * vertical head-room so the box can rise above and below the pill; the box is
+ * inset horizontally so the pill's rounded caps overhang its sides — the two
+ * shapes interlock the way the mock draws them. */
+.colophon__badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding-block: 0.5rem;
+}
+.colophon__box {
+  position: absolute;
+  inset-block: 0;
+  /* Inset the verticals enough that the pill's rounded caps clearly overhang the
+     dashed frame on each side (a touch more than the 0.5rem top/bottom gap). */
+  inset-inline: 0.8rem;
+  border: 1px dashed color-mix(in srgb, var(--colophon-ink) 55%, transparent);
+  pointer-events: none;
+}
+/* The pill (a stadium border) holding "Section ◦ Page" in the nav's own casing —
+ * the colophon's focal flourish. Positioned so it stacks above the dashed box. */
+.colophon__oval {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.5rem 1.45rem;
+  border: 1px solid color-mix(in srgb, var(--colophon-ink) 62%, transparent);
+  border-radius: 999px;
+  font-size: var(--sl-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--sl-color-gray-3);
+  white-space: nowrap;
+}
+/* The separator between section and page — the marketing four-point star, filled
+ * (the back/next plates use the same star outlined). Same muted ink the ring
+ * carried, just the shape swapped: a mask filled with --colophon-ink, so it still
+ * tracks the theme. Same star path as the page-title sparkle. */
+.colophon__sep {
+  flex: none;
+  width: 9px;
+  height: 11px;
+  background-color: var(--colophon-ink);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 100'%3E%3Cpath d='M40 0 Q45 47 80 50 Q45 53 40 100 Q35 53 0 50 Q35 47 40 0 Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 100'%3E%3Cpath d='M40 0 Q45 47 80 50 Q45 53 40 100 Q35 53 0 50 Q35 47 40 0 Z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.colophon__stamp {
+  margin: 1rem 0 0;
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-3);
+}
+
+/* Wide content column: lay the colophon as a grid so the name plate sits
+ * flush-left and the stamp flush-right on one row, with the divider spanning
+ * both. Keyed to the panel's own inline size (the same container the rule bleed
+ * measures against) so it flips on available room, not raw viewport; narrower
+ * columns keep the stacked, centred default above. */
+@container (min-width: 36rem) {
+  .colophon {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: 1rem;
+  }
+  .colophon__rule {
+    grid-column: 1 / -1;
+  }
+  .colophon__marker {
+    justify-self: start;
+  }
+  .colophon__stamp {
+    justify-self: end;
+    margin: 0;
+  }
+}
+
+/* Narrow viewports: tighten the pill so a longer "section · page" still fits on
+ * one line. */
+@media (max-width: 30rem) {
+  .colophon__oval {
+    padding: 0.35rem 0.85rem;
+    letter-spacing: 0.12em;
+  }
+}
+
+/* Section index cards (CardGrid + LinkCard on the landing pages) — Starlight lays
+ * these out two-across at ≥50rem, which makes them read like the Previous / Next
+ * pagination plates below. Force a single full-width column so a section's
+ * sub-pages stack as distinct, full-bleed buttons instead. Stagger grids keep the
+ * two-column offset they depend on. Un-layered so it wins over Starlight's layered
+ * .card-grid rule. */
+.sl-markdown-content .card-grid:not(.stagger) {
+  grid-template-columns: 100%;
+}
+
+/* Previous / Next pagination cards — a riveted "plate" frame echoing the brand
+ * art: the default rounded card border, a small hollow ring at each corner, and
+ * an inner accent line that traces two edges. The traced edges follow the card's
+ * direction — the top plus the leading side — so the Previous card runs down the
+ * LEFT and the Next card down the RIGHT, the way each arrow points. Colors reuse
+ * the default pagination tokens through --pag-line (the gray-5 border tone), and
+ * :hover lifts every part together — border, rivets, lines, label, title, arrow
+ * — to the brighter gray-2/white hover tone. Rivets are fixed-size background
+ * dots so they never stretch with the card; lines are inset pseudo borders. */
+.pagination-links a {
+  --pag-line: var(--sl-color-gray-5);
+  position: relative;
+  border-color: var(--pag-line);
+  background-image:
+    radial-gradient(circle, transparent 0 1.6px, var(--pag-line) 1.6px 2.6px, transparent 2.6px),
+    radial-gradient(circle, transparent 0 1.6px, var(--pag-line) 1.6px 2.6px, transparent 2.6px),
+    radial-gradient(circle, transparent 0 1.6px, var(--pag-line) 1.6px 2.6px, transparent 2.6px),
+    radial-gradient(circle, transparent 0 1.6px, var(--pag-line) 1.6px 2.6px, transparent 2.6px);
+  background-repeat: no-repeat;
+  background-size: 7px 7px;
+  background-position:
+    left 3.5px top 3.5px,
+    right 3.5px top 3.5px,
+    left 3.5px bottom 3.5px,
+    right 3.5px bottom 3.5px;
+}
+/* Inner accent line: two straight segments collinear with the rivets, gapped at
+   each rivet. ::before is the top segment (both cards); ::after is the leading
+   side, flipped per direction. */
+.pagination-links a::before,
+.pagination-links a::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  border: 0 solid var(--pag-line);
+}
+.pagination-links a::before {
+  top: 4px;
+  left: 14px;
+  right: 14px;
+  border-top-width: 1px;
+}
+.pagination-links a::after {
+  top: 14px;
+  bottom: 14px;
+}
+.pagination-links a[rel='prev']::after {
+  left: 4px;
+  border-left-width: 1px;
+}
+.pagination-links a[rel='next']::after {
+  right: 4px;
+  border-right-width: 1px;
+}
+/* Hover: highlight every element together — the default border-hover tone, plus
+ * a subtle panel fill so the whole card lifts. (The rivets keep their hollow
+ * centres over the fill.) */
+.pagination-links a:hover {
+  --pag-line: var(--sl-color-gray-2);
+  color: var(--sl-color-white);
+  background-color: var(--sl-color-gray-6);
+}
+
+/* Screenshots — UI captures dropped into the body. A raw markdown image renders
+ * edge-to-edge and dominates the column; this contains it: centred, width-capped,
+ * with a hairline frame and rounded corners (matching the panel radius) so it
+ * reads as a deliberate inset rather than a pasted-in screenshot. Reusable across
+ * the docs — wrap an image in `<figure class="screenshot"> … </figure>`. Rules
+ * are un-layered so they win over Starlight's layered markdown image styles. */
+.sl-markdown-content .screenshot {
+  margin: 1.5rem auto;
+  max-width: 32rem;
+}
+.sl-markdown-content .screenshot p {
+  margin: 0;
+  position: relative;
+}
+.sl-markdown-content .screenshot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  /* Dashed hairline frame: reads as a wireframe/under-construction placeholder,
+   * reinforcing that the docs are an active build. */
+  border: 1px dashed var(--sl-color-hairline, var(--sl-color-gray-5));
+  border-radius: 0.75rem;
+}
+.sl-markdown-content .screenshot figcaption {
+  margin-top: 0.6rem;
+  text-align: center;
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-3);
+}
+
+/* Click-to-expand affordance. Each screenshot opens the shared lightbox <dialog>
+ * (wired in src/components/Lightbox.astro). The image gains the zoom cursor; on
+ * pointer hover the dashed frame itself brightens to accent — a single line, in
+ * place — and on keyboard focus a single dashed accent ring appears, offset from
+ * the frame. A magnifier badge fades in for both. Keyed off :focus-visible rather
+ * than :focus-within so that focus returned to the trigger after the lightbox
+ * closes (a pointer-driven flow) doesn't leave the figure stuck in its active
+ * state. */
+.sl-markdown-content .screenshot img {
+  cursor: zoom-in;
+  transition:
+    filter 0.2s ease,
+    border-color 0.2s ease;
+}
+.sl-markdown-content .screenshot p:hover img {
+  filter: brightness(1.04);
+  border-color: var(--sl-color-accent);
+}
+.sl-markdown-content .screenshot img:focus-visible {
+  filter: brightness(1.04);
+  outline: 1px dashed var(--sl-color-accent);
+  outline-offset: 4px;
+}
+/* Magnifier badge, top-right of the frame; fades in with the hover/focus state. */
+.sl-markdown-content .screenshot p::after {
+  content: '';
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 1.1rem;
+  opacity: 0;
+  transform: translateY(-0.15rem);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  pointer-events: none;
+}
+.sl-markdown-content .screenshot p:hover::after,
+.sl-markdown-content .screenshot p:has(img:focus-visible)::after {
+  opacity: 1;
+  transform: none;
+}
+
+/* Lightbox — the modal a screenshot expands into. Native <dialog> fills the
+ * viewport with a dark, blurred backdrop and centres the enlarged image; close
+ * via the corner button, Escape, or a click on the surrounding backdrop. */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: none;
+  background: rgba(0, 0, 0, 0.82);
+  align-items: center;
+  justify-content: center;
+}
+.lightbox[open] {
+  display: flex;
+}
+.lightbox::backdrop {
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(2px);
+}
+.lightbox__figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 100%;
+  max-height: 100%;
+}
+.lightbox__img {
+  display: block;
+  max-width: 100%;
+  max-height: 85dvh;
+  width: auto;
+  height: auto;
+  /* Dashed frame matches the in-page figures so the expanded view stays on the
+   * same wireframe footing. */
+  border: 1px dashed var(--sl-color-hairline, var(--sl-color-gray-5));
+  border-radius: 0.75rem;
+  background: var(--sl-color-bg);
+}
+.lightbox__caption {
+  margin: 0;
+  max-width: 48rem;
+  text-align: center;
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-2);
+}
+.lightbox__close {
+  position: absolute;
+  top: clamp(0.75rem, 3vw, 1.5rem);
+  right: clamp(0.75rem, 3vw, 1.5rem);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--sl-color-white) 30%, transparent);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: var(--sl-color-white);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+.lightbox__close:hover {
+  border-color: var(--sl-color-white);
+  background: rgba(0, 0, 0, 0.75);
+}
+.lightbox__close:focus-visible {
+  outline: 2px solid var(--sl-color-accent);
+  outline-offset: 2px;
+}
+/* Gentle fade-in; suppressed for reduced-motion. */
+.lightbox[open],
+.lightbox[open]::backdrop {
+  animation: lightbox-in 0.2s ease;
+}
+@keyframes lightbox-in {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sl-markdown-content .screenshot img,
+  .sl-markdown-content .screenshot p::after {
+    transition: none;
+  }
+  .lightbox[open],
+  .lightbox[open]::backdrop {
+    animation: none;
   }
 }

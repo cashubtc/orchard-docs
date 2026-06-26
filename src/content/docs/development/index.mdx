@@ -1,0 +1,97 @@
+---
+title: Development
+description: "Set up Orchard for local development: run the client and server, apply development-only configuration, and run the unit, CI, and end-to-end tests. For people building on or contributing to Orchard's source."
+---
+
+import { Aside, CardGrid, LinkCard, Steps } from '@astrojs/starlight/components';
+
+This section is for contributing to **Orchard's source code**: running it from a clone,
+making changes, and testing them. It is separate from the [Install](/install/installation/)
+guide, which is for operators running a released build against their own services.
+
+## What Orchard is built from
+
+Orchard is a monorepo with the client and server in their own directories:
+
+| Part | Location | Stack |
+| --- | --- | --- |
+| Client | `src/client` | Angular, Angular Material |
+| Server | `src/server` | NestJS, GraphQL (Apollo) |
+| Shared | `src/shared` | GraphQL types generated from the server schema |
+
+The server stores its data with TypeORM in an SQLite database.
+
+## Prerequisites
+
+- **[Node.js](https://nodejs.org) v22** (the version pinned in `.nvmrc`), which includes npm.
+- **git**, to clone the repository.
+- **Docker** with the Compose plugin, for the [end-to-end tests](/development/e2e/).
+- **Bitcoin Fullnode** for the Oracle and [end-to-end tests](/development/e2e/).
+- **Bitcoin, Lightning and Cashu Mint** on regtest for local development. [Polar](https://lightningpolar.com) is useful for setting up a regtest environment.
+- **[Ollama](https://ollama.com)** for the AI development and [end-to-end tests](/development/e2e/).
+
+## Contributing changes
+
+<Steps>
+
+1. Fork [`cashubtc/orchard`](https://github.com/cashubtc/orchard) on GitHub, then clone
+   your fork:
+
+   ```bash
+   git clone https://github.com/<you>/orchard.git
+   cd orchard
+   ```
+
+2. Add the canonical repository as `upstream` so you can keep your fork in sync:
+
+   ```bash
+   git remote add upstream https://github.com/cashubtc/orchard.git
+   ```
+
+3. Create a branch for your change:
+
+   ```bash
+   git checkout -b my-change
+   ```
+
+4. Make your changes and run the [tests and checks](/development/testing/) before pushing.
+
+5. Push to your fork and open a pull request against `cashubtc/orchard`:
+
+   ```bash
+   git push -u origin my-change
+   ```
+
+</Steps>
+
+## Updating your fork
+
+Before starting new work, pull in the latest changes so your branch stays current:
+
+```bash
+git fetch upstream
+git rebase upstream/master
+```
+
+New to the codebase? [Running locally](/development/running-locally/) walks through getting
+Orchard running from source.
+
+## In this section
+
+<CardGrid>
+  <LinkCard
+    title="Running locally"
+    href="/development/running-locally/"
+    description="Run the client and server dev processes, plus the configuration specific to development."
+  />
+  <LinkCard
+    title="Testing & CI"
+    href="/development/testing/"
+    description="Run the server and client unit tests, formatting, and linting: the same checks CI runs."
+  />
+  <LinkCard
+    title="End-to-end testing"
+    href="/development/e2e/"
+    description="Run Playwright against full Docker stacks: Bitcoin, Lightning, a mint, and Orchard from source."
+  />
+</CardGrid>

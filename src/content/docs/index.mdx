@@ -1,6 +1,6 @@
 ---
 title: Orchard Documentation
-description: Guides and references for setting up and running Orchard, the all-in-one Cashu mint manager — your sovereign bank in cyberspace.
+description: Guides and references for setting up and running Orchard, the all-in-one Cashu mint manager. Your sovereign bank in cyberspace.
 sidebar:
   label: Overview
   order: 0
@@ -16,51 +16,50 @@ import { Aside, CardGrid, LinkButton, LinkCard, Steps } from '@astrojs/starlight
 </p>
 
 <div class="not-content cta-row">
-  <LinkButton href="/new-mint/" class="cta-primary">New mint</LinkButton>
-  <LinkButton href="/existing-mint/" variant="secondary" class="cta-secondary">Existing mint</LinkButton>
+  <LinkButton href="/install/installation/" class="cta-primary">Install Orchard</LinkButton>
+  <LinkButton href="/new-mint/" variant="secondary" class="cta-secondary">New mint</LinkButton>
 </div>
 
 ## Who it's for
 
-Orchard is for people who want to run their **own** mint instead of trusting
-someone else's:
+Orchard is for anyone who runs, or wants to run, their own mint on hardware they
+control.
 
-- **Sovereign individuals** — you'd rather operate the mint than rely on a custodian.
-- **Self-hosters** — you're comfortable keeping a node and a server online.
-- **Communities and projects** — you want to issue ecash for your people, on
-  infrastructure you control.
+- **Individuals:** you'd rather operate the mint than rely on a custodian.
+- **Communities & projects:** you want to issue ecash for your community.
+- **Companies:** you want to offer ecash as part of your product.
 
-You don't have to be a Lightning wizard to start — just willing to tend your own
-setup. Orchard handles the day-to-day, so the bar is "run a server," not "live in
-a terminal."
+You don't have to be a Lightning wizard to start, just willing to tend your own
+setup. Orchard helps you manage the day-to-day with a single web application Bitcoin, Lightning, and Cashu.
 
 <Aside type="tip" title="Brand new?">
   Cashu is private, instant, low-fee digital cash with no accounts and no
-  surveillance. If that's unfamiliar, skim [cashu.space](https://cashu.space)
-  first; the rest of these docs assume that mental model.
+  surveillance. If that's unfamiliar, visit [cashu.space](https://cashu.space).
 </Aside>
 
 ## What Orchard does
 
-A Cashu mint issues and redeems ecash backed by a Lightning wallet. Running one
-well means watching balances, keys, and proofs; reacting when something needs
-attention; and doing it without babysitting a terminal. Orchard wraps that work
-in one manager:
+A sovereign Cashu mint is more than the mint itself: it's a Bitcoin node, a
+Lightning node, and the mint that settles between them. The hard part is keeping
+all three online and healthy at once. Orchard wraps the whole stack in one manager:
 
-- **Operate your mint** — keys, balances, and mint info from a single dashboard.
-- **Stay informed** — health and activity surfaced where you already are.
-- **Tend, don't babysit** — the groundskeeper watches the mint so you don't have
-  to refresh a log all day.
+- **Bitcoin:** node health and mempool activity at a glance.
+- **Lightning:** live updates on payments and activity (channel management coming soon).
+- **Mint:** info, keysets, activity events, and trends in one place.
+- **Server:** health and metrics for the machine (or machines) it all runs on.
+- **AI Agent:** an agent harness that watches your services so you don't have
+  to live in the logs.
 
 ## What you'll need
 
 <Steps>
 
-1. **A Cashu mint to manage.** Orchard manages a mint — it doesn't replace one.
+1. **A Cashu mint to manage.** Orchard manages a mint. It doesn't replace one.
    You'll point it at your mint's backend.
 
-2. **A Lightning backend.** Cashu mints settle against Lightning, so you'll need
-   a node or service your mint can reach.
+2. **A payment backend.** Your mint settles through a payment processor —
+   usually Lightning, but Spark, Ark, Stripe, and others work too. Orchard
+   connects to whichever your mint uses.
 
 3. **Somewhere to run it.** Orchard is self-hosted: a VPS, a home server, or any
    box you control and can keep online.
@@ -69,27 +68,40 @@ in one manager:
 
 ## Choose your path
 
-How you set all this up depends on where you're starting. Two ways in:
+How you set Orchard up depends on where you're starting. Two paths:
 
 <CardGrid>
   <LinkCard
-    title="New Mint"
-    href="/new-mint/"
-    description="Starting fresh. A soup-to-nuts walkthrough — stand up Bitcoin, Lightning, and your mint, then hand the keys to Orchard."
+    title="Install Orchard"
+    href="/install/installation/"
+    description="Already running parts of the stack? Install Orchard and connect it to your existing Bitcoin, Lightning, and mint."
   />
   <LinkCard
-    title="Already Have a Mint"
-    href="/existing-mint/"
-    description="Running part of the stack already. Point Orchard at your existing Bitcoin, Lightning, and mint services — set up each part for the service you run."
+    title="New Mint"
+    href="/new-mint/"
+    description="Starting from nothing. Stand up Bitcoin, Lightning, and your mint from scratch, then install Orchard."
   />
 </CardGrid>
 
-<Aside type="caution" title="Installation steps are on the way">
-  Orchard is under active development, and these install guides are still being
-  written — they live here, in each path: this site is the home for setting Orchard
-  up and running it. The [Orchard repository](https://github.com/cashubtc/orchard)
-  has the source code in the meantime.
-</Aside>
+
+
+## Community & support
+
+Running a mint is easier with people to ask. Bring questions, share what you've
+built, and tell us what's broken.
+
+<CardGrid>
+  <LinkCard
+    title="Signal group"
+    href="https://signal.group/#CjQKIBWaTZhfeNGH0DwXO9igq_M-m9XBDHi9uKC9_hDOlDVoEhDP8PfIsyugGeP8DpvA2jIV"
+    description="Join the chat for discussion and questions about running Orchard."
+  />
+  <LinkCard
+    title="Issues & feature requests"
+    href="https://github.com/cashubtc/orchard/issues"
+    description="Request a feature or report a bug you've found on the GitHub issue tracker."
+  />
+</CardGrid>
 
 ## More
 
@@ -100,13 +112,13 @@ How you set all this up depends on where you're starting. Two ways in:
     description="The source code, releases, and issue tracker for the project."
   />
   <LinkCard
-    title="Back to orchard.space"
+    title="orchard.space"
     href="https://orchard.space"
-    description="The product site — what Orchard is and who it's for."
+    description="The product site: what Orchard is and who it's for."
   />
 </CardGrid>
 
 <Aside type="note">
-  Spotted something missing or wrong? These docs are open source — open an issue
-  or a pull request on the [Orchard repository](https://github.com/cashubtc/orchard).
+  Spotted something missing or wrong? These docs are open source, so open an issue
+  or a pull request on the [Orchard Docs repository](https://github.com/cashubtc/orchard-docs).
 </Aside>

@@ -1,0 +1,97 @@
+---
+title: Set Up Your System
+description: The Linux machine your whole Orchard stack runs on — the foundation under Bitcoin, Lightning, and your Cashu mint. Follow MiniBolt's System guide; this page adds the Orchard-specific tips. Part of the New Mint walkthrough.
+---
+
+import { Aside, LinkCard } from '@astrojs/starlight/components';
+
+The soil. Bitcoin Core, your Lightning node, the mint, and Orchard all run
+on this one machine, so it is the first thing to get right. Liveness is critical
+to both the lightning node and the mint. This makes the host itself critical to
+your service model.
+
+Run it on a machine you control with reliable hardware — a home server or a
+hosted VPS. Both work, and the rest of this guide is the same either way; the
+section below lays out the trade-off.
+
+## What this step covers
+
+- **A host you control** with room for the whole stack: a 2 TB+ SSD for a full
+  Bitcoin node and the data that grows with it, 4 GB+ RAM, and a connection that
+  stays online.
+- **A supported Linux OS.** The stack targets Ubuntu Server LTS. Install it and
+  keep it patched.
+- **Hardened remote access**: key-only SSH, a non-root admin user with `sudo`, and
+  the SSH port reachable only to you.
+- **Security and privacy hardening**: a default-deny firewall that opens only the
+  ports each service needs, plus the network and privacy measures that keep the
+  host locked down.
+- **A backup plan** for keys and configuration, in place before anything holds value.
+
+## Home server or VPS?
+
+Both work, and the rest of this guide is the same either way. The choice comes
+down to one trade-off: a home server maximizes sovereignty and privacy, while a
+VPS maximizes uptime and reachability. For a mint — public-facing infrastructure
+that holds value — we lean toward the home server, but a VPS is a reasonable
+lighter-touch start.
+
+| | Home server | Hosted VPS |
+| --- | --- | --- |
+| **Control** | Hardware is physically yours | The provider owns the host |
+| **Key & data privacy** | Keys never leave your hardware | The provider can access disk and RAM |
+| **Uptime** | Rests on your power and home internet | Datacenter-grade, often with an SLA |
+| **Public reachability** | More manual configuration and networking | Static public IP off the shelf |
+| **Bandwidth** | Capped by residential upload | High and symmetric |
+| **Cost** | One-time hardware | Recurring monthly fee |
+| **Setup** | You install the OS yourself (step 1.2) | Arrives with Linux and SSH ready |
+| **Best when** | Sovereignty and privacy come first | You want reliable uptime without running hardware |
+
+<Aside type="tip" title="Which should I pick?">
+  Pick a **home server** for full sovereignty, if you want to own the hardware, and can own the uptime. Pick a
+  **VPS** for dependable uptime and a public IP, trusting the provider with the
+  machine your keys run on.
+</Aside>
+
+<Aside type="caution" title="Running at home?">
+  Uptime is on you, so design for it. Put the machine on a **UPS** so a power blip
+  cannot corrupt your drives or knock your services offline, and run it on **wired
+  ethernet** instead of Wi-Fi for a stable, always-on connection.
+</Aside>
+
+## Follow MiniBolt's System guide
+
+We do not reproduce these steps. [MiniBolt's System section](https://minibolt.minibolt.info/system/system)
+is the guide we recommend (see [the guides we build on](/new-mint/#the-guides-we-build-on)
+for why). Open it and work through 1.1–1.6 — it applies almost as written. The tips
+below cover the only differences: one for everyone, plus a few if you're on a VPS.
+
+<LinkCard
+  title="Open MiniBolt: System"
+  href="https://minibolt.minibolt.info/system/system"
+  target="_blank"
+  rel="noopener noreferrer"
+  description="The step-by-step system setup we recommend. Work through 1.1–1.6, then come back here for Bitcoin."
+/>
+
+## General guide tips
+
+Follow MiniBolt's steps as written. The one addition: in
+**[1.1 Preparations](https://minibolt.minibolt.info/system/system/preparations)**,
+when you write down your passwords, add an **Orchard setup key** to the list.
+
+## VPS guide tips
+
+A VPS arrives as a running Linux box with SSH already enabled, so a few steps shift:
+
+- **Skip [1.2 Operating system](https://minibolt.minibolt.info/system/system/operating-system).**
+  Your provider already installed Linux.
+- **[1.3 Remote access](https://minibolt.minibolt.info/system/system/remote-access):**
+  ssh at the public IP your provider gives you as there is no machine to find on
+  your local network.
+- **[1.4 Configuration](https://minibolt.minibolt.info/system/system/configuration):**
+  its first task, "Add the admin user," creates the `admin` account the rest of the
+  guide runs as — MiniBolt builds it from the throwaway `temp` user made during the
+  OS install. You skipped that install, so run those same steps from the `root` or
+  `ubuntu` login your provider gave you. That login stands in for `temp`: retire it
+  once `admin` works (delete the spare `ubuntu` user, or disable root SSH).

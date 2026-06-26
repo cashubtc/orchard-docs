@@ -1,65 +1,117 @@
 ---
 title: New Mint
-description: The sovereign path — stand up Bitcoin, Lightning, and a Cashu mint from scratch, then hand the keys to Orchard. The suggested route to a fully self-hosted mint.
+description: The suggested path to a fully sovereign mint — run Bitcoin, Lightning, and a Cashu mint yourself, on hardware you control, then connect Orchard to manage it all from one place.
 ---
 
 import { Aside, CardGrid, LinkCard, Steps } from '@astrojs/starlight/components';
 
-Starting from nothing? This is the suggested path to a **fully sovereign mint** —
-every layer run by you, on hardware you control. A Cashu mint stands on three
-layers, each settling down to the one below it. You'll build them bottom-up, then
-let Orchard tend the result.
+This is the suggested path to a **fully sovereign mint**: every service run and
+hosted by you, on hardware you control. Build the stack from the bottom up, then
+connect Orchard to each service to manage everything from one place.
 
 <Steps>
 
-1. **[Bitcoin node](/new-mint/bitcoin-node/)** — the base layer. Your own Bitcoin
-   Core node, the source of truth your Lightning node trusts.
+1. **[System](/new-mint/system/)** — the soil. A machine you control, set up
+   and secured, with room for every service.
 
-2. **[Lightning node](/new-mint/lightning-node/)** — settles ecash in and out.
-   LND or Core Lightning, anchored to the Bitcoin node below it.
+2. **[Bitcoin node](/new-mint/bitcoin-node/)** — the roots of your mint. Your own Bitcoin
+  node, the source of truth your Lightning node trusts.
 
-3. **[Cashu mint](/new-mint/mint/)** — issues and redeems ecash against that
+3. **[Lightning node](/new-mint/lightning-node/)** — processes deposits and
+   withdrawals from the mint, anchored to the Bitcoin node below it.
+
+4. **[Cashu mint](/new-mint/mint/)** — issues and redeems ecash against that
    Lightning node.
 
-4. **[Orchard](/new-mint/orchard/)** — hand it the keys and tend the mint from one
-   place.
+5. **[Orchard](/new-mint/orchard/)** — the manager. Install Orchard, point it at
+   everything above, and tend the whole stack from one dashboard.
 
 </Steps>
 
-<Aside type="tip" title="Already running some of this?">
-  If you already operate a Bitcoin node, Lightning node, or mint, you don't need
-  to rebuild it. Jump to [Already Have a Mint](/existing-mint/) and point Orchard
-  at what you've got.
+Once all five are in place, you operate the mint from the Orchard dashboard. Already
+run some of these services yourself? See [Install](/install/installation/) to connect Orchard to a
+stack you already have.
+
+<Aside type="tip" title="Already have part of the stack?">
+  Already running a Bitcoin or Lightning node? Pick up at the step you still
+  need. To install Orchard and connect services you already run, see
+  [Install](/install/installation/).
 </Aside>
 
-## The path
+## The guides we build on
+
+Orchard manages bitcoin infrastructure; it is not a Bitcoin or Lightning distribution. Rather than
+reinvent and maintain our own bare-metal setup steps, we hand the base layers
+(System, Bitcoin, and Lightning) off to a guide that already does this well, and
+note the Orchard-specific adjustments on each step. Two guides shaped this path:
 
 <CardGrid>
   <LinkCard
-    title="1. Bitcoin Node"
-    href="/new-mint/bitcoin-node/"
-    description="Run Bitcoin Core and let it sync — the chain everything else settles to."
+    title="RaspiBolt (the origin)"
+    href="https://raspibolt.org"
+    target="_blank"
+    rel="noopener noreferrer"
+    description="The Raspberry Pi guide we learned these best practices from. It does not port cleanly to Linux. Only use this if you are familiar with server setup."
   />
   <LinkCard
-    title="2. Lightning Node"
-    href="/new-mint/lightning-node/"
-    description="Stand up LND or Core Lightning on top of your Bitcoin node."
-  />
-  <LinkCard
-    title="3. Cashu Mint"
-    href="/new-mint/mint/"
-    description="Run a Cashu mint — Nutshell or CDK — backed by your Lightning node."
-  />
-  <LinkCard
-    title="4. Orchard"
-    href="/new-mint/orchard/"
-    description="Point Orchard at your mint and manage it all from one dashboard."
+    title="MiniBolt (what we recommend)"
+    href="https://minibolt.minibolt.info"
+    target="_blank"
+    rel="noopener noreferrer"
+    description="The same best practices, already built for Linux on capable hardware. The purpose-fit path for a public-facing mint, and where our base-layer steps hand off."
   />
 </CardGrid>
 
-<Aside type="caution" title="Step-by-step commands are on the way">
-  Orchard is under active development. These guides frame each layer and link out
-  to each tool's own docs; the exact commands land here as the first release
-  stabilizes. The [Orchard repository](https://github.com/cashubtc/orchard) has the
-  source code in the meantime.
+Orchard's own docs pick up where MiniBolt leaves off, at the Cashu mint and Orchard.
+
+<Aside type="note" title="Node-in-a-box setups">
+  Umbrel, Start9, and similar appliances are great for plug-and-play
+  self-hosting, but not the right fit here. They run pre-packaged apps on an OS
+  you do not fully control, tuned for private use. A mint is public-facing
+  infrastructure, and this path builds and hardens each base layer yourself.
 </Aside>
+
+## Where to start
+
+<CardGrid>
+  <LinkCard
+    title="1. System"
+    href="/new-mint/system/"
+    description="Prepare and harden the machine the whole stack runs on."
+  />
+  <LinkCard
+    title="2. Bitcoin Node"
+    href="/new-mint/bitcoin-node/"
+    description="Run Bitcoin and let it sync — the chain everything else settles to."
+  />
+  <LinkCard
+    title="3. Lightning Node"
+    href="/new-mint/lightning-node/"
+    description="Run a Lightning node on top of your Bitcoin node."
+  />
+  <LinkCard
+    title="4. Cashu Mint"
+    href="/new-mint/mint/"
+    description="Run a Cashu mint backed by your Lightning node."
+  />
+  <LinkCard
+    title="5. Orchard"
+    href="/new-mint/orchard/"
+    description="Install Orchard and manage the whole stack from one dashboard."
+  />
+</CardGrid>
+
+## After new mint
+
+<CardGrid>
+  <LinkCard
+    title="Your Orchard"
+    href="/orchard/"
+    description="Stack built and managed? Operate the mint from the dashboard."
+  />
+  <LinkCard
+    title="Connect an existing stack"
+    href="/install/installation/"
+    description="Already run your own services? The Install pages connect Orchard to them."
+  />
+</CardGrid>

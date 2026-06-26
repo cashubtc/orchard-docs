@@ -1,0 +1,23 @@
+---
+title: Setup
+description: Set up your Orchard instance the first time you open it — enter your setup key and create the first operator account before any service is exposed.
+---
+
+import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+To use Orchard you must first create the admin account. This is a one-time step: you
+prove you own the instance with your setup key and create the first operator account.
+
+<figure class="screenshot">
+
+![The Orchard setup screen: a field for the setup key, then username and password fields to create the first operator account.](../../../assets/your-orchard-setup.png)
+
+<figcaption>Orchard's one-time setup screen.</figcaption>
+
+</figure>
+
+## How to set up
+
+- **Prove ownership with your setup key.** Enter the same `SETUP_KEY` you set in Orchard's `.env`. It confirms you're the one standing up this instance, so no one else can claim it first.
+- **Create the admin account.** Choose any username and password for the first operator. You can change them later from your account settings, and Orchard hashes the password before storing it in its database.
+- **Land on Home.** Once the account is created, Orchard signs you in and opens the [Home screen](/orchard/home/).

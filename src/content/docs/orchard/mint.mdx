@@ -1,0 +1,95 @@
+---
+title: Mint
+description: Operate the Cashu mint itself from Orchard — its dashboard, public info, configuration, keysets, and database backup and restore, across five tabs.
+---
+
+import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+Connecting your Cashu Mint to Orchard gives you a complete mirco-application for mint
+operation. Here you can observe, configure, and manage your mint.
+
+<figure class="screenshot">
+
+![Orchard's Mint view on the Info tab, beside Dashboard, Config, Keysets, and Database tabs, for "Demo Dayz Mint". Editable fields show the mint's name, description, icon URL, and a long description, alongside connection URLs, contact methods for X and Nostr, and a Message of the Day.](../../../assets/your-orchard-mint.png)
+
+<figcaption>Mint information and configuration.</figcaption>
+
+</figure>
+
+## Dashboard
+
+Get an executive overview of your mint's health and status:
+
+- **Info** — the mint's public info
+- **Config** — supported features
+- **Keysets** — keyset breakdown and database growth.
+- **Activity** — recent activity and volume.
+- **Balance Sheet** — a real-time snapshot of the mint's holdings.
+- **Nutalytics** — rich timeseries charts of the mint's activity.
+
+## Info
+
+Update public information that wallets read about your mint.
+
+- **Name**, **description**, and a longer **description**.
+- **Icon** — the image a wallet displays for your mint.
+- **Connection URLs** — where wallets reach the mint.
+- **Contacts** — how users get in touch (email, X, Nostr, and so on).
+- **Message of the Day** — a short broadcast note.
+
+Keep it accurate: this is what a wallet shows someone before they trust your mint.
+
+## Config
+
+View and manage the features your mint does and does not support, and how they are configured.
+Some features are managed in the mint's own config file, and others can be managed in Orchard.
+
+<Aside type="note" title="Why the split">
+The mint's RPC offers only limited real-time control over mint features for now, so anything
+it doesn't expose has to be set in the config file directly.
+</Aside>
+
+## Keysets
+
+Manage your mint's keysets and monitor balances after rotations.
+Keysets can be rotated to change fees, versions, and denominations.
+
+## Database
+
+No more is the database a black box. You can browse mint, melt, and swap records with a rich set of filters to find exactly what you need.
+
+Back up and restore the mint database straight from the dashboard.
+
+- **Create Backup** downloads a copy of the database.
+- **Restore Backup** restores the database from a saved backup.
+
+<Aside type="note" title="Backing up the database">
+The mint database should always be backed up before updating the mint.
+This ensures you can restore the mint in case of a problem.
+</Aside>
+
+<Aside type="caution" title="Restoring a backup">
+The mint must be shut down before you restore. Follow the on-screen steps closely to ensure
+a successful restore.
+</Aside>
+
+
+### The recovery model
+
+A lost or corrupted mint is restored from two things together:
+
+- **The secret seed**, which derives the mint's signing keys. This static private key lives in the
+  mint daemon's config rather than its database. This half stays your responsibility.
+- **The database**, which changes every time the mint issues or redeems ecash.
+
+With both, a mint lost to a dead disk or similar catastrophe comes back fully operational, with the same keysets and
+the same outstanding ecash. With only one, it cannot. Have a backup and storage strategy for both.
+
+## AI
+
+Connecting a mint gives the [AI agent](/orchard/settings/#ai) read-only tools
+for knowing what's happening on your mint:
+
+- **Mint Info** — mint identity, version, and operator contact info.
+- **Mint Analytics** — balances, mints, melts, and fees over time.
+- **Mint Metrics** — mint and melt volumes, swap fees, and issuance over time.

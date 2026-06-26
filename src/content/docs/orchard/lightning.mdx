@@ -1,0 +1,44 @@
+---
+title: Lightning
+description: Watch the Lightning node that settles your mint's ecash from Orchard. A dedicated Lightning view is on the way; today the Home view summarises the node's balances and connectivity.
+---
+
+import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+Your Lightning node is where the mint actually settles value, and where the bitcoin backing your ecash is custodied.
+Connecting it gives you a view of the node and feeds the assets side of your balance sheet.
+
+<figure class="screenshot">
+
+![Orchard's Lightning view for the node "bob", with a single Dashboard tab and a centered lightning-bolt icon above the message "Lightning Dashboard Coming Soon!".](../../../assets/your-orchard-lightning.png)
+
+<figcaption>The dedicated Lightning view — a full node dashboard is on the way.</figcaption>
+
+</figure>
+
+<Aside type="note" title="Connecting your node">
+  Which Lightning node Orchard connects to, and how, is set with environment
+  variables. See [Installation & Configuration](/install/configuration/#lightning).
+</Aside>
+
+## Lightning Dashboard
+
+Today, the [home page](/orchard/home/#lightning) summarises your Lightning node.
+A dedicated dashboard is coming soon.
+
+## Mint Assets
+
+Your mint's [balance sheet](/orchard/mint/#dashboard) weighs it's liabilities(the ecash in
+circulation) against the real bitcoin that backs it (your outbound lightning liquidity). 
+A connected Lightning node fills in the assets side of the sheet, and lets Orchard
+track how your coverage shifts over time.
+
+## AI
+
+Connecting a Lightning node also gives the [AI agent](/orchard/settings/#ai) read-only tools
+for knowing what's happening on your node:
+
+- **Lightning Info** — node identity, sync status, and channel counts.
+- **Channels** — open and closed channels with balances and peer info.
+- **Peers** — connected peers and traffic.
+- **Lightning Analytics** — payments, routing, and balance trends over time.

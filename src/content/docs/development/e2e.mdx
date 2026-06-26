@@ -1,0 +1,194 @@
+---
+title: End-to-end testing
+description: Run Orchard's Playwright end-to-end tests against full Docker stacks (Bitcoin, Lightning, a Cashu mint, and Orchard built from source) across five backend configurations.
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+The end-to-end tests drive a real, running Orchard with [Playwright](https://playwright.dev).
+Each test runs against a full stack brought up with Docker: a regtest Bitcoin
+node, Lightning nodes, a Cashu mint, and Orchard built from the repository source.
+
+<Aside type="caution" title="Run locally, not in CI">
+  Unlike the [unit tests](/development/testing/), the end-to-end tests are not run
+  in CI. They need Docker and take time to bring up, so you run them on your own
+  machine.
+</Aside>
+
+## Prerequisites
+
+- **Docker** with the Compose plugin.
+- **Playwright's browsers**, installed once with `npx playwright install`.
+- For the AI tests only: **[Ollama](https://ollama.com)** reachable at
+  `host.docker.internal:11434`.
+- For the [mainchain tests](#mainchain-testing) only: a **Bitcoin full
+  node** (`bitcoind` 26+) running on your host, so the stack's pruned node can
+  load a UTXO snapshot built from your local chain.
+
+## The stacks
+
+The tests run against five backend configurations, each a different combination of
+Lightning node, mint implementation, and database:
+
+| Config | Bitcoin | Lightning | Mint | Database |
+| --- | --- | --- | --- | --- |
+| `lnd-nutshell-sqlite` | core | lnd | nutshell | SQLite |
+| `cln-nutshell-postgres` | core | cln | nutshell | Postgres |
+| `lnd-cdk-sqlite` | core | lnd | cdk | SQLite |
+| `cln-cdk-postgres` | core | cln | cdk | Postgres |
+| `fake-cdk-postgres` | - | - | cdk | Postgres |
+
+`fake-cdk-postgres` runs without Bitcoin or Lightning, to exercise Orchard when
+those services are absent.
+
+## Configuration
+
+To override defaults for your machine, copy the
+template to `e2e/.env` (gitignored) and uncomment what you need:
+
+```bash
+cp e2e/.env.example e2e/.env
+```
+
+### AI tests
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `AI_MODEL` | — | The Ollama model the [AI tests](#ai-tests) run against (for example `llama3.2` or `gemma3:4b`). Pull it first with `ollama pull <model>`. |
+
+### Block miner
+
+Each regtest stack runs a sidecar that mines one block on a fixed interval to
+keep the chain advancing (skipped on `fake-cdk-postgres`, which has no Bitcoin
+node).
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `MINE_INTERVAL_SECONDS` | `30` | Seconds between mined blocks. |
+
+### Activity simulator
+
+Tunables for the [cadence simulator](#generating-activity):
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `ACTIVITY_INTERVAL_SECONDS` | `90` | Base delay between cycles. |
+| `ACTIVITY_JITTER_SECONDS` | `15` | Random plus/minus jitter on that delay. |
+| `ACTIVITY_DISRUPT_SECONDS` | `4` | How long each pause/unpause fault lasts. |
+| `ACTIVITY_DISRUPT_EVERY` | `1` | Inject a fault every N cycles. |
+| `ACTIVITY_RECOVERY_TIMEOUT` | `60` | Seconds to wait for a service to recover before aborting. |
+| `ACTIVITY_SEED` | optional | Fix the RNG seed for reproducible cycle timing. |
+
+### Mainchain
+
+Point the [mainchain tests](#mainchain-testing) and their bootstrap at your host
+Bitcoin node:
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `BITCOIN_CLI` | `bitcoin-cli` on `PATH` | Full path to your host's `bitcoin-cli`. |
+| `BITCOIN_CLI_ARGS` | — | Extra args if your node uses `rpcauth`, for example `-rpcuser=you -rpcpassword=secret`. |
+| `HOST_BITCOIN_P2P_PORT` | `8333` | The host port the stack's pruned node connects to. |
+
+After loading the snapshot, the stack's pruned mainchain node catches up to the
+chain tip once, using bitcoind's fast defaults. On a constrained laptop you can
+throttle that container's CPU and memory (slower catch-up, but it only happens
+once):
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `MAINCHAIN_PAR` | auto (all cores) | Script-verification threads; the biggest CPU lever. |
+| `MAINCHAIN_DBCACHE` | `450` | UTXO cache in MiB; the biggest RAM lever. |
+| `MAINCHAIN_BLOCKSONLY` | `0` | Set `1` to disable transaction relay. |
+| `MAINCHAIN_MAXMEMPOOL` | `300` | Mempool ceiling in MiB. |
+
+## Run the tests
+
+<Steps>
+
+1. Bring up every stack. This blocks until they are all healthy:
+
+   ```bash
+   npm run e2e:up
+   ```
+
+2. Run the test suite:
+
+   ```bash
+   npm run e2e:test
+   ```
+
+3. Tear the stacks down when you are done. This removes their volumes:
+
+   ```bash
+   npm run e2e:down
+   ```
+
+</Steps>
+
+To work with a single stack instead, pass its config name to `e2e:up` and
+`e2e:down`, and filter `e2e:test` by project. Each project is named
+`<config>:<port>`:
+
+```bash
+npm run e2e:up cln-cdk-postgres
+npm run e2e:test -- --project=cln-cdk-postgres:3323
+npm run e2e:down cln-cdk-postgres
+```
+
+To watch a stack while it runs, use `npm run e2e:logs <config>`; to list its
+services, `npm run e2e:ps <config>`.
+
+## AI tests
+
+The AI tests use a separate config and need Ollama running:
+
+```bash
+npm run e2e:test:ai
+```
+
+## API harness
+
+A Supertest-based API harness runs separately from the Playwright suite:
+
+```bash
+npm run test:server:e2e
+```
+
+## Generating activity
+
+A cadence simulator can drive sustained, repeating traffic against the running
+stacks while you run tests, including fault injection. Start a runner on every
+stack, check on them, then stop them when you are done:
+
+```bash
+npm run e2e:sim:up      # start
+npm run e2e:sim:status  # check
+npm run e2e:sim:down    # stop
+```
+
+To work with a single stack instead, pass its config name. Following a runner's
+logs is per-stack only — against `all` they would interleave:
+
+```bash
+npm run e2e:sim:up cln-cdk-postgres
+npm run e2e:sim:logs cln-cdk-postgres   # follow this stack
+npm run e2e:sim:down cln-cdk-postgres
+```
+
+## Mainchain testing
+
+One stack (`cln-nutshell-postgres`) can run against a real mainnet Bitcoin node to
+exercise chain features. It needs a one-time snapshot, built with
+`npm run e2e:bootstrap-mainchain`, and a `bitcoind` running on your host. See the
+repository's e2e README for the host requirements.
+
+## Writing specs
+
+Every spec under `e2e/specs` must carry at least one tag (for example `@canary`,
+`@lightning`, `@cdk`, `@postgres`) declaring which stacks it is meaningful for. A
+spec with no tag matches no stack and silently does not run.
+
+For the full configuration matrix, network topologies, exposed ports, and tag
+reference, see [`e2e/README.md`](https://github.com/cashubtc/orchard/blob/master/e2e/README.md)
+in the repository.

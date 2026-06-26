@@ -258,7 +258,7 @@ army van defense carry jealous true garbage claim echo media make ...
   This phrase controls every keyset the mint issues, and it never changes. Have a
   backup plan for this seed. The seed alone cannot rebuild a mint:
   recovery needs the seed **together with** a recent copy of the mint's database (see
-  [Backup and restore](/orchard/mint/#backup-and-restore)). Lose the seed and the mint
+  [Backup and restore](/orchard/mint/#database)). Lose the seed and the mint
   can no longer sign; leak it and someone else can.
 </Aside>
 
@@ -441,72 +441,24 @@ curl http://127.0.0.1:8085/v1/info
 
 Wallets reach a mint over HTTPS, so the mint needs a public hostname. A Cloudflare
 Tunnel makes one outbound connection from this machine to Cloudflare's network and
-forwards traffic to the mint's local port. Your home IP is never exposed, and there is
-no router port to forward. This is the same approach MiniBolt uses to publish services
-like its block explorer.
+forwards traffic to the mint's local port — your home IP is never exposed, and there is
+no router port to forward.
 
-* With user `admin`, download the current `cloudflared` Debian package and install it
+Follow MiniBolt's
+[Cloudflare Tunnel guide](https://minibolt.minibolt.info/bonus-guides/networking/cloudflare-tunnel)
+to install `cloudflared`, authenticate it to your Cloudflare account, create a tunnel,
+and run it as a `systemd` service. It is the same `cloudflared` setup MiniBolt uses for
+its other services, with checksum-verified downloads and screenshots for the Cloudflare
+dashboard steps. Two things are specific to the mint:
 
-```bash
-cd /tmp
-wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
-sudo dpkg -i cloudflared-linux-amd64.deb
-rm cloudflared-linux-amd64.deb
-```
+* **Use your mint's hostname throughout.** Wherever the guide uses `subdomain.domain.com`
+  — in the `cloudflared tunnel route dns` command and in the tunnel config — use the same
+  hostname you set as `url` in `config.toml`, for example `mint.yourdomain.com`.
+* **Route it to the mint's local port.** In the tunnel's `config.yml`, replace the
+  guide's example ingress rules with a single rule for the mint, keeping the
+  `http_status:404` rule last:
 
-* Check the correct installation by requesting the version
-
-```bash
-cloudflared --version
-```
-
-**Example** of expected output:
-
-```
-cloudflared version 2026.6.0 (built 2026-06-01)
-```
-
-* Authenticate to Cloudflare. This prints a URL: open it in a browser already logged
-  in to Cloudflare and authorize the domain you added. It writes a certificate to
-  `~/.cloudflared/cert.pem`
-
-```bash
-cloudflared tunnel login
-```
-
-* Create the tunnel. Name it anything; note the `<UUID>` it prints for the next steps
-
-```bash
-cloudflared tunnel create orchard-mint
-```
-
-**Example** of expected output:
-
-```
-Created tunnel orchard-mint with id 8666c35d-6ac3-4b39-9324-12ae32ce64a8
-Credentials written to /home/admin/.cloudflared/8666c35d-6ac3-4b39-9324-12ae32ce64a8.json
-```
-
-* Route the public hostname at the tunnel. Use the same hostname you put in `url` in
-  the config
-
-```bash
-cloudflared tunnel route dns <UUID> mint.yourdomain.com
-```
-
-**Example** of expected output:
-
-```
-Added CNAME mint.yourdomain.com which will route to this tunnel <UUID>
-```
-
-* Create the tunnel config file. Map the hostname to the mint's local port; the
-  `http_status:404` rule must stay last. Save and exit
-
-```yaml title="/home/admin/.cloudflared/config.yml"
-tunnel: <UUID>
-credentials-file: /home/admin/.cloudflared/<UUID>.json
-
+```yaml
 ingress:
   # Cashu mint
   - hostname: mint.yourdomain.com
@@ -514,57 +466,16 @@ ingress:
   - service: http_status:404
 ```
 
-* Create the `cloudflared` service file
-
-```bash
-sudo nano /etc/systemd/system/cloudflared.service
-```
-
-* Paste the following configuration. Save and exit
-
-```ini title="/etc/systemd/system/cloudflared.service"
-# Orchard: systemd unit for cloudflared
-# /etc/systemd/system/cloudflared.service
-
-[Unit]
-Description=Cloudflared
-Requires=network-online.target
-After=network-online.target
-
-[Service]
-ExecStart=/usr/bin/cloudflared --no-autoupdate --config /home/admin/.cloudflared/config.yml tunnel run
-
-# Process management
-####################
-Type=notify
-TimeoutStartSec=0
-
-[Install]
-WantedBy=multi-user.target
-```
-
-* Reload systemd, enable autoboot, and start the tunnel
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable cloudflared
-sudo systemctl start cloudflared
-```
-
-* From any machine, ask your public mint for its info. You should get the same JSON as
-  the local check, now over HTTPS
+With the tunnel running, ask your public mint for its info from any machine. You should
+get the same JSON as the local check, now over HTTPS:
 
 ```bash
 curl https://mint.yourdomain.com/v1/info
 ```
 
 <Aside type="caution" title="Cloudflare sees your traffic">
-  A Cloudflare Tunnel terminates TLS at Cloudflare's edge and re-originates to your
-  mint over plain HTTP on the machine itself, so Cloudflare can read and modify
-  traffic to your mint. This is the trade-off for the convenience. For a sovereign
-  alternative, MiniBolt also documents
-  [exposing services over Tor](https://minibolt.minibolt.info/bonus-guides/system/cloudflare-tunnel);
-  we do not reproduce those steps here.
+  A Cloudflare Tunnel hides your home IP, but Cloudflare terminates TLS at its edge and
+  can read or modify your mint's traffic. That's the trade-off for the convenience.
 </Aside>
 
 <Aside type="tip" title="Mint is online">
@@ -577,21 +488,24 @@ curl https://mint.yourdomain.com/v1/info
 - **Mint information.** `name`, `description`, `contact_email`, `motd`, and `icon_url`
   in `[mint_info]` are what wallets show before someone trusts your mint. Keep them
   accurate. Once Orchard is connected you manage these from the dashboard; see
-  [Mint information](/orchard/mint/#mint-information).
+  [Mint information](/orchard/mint/#info).
 - **Fees and limits.** Set `input_fee_ppk` under `[info]` to charge a per-input fee,
   `fee_percent` and `reserve_fee_min` under `[lnd]` to tune the Lightning fee reserve,
-  and `max_inputs` / `max_outputs` under `[limits]` to cap transaction size.
+  and `max_inputs` / `max_outputs` under `[limits]` to cap transaction size. Once Orchard
+  is connected, you can change the input fee by rotating to a new keyset; see
+  [Keysets](/orchard/mint/#keysets).
 - **A least-privilege macaroon.** Instead of `admin.macaroon`, bake an LND macaroon
   limited to invoice and offchain permissions and point `macaroon_file` at it, so a
   leaked mint credential cannot touch the rest of your node.
-- **Other ways to expose the mint.** A Cloudflare Tunnel is the low-friction option.
-  Port forwarding with dynamic DNS, or a Tor hidden service, are sovereign
-  alternatives MiniBolt documents; the mint's local port is the same either way.
+- **Other ways to expose the mint.** The Tunnel is the easy option and hides your IP.
+  Alternatives: a VPS relay you control (also hides your IP, no Cloudflare in the path),
+  or a forwarded port from home (simplest, but exposes your IP). Tor won't work as wallets
+  can't reach a `.onion` mint.
 
 ### Secure the management API with mutual TLS
 
-The management gRPC runs plaintext in the main setup because Orchard shares this machine
-and the port is reachable only from it. If Orchard runs on a different host, or you want
+The management gRPC runs insecurely in the main setup because Orchard shares this machine
+and the port is reachable only from the local network. If Orchard runs on a different host, or you want
 authentication once the connection leaves this machine, give the interface mutual TLS instead.
 `cdk-mintd` does not generate these certificates: you create a small private CA that
 signs one certificate for the mint and one for Orchard.
@@ -633,27 +547,21 @@ sudo systemctl restart cdk-mintd
 ```
 
 Give Orchard the three client files so it can connect: `ca.pem` to verify the mint, plus
-`client.pem` and `client.key` as its own identity. To return to plaintext, stop the mint,
-remove `/data/cdk-mintd/tls`, and start it again.
-
-<Aside type="caution" title="Confirm the certificate setup">
-  The gRPC client stack (tonic/rustls) is strict about key formats and the address it
-  verifies. If Orchard cannot connect, check the key format and that the server
-  certificate's `subjectAltName` matches the address Orchard dials. Confirm this path on
-  your own setup before relying on it.
-</Aside>
+`client.pem` and `client.key` as its own identity. To return to running insecurely, stop
+the mint, remove `/data/cdk-mintd/tls`, and start it again.
 
 ## Upgrade
-
-* Back up the mint first, so you can roll back if the new version misbehaves. With
-  Orchard connected, the simplest way is from its dashboard; see
-  [Backup and restore](/orchard/mint/#backup-and-restore).
 
 * With user `admin`, stop the service
 
 ```bash
 sudo systemctl stop cdk-mintd
 ```
+
+* Back up the mint database before upgrading, so you can roll back if the new version
+  misbehaves. Orchard reads the database straight from Postgres, so the backup works with
+  the mint stopped — and stopping first gives a clean snapshot. See
+  [Backup and restore](/orchard/mint/#database).
 
 * Download the new release binary and its checksum for your architecture (replace the
   version with the release you want)
@@ -724,10 +632,10 @@ sudo rm /usr/local/bin/cdk-mintd
 
 * Delete the mint's ingress entry from `/home/admin/.cloudflared/config.yml`, remove
   the DNS record from your Cloudflare dashboard, and delete the tunnel if it is no
-  longer used
+  longer used. Use the name you gave it (`cloudflared tunnel list` shows it)
 
 ```bash
-cloudflared tunnel delete orchard-mint
+cloudflared tunnel delete <NAME>
 ```
 
 ## Port reference
@@ -741,22 +649,3 @@ cloudflared tunnel delete orchard-mint
 
 The mint has no inbound public port. Wallets reach it through the Cloudflare Tunnel's
 outbound connection.
-
-## After the mint
-
-The mint is running, and it writes to the `cdk_mintd` Postgres database and serves its
-management gRPC on `127.0.0.1:8086`. The last step installs Orchard and points it at
-the stack.
-
-<CardGrid>
-  <LinkCard
-    title="Next: Install Orchard"
-    href="/new-mint/orchard/"
-    description="Install Orchard with its own user and point it at the stack you built."
-  />
-  <LinkCard
-    title="CDK on GitHub"
-    href="https://github.com/cashubtc/cdk"
-    description="The source, releases, and configuration reference for cdk-mintd."
-  />
-</CardGrid>

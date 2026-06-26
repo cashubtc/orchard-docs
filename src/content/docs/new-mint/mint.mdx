@@ -1,6 +1,6 @@
 ---
 title: Run a Cashu Mint
-description: Install a CDK Cashu mint (cdk-mintd) from the official prebuilt binary, backed by your own LND node — with Postgres, Redis, Prometheus metrics, a hardened systemd service, and a Cloudflare Tunnel to put it online. Part of the New Mint walkthrough.
+description: Install a CDK Cashu mint (cdk-mintd) from the official prebuilt binary, backed by your own LND node — with Postgres, Redis, a hardened systemd service, and a Cloudflare Tunnel to put it online. Part of the New Mint walkthrough.
 ---
 
 import { Aside, Code, CardGrid, LinkCard } from '@astrojs/starlight/components';
@@ -26,9 +26,8 @@ Postgres you set up for Lightning, and expose it on the internet with a Cloudfla
 - **`cdk-mintd` installed from its official prebuilt binary**, checksum-verified and placed as a system binary.
 - **An isolated `cdk-mintd` service user** that reads your LND node's TLS
   certificate and macaroon, with no other privileges.
-- **Postgres, Redis, and Prometheus** wired in: Postgres for the mint database
-  (the same instance your LND node uses), Redis for the response cache, and
-  Prometheus metrics for Orchard to read later.
+- **Postgres and Redis** wired in: Postgres for the mint database
+  (the same instance your LND node uses) and Redis for the response cache.
 - **A hardened systemd service** so the mint starts on boot and restarts on
   failure.
 - **A public mint URL** served through a Cloudflare Tunnel, with TLS terminated at
@@ -173,8 +172,8 @@ sudo chmod g+r /data/lnd/data/chain/bitcoin/mainnet/admin.macaroon
 
 ### Download and install cdk-mintd
 
-CDK publishes a static binary for each release, built with the Postgres, Redis, and
-Prometheus features this guide uses, so there is nothing to compile.
+CDK publishes a static binary for each release, built with the Postgres and Redis
+features this guide uses, so there is nothing to compile.
 
 * With user `admin`, download the release binary for your architecture and its checksum
   file
@@ -306,12 +305,6 @@ address = "https://localhost:10009"
 cert_file = "/home/cdk-mintd/.lnd/tls.cert"
 macaroon_file = "/home/cdk-mintd/.lnd/data/chain/bitcoin/mainnet/admin.macaroon"
 
-# Expose Prometheus metrics on 127.0.0.1 (this machine only) for Orchard to read
-[prometheus]
-enabled = true
-address = "127.0.0.1"
-port = 9000
-
 # Management gRPC that Orchard uses to manage the mint, plaintext and reachable
 # only from this machine because Orchard runs here too. To secure it for a remote
 # Orchard, see "Secure the management API with mutual TLS" under Extras.
@@ -327,11 +320,11 @@ port = 8086
 exit
 ```
 
-<Aside type="note" title="Keep these ports private">
-  Two endpoints are reachable only from this machine, for Orchard, which runs here too:
-  the Prometheus metrics at `127.0.0.1:9000/metrics` and the management gRPC at
-  `127.0.0.1:8086`. Keep both bound to `127.0.0.1` and never add either to the Cloudflare
-  Tunnel below. Only the mint's own port (`8085`) belongs on the public internet.
+<Aside type="note" title="Keep this port private">
+  The management gRPC at `127.0.0.1:8086` is reachable only from this machine, for
+  Orchard, which runs here too. Keep it bound to `127.0.0.1` and never add it to the
+  Cloudflare Tunnel below. Only the mint's own port (`8085`) belongs on the public
+  internet.
 </Aside>
 
 <Aside type="note" title="Managing the mint through Orchard">
@@ -781,7 +774,6 @@ cloudflared tunnel delete orchard-mint
 | --- | --- | --- |
 | 8085 | TCP (localhost) | Mint HTTP API, forwarded by the tunnel |
 | 8086 | TCP (localhost) | Management gRPC, used by Orchard |
-| 9000 | TCP (localhost) | Prometheus metrics, read by Orchard |
 | 6379 | TCP (localhost) | Redis response cache |
 | 5432 | TCP (localhost) | Postgres, shared with LND |
 
@@ -790,9 +782,9 @@ outbound connection.
 
 ## After the mint
 
-The mint is running, and it writes to the `cdk_mintd` Postgres database, serves its
-management gRPC on `127.0.0.1:8086`, and exposes metrics on `127.0.0.1:9000`. The last
-step installs Orchard and points it at all of them.
+The mint is running, and it writes to the `cdk_mintd` Postgres database and serves its
+management gRPC on `127.0.0.1:8086`. The last step installs Orchard and points it at
+the stack.
 
 <CardGrid>
   <LinkCard

@@ -258,8 +258,8 @@ army van defense carry jealous true garbage claim echo media make ...
   This phrase controls every keyset the mint issues, and it never changes. Have a
   backup plan for this seed. The seed alone cannot rebuild a mint:
   recovery needs the seed **together with** a recent copy of the mint's database (see
-  [Back up the mint](#back-up-the-mint)). Lose the seed and the mint can no longer
-  sign; leak it and someone else can.
+  [Backup and restore](/orchard/mint/#backup-and-restore)). Lose the seed and the mint
+  can no longer sign; leak it and someone else can.
 </Aside>
 
 ## Configuration
@@ -282,7 +282,6 @@ listen_host = "127.0.0.1"
 listen_port = 8085
 mnemonic = "your twelve or twenty-four word seed phrase here"
 
-# Cache deterministic responses in Redis (NUT-19)
 [info.http_cache]
 backend = "redis"
 ttl = 60
@@ -290,13 +289,11 @@ tti = 60
 key_prefix = "mintd"
 connection_string = "redis://127.0.0.1:6379"
 
-# The public face of your mint, shown to wallets that connect
 [mint_info]
 name = "Your Mint"
-description = "A Cashu mint backed by my own Lightning node"
+description = "Sovereign bank in cyberspace"
 contact_email = "you@yourdomain.com"
 
-# Reuse the Postgres instance your LND node runs on
 [database]
 engine = "postgres"
 
@@ -304,7 +301,6 @@ engine = "postgres"
 url = "postgresql://cdk_mintd:your-mint-db-password@127.0.0.1:5432/cdk_mintd"
 tls_mode = "disable"
 
-# Settle through your LND node
 [ln]
 ln_backend = "lnd"
 
@@ -313,9 +309,6 @@ address = "https://localhost:10009"
 cert_file = "/home/cdk-mintd/.lnd/tls.cert"
 macaroon_file = "/home/cdk-mintd/.lnd/data/chain/bitcoin/mainnet/admin.macaroon"
 
-# Management gRPC that Orchard uses to manage the mint, plaintext and reachable
-# only from this machine because Orchard runs here too. To secure it for a remote
-# Orchard, see "Secure the management API with mutual TLS" under Extras.
 [mint_management_rpc]
 enabled = true
 address = "127.0.0.1"
@@ -328,18 +321,11 @@ port = 8086
 exit
 ```
 
-<Aside type="note" title="Keep this port private">
-  The management gRPC at `127.0.0.1:8086` is reachable only from this machine, for
-  Orchard, which runs here too. Keep it bound to `127.0.0.1` and never add it to the
-  Cloudflare Tunnel below. Only the mint's own port (`8085`) belongs on the public
-  internet.
-</Aside>
-
 <Aside type="note" title="Managing the mint through Orchard">
   With `[mint_management_rpc]` enabled, the mint reads `[mint_info]` from this file only
-  on first start. After that, the name, description, and contact are managed over the
-  gRPC by Orchard, not by editing `config.toml`. It runs plaintext here because Orchard
-  shares this machine and the port is reachable only from it. If Orchard runs on a
+  on first start. After that, info can be managed over the
+  gRPC by Orchard, not by editing `config.toml`. It runs insecurely here because Orchard
+  shares this machine and the port is reachable only from within the network. If Orchard runs on a
   different host, secure it with
   [mutual TLS](#secure-the-management-api-with-mutual-tls) instead.
 </Aside>
@@ -419,7 +405,6 @@ and log in as `admin`.
 sudo systemctl start cdk-mintd
 ```
 
-The first start builds the mint's keysets and connects to Postgres, Redis, and LND.
 Watch the journal in the other terminal until it settles.
 
 ### Validation
@@ -448,43 +433,8 @@ curl http://127.0.0.1:8085/v1/info
 <Code code={`{"name":"Your Mint","version":"cdk-mintd/${latestCdkVersion}","description":"A Cashu mint backed by my own Lightning node","contact":[...],"nuts":{...}}`} />
 
 <Aside type="tip" title="Mint is up">
-  A JSON response from `/v1/info` means the daemon built its keysets, reached Postgres
-  and Redis, and connected to LND. Back it up next, then give it a public address.
-</Aside>
-
-## Back up the mint
-
-A mint is restored from two things together: the **seed phrase** from earlier and a
-recent copy of its **database**. The seed never changes, so you back it up once. The
-database changes every time the mint issues or redeems ecash, so it needs regular
-backups to stay current. Keep both and a mint lost to a dead disk comes back fully
-operational, with the same keysets and the same outstanding ecash.
-
-* With user `admin`, dump the mint database to a compressed file
-
-```bash
-sudo -u postgres pg_dump cdk_mintd | gzip > cdk_mintd-$(date +%F).sql.gz
-```
-
-* Copy that dump off the machine, and take a fresh one on a schedule so the backup
-  never lags far behind the live mint
-
-<Aside type="tip" title="Restoring a mint">
-  To bring a mint back on a new machine: install `cdk-mintd` as above with the **same
-  seed** in `config.toml`, recreate the database
-  (`sudo -u postgres createdb -O cdk_mintd cdk_mintd`), and load your latest dump into it
-
-  ```bash
-  gunzip -c cdk_mintd-DATE.sql.gz | sudo -u postgres psql cdk_mintd
-  ```
-
-  The mint returns with the same keysets and balances it had when the dump was taken.
-</Aside>
-
-<Aside type="note" title="Backups from Orchard">
-  Once Orchard is connected to this mint, you can run these database backups from its
-  dashboard instead of the command line: see [Backup and restore](/orchard/mint/#backup-and-restore).
-  Either way the seed stays your responsibility, kept offline.
+  A JSON response from `/v1/info` means the mint is running and serving its API.
+  Next step is to make the mint publicly reachable.
 </Aside>
 
 ## Put your mint online with a Cloudflare Tunnel
@@ -694,6 +644,10 @@ remove `/data/cdk-mintd/tls`, and start it again.
 </Aside>
 
 ## Upgrade
+
+* Back up the mint first, so you can roll back if the new version misbehaves. With
+  Orchard connected, the simplest way is from its dashboard; see
+  [Backup and restore](/orchard/mint/#backup-and-restore).
 
 * With user `admin`, stop the service
 

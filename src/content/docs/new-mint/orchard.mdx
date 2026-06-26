@@ -1,6 +1,7 @@
 ---
 title: Install Orchard
 description: Install Orchard from source with its own user and point it at the Bitcoin, Lightning, and Cashu mint you just built. The final step of the New Mint walkthrough, after which you manage the whole stack from one private dashboard.
+next: false
 ---
 
 import { Aside, Code, CardGrid, LinkCard } from '@astrojs/starlight/components';
@@ -362,8 +363,8 @@ sudo ufw allow 4321/tcp comment 'allow Orchard SSL from anywhere'
   proceed.
 
 <Aside type="tip" title="Orchard is up">
-  The dashboard at `https://minibolt.local:4321` means Orchard built, started, and is
-  ready to connect to the services you configured. Finish wiring it from the dashboard.
+  The dashboard at `https://minibolt.local:4321` means Orchard built, started, and ready
+  for you to create the admin account.
 </Aside>
 
 ## Extras (optional)
@@ -371,7 +372,7 @@ sudo ufw allow 4321/tcp comment 'allow Orchard SSL from anywhere'
 ### Remote access over Tor
 
 For access from outside your local network, add a Tor hidden service that points at
-Orchard, the same way MiniBolt does for ThunderHub.
+Orchard.
 
 * With user `admin`, edit the `torrc` file
 

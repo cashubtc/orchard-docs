@@ -6,22 +6,21 @@ description: Install Orchard from source with its own user and point it at the B
 import { Aside, Code, CardGrid, LinkCard } from '@astrojs/starlight/components';
 import { latestTag } from '../../../data/latest-releases';
 
-Orchard itself: the web app that manages the stack you just built. It connects to your
+Orchard, your sovereign bank in cyberspace: the web app that wraps the stack you just built. It connects to your
 Bitcoin node, your Lightning node, and your Cashu mint, and surfaces them in one
-dashboard so you tend the mint instead of watching a terminal. This is the last step.
+dashboard for a simplified operational interface. This is the last step.
 
 Like every other service, Orchard runs under its own user and points at endpoints you
-already configured, so the values in this step come straight from the ones before it.
-It is a private admin dashboard, so unlike the mint it is never exposed to the public
-internet.
+already configured.
 
 ## What this step covers
 
 - **An isolated `orchard` user** that runs the app and reads only what it needs.
 - **Orchard built from source** and run as a service.
-- **Connections to the stack you built** — your mint (its API, database, and management
+- **Connections to the stack you built**: your mint (its API, database, and management
   gRPC), plus your Lightning and Bitcoin nodes.
-- **Private access to the dashboard** over an SSH tunnel or a Tor hidden service.
+- **Private access to the dashboard** over your local network with HTTPS, or a Tor
+  hidden service for remote access.
 
 ## Requirements
 
@@ -54,7 +53,7 @@ back here.
 
 ### Create the Orchard database role
 
-Orchard reads the mint's database and can back it up, but it never writes to it: changes
+Orchard reads the mint's database and can perform backups, but it never writes to it: changes
 go through the management gRPC. Give it a dedicated role with read-only access to the
 `cdk_mintd` database, scoped so it cannot read your Lightning node's database on the same
 instance.
@@ -77,6 +76,18 @@ SQL
 
 A read-only role is all `pg_dump` needs, so the same grant both feeds the dashboard and
 lets Orchard back the mint up.
+
+<Aside type="note" title="Restore needs more than read-only">
+  This read-only role cannot **restore** a backup from Orchard: a restore drops and
+  recreates the mint's tables, which a `SELECT`-only role is not allowed to do, so the
+  Restore button will fail. That is the safer default so Orchard can never write to or
+  wipe your mint database. On the rare occasion you need to restore, load the backup file
+  you downloaded from Orchard from the command line as the database owner instead:
+
+  ```bash
+  sudo -u postgres psql cdk_mintd < backup.sql
+  ```
+</Aside>
 
 ## Installation
 
@@ -150,8 +161,7 @@ cp .env.example .env
 nano .env
 ```
 
-* Fill in the following. Only the Orchard section is required; the Bitcoin, Lightning,
-  and mint sections are each optional, switched on by filling them in. The connection
+* Fill in the following. The connection
   values are the ones you set in earlier steps
 
 ```ini title="/home/orchard/orchard/.env"
@@ -166,9 +176,7 @@ LOG_LEVEL=warn
 # --------------------------------------------
 # Orchard Configs (optional)
 # --------------------------------------------
-# Keep Orchard's data under /data with the rest of the stack
 DATABASE_DIR=/data/orchard
-# Route Orchard's outbound traffic through the Tor service from your system setup
 TOR_PROXY_SERVER=socks://127.0.0.1:9050
 
 # --------------------------------------------
@@ -217,12 +225,11 @@ sudo chmod g+r /data/lnd/data/chain/bitcoin/mainnet/readonly.macaroon
 <Aside type="note" title="These are your Bitcoin step credentials">
   MiniBolt's Bitcoin Core sets an `rpcauth` line in `bitcoin.conf` with the username
   `minibolt` and a password you chose, which is exactly what Orchard needs here. If you
-  set a different username, match it. The Bitcoin connection is optional: leave its
-  section blank to skip it.
+  set a different username, match it.
 </Aside>
 
 <Aside type="note" title="If you secured the mint's gRPC with TLS">
-  Setting `MINT_RPC_MTLS=false` matches the plaintext gRPC the mint step sets up for an
+  Setting `MINT_RPC_MTLS=false` matches the insecure gRPC the mint step sets up for an
   on-machine Orchard. If you took the
   [mutual TLS](/new-mint/mint/#secure-the-management-api-with-mutual-tls) option instead,
   leave `MINT_RPC_MTLS` at its default and point `MINT_RPC_KEY`, `MINT_RPC_CERT`, and
@@ -310,27 +317,61 @@ sudo ss -tulpn | grep 3321
 tcp   LISTEN 0   511   127.0.0.1:3321   0.0.0.0:*   users:(("node",pid=4242,fd=20))
 ```
 
-* From your own computer, open an SSH tunnel to the dashboard. This forwards it to your
-  machine without opening any port to the network
+### Reverse proxy & Firewall
+
+You set up Nginx as a reverse proxy with a self-signed certificate in MiniBolt's
+[security section](https://minibolt.minibolt.info/index-1/security#nginx). Add Orchard's
+configuration to reach the dashboard over HTTPS on your local network.
+
+* With user `admin`, create the reverse proxy configuration
 
 ```bash
-ssh -L 8080:127.0.0.1:3321 admin@your-server
+sudo nano /etc/nginx/sites-available/orchard-reverse-proxy.conf
 ```
 
-Then browse to `http://localhost:8080` and complete the first-run setup with your
-Orchard setup key.
+* Paste the following. Save and exit
+
+```nginx
+server {
+  listen 4321 ssl;
+  error_page 497 =301 https://$host:$server_port$request_uri;
+
+  location / {
+    proxy_pass http://127.0.0.1:3321;
+  }
+}
+```
+
+* Enable the site, test the configuration, and reload Nginx
+
+```bash
+sudo ln -s /etc/nginx/sites-available/orchard-reverse-proxy.conf /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+* Allow incoming HTTPS to the dashboard
+
+```bash
+sudo ufw allow 4321/tcp comment 'allow Orchard SSL from anywhere'
+```
+
+* Browse to `https://minibolt.local:4321` (or your node's IP, e.g.
+  `https://192.168.x.xxx:4321`) and complete the first-run setup with your Orchard setup
+  key. Your browser will warn about the self-signed certificate; click **Advanced** and
+  proceed.
 
 <Aside type="tip" title="Orchard is up">
-  A dashboard at `http://localhost:8080` means Orchard built, started, and is ready to
-  connect to the services you configured. Finish wiring it from the dashboard.
+  The dashboard at `https://minibolt.local:4321` means Orchard built, started, and is
+  ready to connect to the services you configured. Finish wiring it from the dashboard.
 </Aside>
 
 ## Extras (optional)
 
 ### Remote access over Tor
 
-For always-on access from anywhere without an SSH tunnel, add a Tor hidden service that
-points at Orchard, the same way MiniBolt does for ThunderHub.
+For access from outside your local network, add a Tor hidden service that points at
+Orchard, the same way MiniBolt does for ThunderHub.
 
 * With user `admin`, edit the `torrc` file
 
@@ -434,14 +475,25 @@ sudo nano +63 /etc/tor/torrc --linenumbers
 sudo systemctl reload tor
 ```
 
+### Remove the reverse proxy & firewall rule
+
+* Remove Orchard's Nginx site and its firewall rule, then reload Nginx
+
+```bash
+sudo rm /etc/nginx/sites-enabled/orchard-reverse-proxy.conf /etc/nginx/sites-available/orchard-reverse-proxy.conf
+sudo systemctl reload nginx
+sudo ufw delete allow 4321/tcp
+```
+
 ## Port reference
 
 | Port | Protocol | Use |
 | --- | --- | --- |
-| 3321 | TCP (localhost) | Orchard dashboard, reached over SSH or Tor |
+| 3321 | TCP (localhost) | Orchard dashboard, behind the Nginx and Tor proxies |
+| 4321 | TCP (LAN) | Nginx HTTPS reverse proxy for the dashboard |
 
-Orchard has no public port. It is your admin dashboard, so it stays off the Cloudflare
-Tunnel and reachable only over a private channel.
+Orchard has no internet-facing port. It is your admin dashboard, so it stays off the
+Cloudflare Tunnel and reachable only over your local network or Tor.
 
 ## After new mint
 

@@ -4,10 +4,17 @@ description: "The suggested path to a fully sovereign mint: run Bitcoin, Lightni
 ---
 
 import { Aside, CardGrid, LinkCard, Steps } from '@astrojs/starlight/components';
+import CopyForAgent from '../../../components/CopyForAgent.astro';
 
 This is the suggested path to a **fully sovereign mint**: every service run and
 hosted by you, on hardware you control. Build the stack from the bottom up, then
 connect Orchard to each service to manage everything from one place.
+
+<CopyForAgent
+  block
+  label="Copy this guide for your agent"
+  sources={[{ label: 'New Mint guide', href: '/_llms-txt/new-mint.txt' }]}
+/>
 
 <Steps>
 

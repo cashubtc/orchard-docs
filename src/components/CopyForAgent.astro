@@ -1,0 +1,308 @@
+---
+// "Copy for your agent" — a button that copies a page's llms-*.txt guide to the
+// clipboard so a reader can paste the docs straight into an AI assistant. Pairs
+// with the static files emitted by starlight-llms-txt (see astro.config.mjs).
+//
+// One source  → a single button that copies that file on click (used on the
+//               section index pages, each pointing at its /_llms-txt/<set>.txt).
+// Many sources → a disclosure button that opens a small menu of options (used on
+//               the Overview, offering the full / abridged / map variants).
+//
+// Static and framework-free: the markup is server-rendered and a single client
+// <script> (shared by every instance on the page) wires up the fetch + copy and
+// the menu toggle, mirroring the native-<dialog> approach in Lightbox.astro.
+interface Source {
+  /** Button / menu-option label, e.g. "Complete docs" or "New Mint guide". */
+  label: string;
+  /** Absolute path to the .txt file to copy, e.g. "/llms-full.txt". */
+  href: string;
+  /** Optional one-line hint shown under the label in the menu. */
+  description?: string;
+}
+
+interface Props {
+  /** Trigger label. */
+  label?: string;
+  /** One source → direct copy; many → a menu of options. */
+  sources: Source[];
+  /** Standalone block (margin + left-aligned) instead of inline in a CTA row. */
+  block?: boolean;
+}
+
+const { label = 'Copy for your agent', sources, block = false } = Astro.props;
+const isMenu = sources.length > 1;
+// Unique id linking the trigger to its menu (aria-controls). Only one menu
+// instance exists per page today, but keep it collision-proof regardless.
+const menuId = `agent-copy-${Math.random().toString(36).slice(2, 9)}`;
+---
+
+<div class:list={['agent-copy not-content', { 'agent-copy--block': block }]}>
+  {
+    isMenu ? (
+      <button type="button" class="agent-copy__btn" aria-haspopup="true" aria-expanded="false" aria-controls={menuId}>
+        <svg class="agent-copy__icon agent-copy__icon-copy" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+        <span class="agent-copy__label">{label}</span>
+        <svg class="agent-copy__chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+      </button>
+    ) : (
+      <button type="button" class="agent-copy__btn" data-copy-href={sources[0].href}>
+        <svg class="agent-copy__icon agent-copy__icon-copy" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+        <svg class="agent-copy__icon agent-copy__icon-check" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+        <span class="agent-copy__label">{label}</span>
+      </button>
+    )
+  }
+
+  {
+    isMenu && (
+      <div class="agent-copy__menu" id={menuId} hidden>
+        <ul>
+          {sources.map((source) => (
+            <li>
+              <button type="button" class="agent-copy__item" data-copy-href={source.href}>
+                <span class="agent-copy__item-icon">
+                  <svg class="agent-copy__icon agent-copy__icon-copy" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                  <svg class="agent-copy__icon agent-copy__icon-check" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                </span>
+                <span class="agent-copy__item-text">
+                  <span class="agent-copy__item-label">{source.label}</span>
+                  {source.description && <span class="agent-copy__item-desc">{source.description}</span>}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+
+  <span class="agent-copy__status sr-only" aria-live="polite" />
+</div>
+
+<style>
+  .agent-copy {
+    position: relative;
+    display: inline-flex;
+  }
+  /* Standalone placement (section pages): own line, with breathing room. The
+     hero CTA row uses the inline default and lets its own gap do the spacing. */
+  .agent-copy--block {
+    display: flex;
+    margin: 1.75rem 0;
+  }
+
+  /* Trigger / single button — matches the secondary CTA footprint (outlined,
+     0.75rem radius, 600 weight) so it lines up with the hero buttons. */
+  .agent-copy__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    font: inherit;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--sl-color-white);
+    background: transparent;
+    cursor: pointer;
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+  .agent-copy__btn:hover {
+    border-color: var(--sl-color-gray-3);
+    background: var(--sl-color-gray-6);
+  }
+  .agent-copy__btn:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+  }
+  /* Copied confirmation on the single button. */
+  .agent-copy__btn[data-state='copied'] {
+    border-color: var(--sl-color-accent);
+    color: var(--sl-color-accent-high);
+  }
+
+  .agent-copy__icon {
+    flex: none;
+  }
+  /* Copy ⇄ check swap, driven by data-state on whichever button was activated
+     (the single button itself, or a menu item). */
+  .agent-copy__icon-check {
+    display: none;
+  }
+  [data-state='copied'] .agent-copy__icon-copy {
+    display: none;
+  }
+  [data-state='copied'] .agent-copy__icon-check {
+    display: inline;
+  }
+
+  /* Disclosure menu (Overview). */
+  .agent-copy__menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    z-index: 40;
+    min-width: 17rem;
+    max-width: min(24rem, 86vw);
+    margin: 0;
+    padding: 0.35rem;
+    background: var(--sl-color-bg-sidebar);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.75rem;
+    box-shadow: 0 14px 34px -16px rgba(0, 0, 0, 0.7);
+  }
+  .agent-copy__menu[hidden] {
+    display: none;
+  }
+  .agent-copy__menu ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .agent-copy__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    width: 100%;
+    margin: 0;
+    padding: 0.55rem 0.65rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    color: var(--sl-color-white);
+    cursor: pointer;
+  }
+  .agent-copy__item:hover,
+  .agent-copy__item:focus-visible {
+    background: color-mix(in srgb, var(--sl-color-accent) 13%, transparent);
+    outline: none;
+  }
+  .agent-copy__item-icon {
+    flex: none;
+    display: inline-flex;
+    margin-top: 0.15rem;
+    color: var(--sl-color-gray-3);
+  }
+  .agent-copy__item:hover .agent-copy__item-icon,
+  .agent-copy__item[data-state='copied'] .agent-copy__item-icon {
+    color: var(--sl-color-accent-high);
+  }
+  .agent-copy__item-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+  }
+  .agent-copy__item-label {
+    font-weight: 600;
+  }
+  .agent-copy__item-desc {
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+    line-height: 1.4;
+  }
+
+  .agent-copy__chevron {
+    transition: transform 0.2s ease;
+  }
+  .agent-copy__btn[aria-expanded='true'] .agent-copy__chevron {
+    transform: rotate(180deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .agent-copy__btn,
+    .agent-copy__chevron {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const COPIED_MS = 1900;
+
+  async function readText(href: string): Promise<string> {
+    const res = await fetch(href, { headers: { Accept: 'text/plain' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.text();
+  }
+
+  async function toClipboard(text: string) {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+    // Legacy fallback for non-secure contexts / old browsers.
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('.agent-copy')) {
+    const trigger = root.querySelector<HTMLButtonElement>('.agent-copy__btn');
+    const menu = root.querySelector<HTMLElement>('.agent-copy__menu');
+    const status = root.querySelector<HTMLElement>('.agent-copy__status');
+
+    // Disclosure menu (Overview): toggle the popup of options.
+    if (trigger && menu) {
+      const setOpen = (open: boolean) => {
+        menu.hidden = !open;
+        trigger.setAttribute('aria-expanded', String(open));
+        if (open) menu.querySelector<HTMLButtonElement>('[data-copy-href]')?.focus();
+      };
+      trigger.addEventListener('click', () => setOpen(menu.hidden));
+      document.addEventListener('click', (event) => {
+        if (!root.contains(event.target as Node)) setOpen(false);
+      });
+      root.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !menu.hidden) {
+          setOpen(false);
+          trigger.focus();
+        }
+      });
+    }
+
+    // Copy actions: the single button itself, or each menu option.
+    for (const btn of root.querySelectorAll<HTMLButtonElement>('[data-copy-href]')) {
+      const href = btn.dataset.copyHref!;
+      const labelEl = btn.querySelector<HTMLElement>('.agent-copy__label, .agent-copy__item-label');
+      btn.addEventListener('click', async () => {
+        const original = labelEl?.textContent ?? '';
+        try {
+          await toClipboard(await readText(href));
+        } catch {
+          // Fallback: open the file so the reader can copy or save it by hand.
+          if (status) status.textContent = 'Could not copy automatically; opening the file instead.';
+          window.open(href, '_blank', 'noopener');
+          return;
+        }
+        btn.dataset.state = 'copied';
+        if (labelEl) labelEl.textContent = 'Copied!';
+        if (status) status.textContent = 'Guide copied to your clipboard.';
+        window.setTimeout(() => {
+          delete btn.dataset.state;
+          if (labelEl) labelEl.textContent = original;
+        }, COPIED_MS);
+        // Close the menu shortly after, leaving the confirmation visible briefly.
+        if (menu && trigger) {
+          window.setTimeout(() => {
+            menu.hidden = true;
+            trigger.setAttribute('aria-expanded', 'false');
+          }, COPIED_MS);
+        }
+      });
+    }
+  }
+</script>

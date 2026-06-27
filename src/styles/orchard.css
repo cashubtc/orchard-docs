@@ -242,21 +242,29 @@
   margin-top: 1.75rem;
 }
 
-/* Ember primary CTA — the marketing site's "Source Code" button, rebuilt from
- * the brand ramp (theme-4 → theme-1). Applied to Starlight's <LinkButton> via a
- * class; these rules are un-layered, so they override the layered .sl-link-button
- * pill/accent styles. Rounded corners (not a full pill) and dark text on the
- * bright ramp in both themes. A top gloss + inset sheen give it depth; on hover
- * the ramp drifts (no ambient motion, disabled under reduced motion). */
+/* Ember primary CTA — the marketing site's "Source Code" button, on the brand
+ * ramp (theme-4 → theme-1) with a top bloom. Applied to Starlight's <LinkButton>
+ * via a class; these rules are un-layered, so they override the layered
+ * .sl-link-button pill/accent styles. Rounded corners (not a full pill), dark
+ * text on the bright ramp in both themes.
+ *
+ * No border and no box-shadow at all: every edge treatment banded here. Starlight's
+ * .primary variant paints a 1px accent border, and inset shadows traced a second
+ * rounded ring a pixel off the fill — together a cheap double line at the corners.
+ * The top light comes from the gradient's own bloom instead. Hover and rest are
+ * two held states the button transitions between: on hover the ramp sweeps across
+ * and the brightness swells (a spring ease overshoots, so it reads as a pulse),
+ * the button scales up, and it holds there; leaving eases every property back to
+ * rest (no snap), with a spring squish on the scale. */
 .cta-primary,
 .cta-primary:hover {
   color: var(--color-theme-7);
 }
 .cta-primary {
   margin: 0;
-  border: 1px solid transparent;
+  border: 0;
   border-radius: 0.75rem;
-  padding: 0.75rem 1.75rem;
+  padding: 0.8rem 1.85rem;
   font-size: 1rem;
   font-weight: 600;
   background-image:
@@ -265,9 +273,18 @@
   background-size: 100% 100%, 200% 100%;
   background-position: 28% 0%, 16% 50%;
   background-repeat: no-repeat;
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--color-theme-1) 60%, transparent),
-    inset 0 -1px 0 color-mix(in srgb, var(--color-theme-5) 40%, transparent);
+  filter: brightness(1);
+  box-shadow: none;
+  transition:
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-position 0.7s ease,
+    filter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.cta-primary:hover,
+.cta-primary:focus-visible {
+  transform: scale(1.03);
+  background-position: 28% 0%, 84% 50%;
+  filter: brightness(1.07);
 }
 /* Outlined secondary CTA — same footprint and corner radius as .cta-primary so
  * the pair reads as a matched set, but keeps Starlight's outline treatment
@@ -280,24 +297,18 @@
   font-weight: 600;
 }
 
-@keyframes cta-flow {
-  from { background-position: 28% 0%, 16% 50%; }
-  to { background-position: 28% 0%, 84% 50%; }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .cta-primary {
-    animation: cta-flow 5s ease-in-out infinite alternate;
-    animation-play-state: paused;
-  }
-  .cta-primary:hover,
-  .cta-primary:focus-visible {
-    animation-play-state: running;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   * {
     scroll-behavior: auto;
+  }
+  /* Hold the CTA still: no sweep, no scale, no transition. */
+  .cta-primary {
+    transition: none;
+  }
+  .cta-primary:hover,
+  .cta-primary:focus-visible {
+    transform: none;
+    background-position: 28% 0%, 16% 50%;
   }
 }
 

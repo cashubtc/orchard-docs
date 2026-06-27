@@ -1,0 +1,84 @@
+name: Deploy docs
+
+# Cloudflare Pages is connected to the fork (orangeshyguy21/orchard-docs), not
+# this repo, because installing the Cloudflare GitHub App on the cashubtc org
+# needs an org owner. So this workflow keeps the fork's master mirrored to this
+# repo and pokes a Cloudflare Deploy Hook when an orchard/cdk release changes.
+#
+#   - push to master here  -> mirror into the fork -> Cloudflare builds (instant)
+#   - orchard/cdk release   -> polled daily -> deploy hook re-bakes the new version
+#
+# The build re-fetches the latest orchard/cdk release tags at build time
+# (see src/data/latest-releases.ts), so a plain rebuild is all a release needs.
+
+on:
+  push:
+    branches: [master]          # content changed -> deploy immediately
+  schedule:
+    - cron: '37 8 * * *'        # once a day (08:37 UTC); off the hour to dodge scheduler congestion
+  workflow_dispatch: {}          # manual "Run workflow" button
+
+concurrency:
+  group: deploy-docs
+  cancel-in-progress: false
+
+permissions:
+  contents: read                 # only reads here; the fork push uses a deploy key
+
+jobs:
+  deploy:
+    if: github.repository == 'cashubtc/orchard-docs'   # never act if this file is mirrored into the fork
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore last-seen release tags
+        uses: actions/cache@v4
+        with:
+          path: .deploy-state
+          key: deploy-state-${{ github.run_id }}
+          restore-keys: deploy-state-
+
+      - name: Sync fork + trigger Cloudflare
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CF_DEPLOY_HOOK: ${{ secrets.CF_DEPLOY_HOOK }}
+          FORK_DEPLOY_KEY: ${{ secrets.FORK_DEPLOY_KEY }}
+        run: |
+          set -euo pipefail
+
+          # --- deploy key, used only for the fork remote ---
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$FORK_DEPLOY_KEY" > ~/.ssh/fork_key
+          chmod 600 ~/.ssh/fork_key
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/fork_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+          FORK=git@github.com:orangeshyguy21/orchard-docs.git
+
+          # --- previous release tags (Actions cache) ---
+          mkdir -p .deploy-state; STATE=.deploy-state/tags.env
+          PREV_ORCHARD=""; PREV_CDK=""
+          [ -f "$STATE" ] && { . "$STATE"; PREV_ORCHARD="${ORCHARD:-}"; PREV_CDK="${CDK:-}"; }
+
+          # --- latest releases (the same tags the build bakes in) ---
+          CUR_ORCHARD=$(gh api repos/cashubtc/orchard/releases/latest --jq .tag_name 2>/dev/null || true)
+          CUR_CDK=$(gh api repos/cashubtc/cdk/releases/latest --jq .tag_name 2>/dev/null || true)
+          [ -z "$CUR_ORCHARD" ] && CUR_ORCHARD="$PREV_ORCHARD"
+          [ -z "$CUR_CDK" ]     && CUR_CDK="$PREV_CDK"
+
+          MAIN_SHA=$(git rev-parse HEAD)
+          FORK_SHA=$(git ls-remote "$FORK" master | cut -f1 || true)
+
+          if [ "$MAIN_SHA" != "$FORK_SHA" ]; then
+            git push --force "$FORK" HEAD:master
+            echo "::notice::Fork synced to $MAIN_SHA -> Cloudflare building."
+          elif [ "$CUR_ORCHARD" != "$PREV_ORCHARD" ] || [ "$CUR_CDK" != "$PREV_CDK" ]; then
+            [ -z "${CF_DEPLOY_HOOK:-}" ] && { echo "::error::CF_DEPLOY_HOOK not set"; exit 1; }
+            curl -fsS -X POST "$CF_DEPLOY_HOOK" >/dev/null
+            echo "::notice::Release changed (orchard:$CUR_ORCHARD cdk:$CUR_CDK) -> deploy hook fired."
+          else
+            echo "::notice::No change."
+          fi
+
+          printf 'ORCHARD=%s\nCDK=%s\n' "$CUR_ORCHARD" "$CUR_CDK" > "$STATE"

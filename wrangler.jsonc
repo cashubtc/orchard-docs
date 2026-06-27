@@ -4,6 +4,11 @@
   // There is no Worker script (no `main`) — this is a pure static site.
   "name": "orchard-docs",
   "compatibility_date": "2026-06-27",
+  // Custom domain — provisions the proxied DNS record + TLS cert on deploy.
+  // Requires orchard.space to be a zone in this Cloudflare account.
+  "routes": [
+    { "pattern": "docs.orchard.space", "custom_domain": true }
+  ],
   "assets": {
     "directory": "./dist",
     // Serve Starlight's generated 404.html on unknown routes.

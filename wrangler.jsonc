@@ -1,0 +1,12 @@
+{
+  // Static-assets-only Workers deploy for the Orchard docs site.
+  // `npm run build` emits the site to ./dist; wrangler uploads that directory.
+  // There is no Worker script (no `main`) — this is a pure static site.
+  "name": "orchard-docs",
+  "compatibility_date": "2026-06-27",
+  "assets": {
+    "directory": "./dist",
+    // Serve Starlight's generated 404.html on unknown routes.
+    "not_found_handling": "404-page"
+  }
+}

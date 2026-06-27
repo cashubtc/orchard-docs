@@ -13,7 +13,7 @@ repo is just the machine that builds it. For Orchard's own source code, see
 
 ```bash
 npm install
-npm run dev        # http://localhost:4321
+npm run dev       # http://localhost:4321
 ```
 
 Node **22** is required (see [.nvmrc](.nvmrc)). That's the whole setup — it's a

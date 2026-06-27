@@ -43,8 +43,7 @@ export default defineConfig({
         'Documentation for Orchard, the all-in-one Cashu mint manager. Guides for setting up and running your own sovereign bank in cyberspace.',
       // Emits /llms.txt (a curated map), /llms-full.txt (the whole corpus),
       // /llms-small.txt (a trimmed variant), and one subset per journey — all
-      // static files generated at build for AI agents. Pairs with the per-page
-      // `<slug>.md` endpoint (src/pages/[...slug].md.ts). See AGENTS.md pillar 3.
+      // static files generated at build for AI agents. See AGENTS.md pillar 3.
       plugins: [
         starlightLlmsTxt({
           projectName: 'Orchard',
@@ -53,7 +52,6 @@ export default defineConfig({
           details: [
             'Orchard is a free, open-source, self-hosted web app that manages a complete Cashu mint stack (Bitcoin Core, a Lightning node, the mint, and the machine they run on) from one dashboard.',
             'These are product/operator docs for self-hosters setting up and running their own mint, not developer API docs. The source code lives at https://github.com/cashubtc/orchard; this site is canonical for how to install, run, and operate Orchard.',
-            'Append `.md` to any page URL (for example https://docs.orchard.space/new-mint/system.md) to fetch that page as raw Markdown.',
           ].join('\n\n'),
           customSets: [
             {
@@ -100,9 +98,6 @@ export default defineConfig({
       components: {
         SiteTitle: './src/components/SiteTitle.astro',
         SocialIcons: './src/components/SocialIcons.astro',
-        // Adds a <link rel="alternate" type="text/markdown"> per page pointing at
-        // its `<slug>.md` variant, so agents can auto-discover the raw Markdown.
-        Head: './src/components/Head.astro',
         // Re-renders the default Footer and appends a shared lightbox <dialog>
         // so `.screenshot` figures expand on click. (Footer renders once per page.)
         Footer: './src/components/Lightbox.astro',

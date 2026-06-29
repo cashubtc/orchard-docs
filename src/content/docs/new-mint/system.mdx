@@ -5,7 +5,7 @@ description: The Linux machine your whole Orchard stack runs on, the foundation 
 
 import { Aside, LinkCard } from '@astrojs/starlight/components';
 
-The soil. Bitcoin Core, your Lightning node, the mint, and Orchard all run
+Bitcoin Core, your Lightning node, the mint, and Orchard all run
 on this one machine, so it is the first thing to get right. Liveness is critical
 to both the lightning node and the mint. This makes the host itself critical to
 your service model.
@@ -32,9 +32,8 @@ section below lays out the trade-off.
 
 Both work, and the rest of this guide is the same either way. The choice comes
 down to one trade-off: a home server maximizes sovereignty and privacy, while a
-VPS maximizes uptime and reachability. For a mint — public-facing infrastructure
-that holds value — we lean toward the home server, but a VPS is a reasonable
-lighter-touch start.
+VPS maximizes uptime and reachability. This guide covers the home server primarily,
+but a VPS is a reasonable alternative.
 
 | | Home server | Hosted VPS |
 | --- | --- | --- |
@@ -87,7 +86,7 @@ A VPS arrives as a running Linux box with SSH already enabled, so a few steps sh
 - **Skip [1.2 Operating system](https://minibolt.minibolt.info/system/system/operating-system).**
   Your provider already installed Linux.
 - **[1.3 Remote access](https://minibolt.minibolt.info/system/system/remote-access):**
-  ssh at the public IP your provider gives you as there is no machine to find on
+  SSH at the public IP your provider gives you as there is no machine to find on
   your local network.
 - **[1.4 Configuration](https://minibolt.minibolt.info/system/system/configuration):**
   its first task, "Add the admin user," creates the `admin` account the rest of the

@@ -6,7 +6,7 @@ description: Install a CDK Cashu mint (cdk-mintd) from the official prebuilt bin
 import { Aside, Code, CardGrid, LinkCard } from '@astrojs/starlight/components';
 import { latestCdkVersion } from '../../../data/latest-releases';
 
-The mint. This is the service that issues and redeems ecash using your Lightning node as a backend
+Your mint issues and redeems ecash using your Lightning node as a backend
 for deposits and withdrawals. Mints are elegant in their operational simplicity, once you've gotten
 the setup right.
 
@@ -234,7 +234,7 @@ sudo chown -R cdk-mintd:cdk-mintd /data/cdk-mintd
 
 `cdk-mintd` derives the mint's signing keys from a standard BIP-39 seed phrase.
 The mint signs with it on every operation, so the seed lives here on the server.
-CDK does not generate one for you, so make a fresh 24 word phrase with the BIP-39 reference
+CDK does not generate one for you, so make a fresh 24-word phrase with the BIP-39 reference
 implementation, which Ubuntu packages.
 
 * With user `admin`, install the generator and print a fresh phrase

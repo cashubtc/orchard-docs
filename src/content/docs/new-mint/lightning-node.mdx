@@ -5,9 +5,8 @@ description: Stand up an LND node on top of your Bitcoin node, the layer your Ca
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-The conduit. Your Cashu mint issues ecash backed by Lightning, so this
-node is what moves real sats in and out when users mint and melt. It anchors to
-the Bitcoin node you set up in the previous step.
+Your Lightning node lets you accept and send payments over the Lightning network, and
+will also function as the backend for your mint.
 
 This guide uses [LND](https://github.com/lightningnetwork/lnd), Lightning Labs'
 widely deployed node. Your mint connects to it over gRPC/REST with a macaroon and
@@ -15,7 +14,7 @@ TLS certificate.
 
 ## What this step covers
 
-- **The node**, pointed at your Bitcoin Core node's RPC and notification endpoints.
+- **The node**, pointed at your Bitcoin node's RPC and notification endpoints.
 - **A funded channel or two**: outbound liquidity to melt, inbound to mint.
 - **gRPC connections** your mint can authenticate against in the next step.
 

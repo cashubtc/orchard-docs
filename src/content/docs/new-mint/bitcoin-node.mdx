@@ -5,18 +5,20 @@ description: Stand up your own Bitcoin Core node, the base layer your Lightning 
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-The roots. A Bitcoin full node validates the chain independently, so your
-Lightning node trusts your own copy of the ledger rather than someone else's.
-Running your own node is what makes the rest of the stack genuinely sovereign.
+A Bitcoin full node is the roots of the operation. It gives you a complete copy
+of the ledger, validation, privacy when posting transactions, control of your mempool for
+feerate estimation, and much more. 
+
+You can't run a lightning node without one, and there's no better node than your own.
 
 ## What this step covers
 
 - **Bitcoin Core (`bitcoind`)**: the reference full node. You install it, let it
   perform its initial block download, and keep it online.
-- **An RPC connection** your Lightning node can reach, so Lightning can watch the
-  chain and broadcast transactions.
+- **An RPC connection** your Lightning node can reach, so Lightning can perform actions
+  on chain like funding your wallet, and opening channels.
 
-Plan for the initial sync to take time and disk: a full node needs almost 1 TB of disk
+Plan for the initial sync to take time and disk space: a full node needs almost 1 TB of disk
 and can take a day or more to validate from genesis.
 
 <Aside type="note" title="Pruned vs. full">

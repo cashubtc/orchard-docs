@@ -1,6 +1,6 @@
 ---
 title: Mint
-description: "Operate the Cashu mint itself from Orchard: its dashboard, public info, configuration, keysets, and database backup and restore, across five tabs."
+description: "Operate the Cashu mint itself from Orchard: its dashboard, public info, configuration, keysets, database backup and restore, and system metrics, across six tabs."
 ---
 
 import { Aside, CardGrid, LinkCard } from '@astrojs/starlight/components';
@@ -83,6 +83,26 @@ A lost or corrupted mint is restored from two things together:
 
 With both, a mint lost to a dead disk or similar catastrophe comes back fully operational, with the same keysets and
 the same outstanding ecash. With only one, it cannot. Have a backup and storage strategy for both.
+
+## System
+
+Watch how the mint itself is running. Orchard reads the mint's metrics page every
+minute and charts it here, over a date range and interval you pick.
+
+- **System** — processor use, memory used, and memory as a percentage.
+- **HTTP** — request volume, error rate, which endpoints get hit, and how long
+  requests take at the 50th, 95th, and 99th percentile.
+- **Mint** — mint operations, requests in flight, and operation timings.
+- **Database** — operations, open connections, and query timings.
+- **Activity and errors** — wallet and payment operations, authentication rate on
+  mints that support it, and errors.
+
+<Aside type="note" title="This tab needs a cdk mint">
+  The charts appear once a cdk mint publishes its metrics page and Orchard's
+  `MINT_METRICS_API` points at it; see
+  [Cashu Mint configuration](/install/configuration/#cashu-mint). Nutshell mints
+  publish no metrics. Data starts accruing the moment it's connected so there is no backfilling.
+</Aside>
 
 ## AI
 

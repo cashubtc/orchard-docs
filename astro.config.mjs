@@ -63,13 +63,13 @@ export default defineConfig({
             {
               label: 'Install',
               description:
-                'Install Orchard (Node.js or Docker) and configure it with environment variables, including how to connect the services it manages: Bitcoin, Lightning, Taproot Assets, and the mint.',
+                'Install Orchard (Node.js or Docker) and configure it with environment variables, including how to connect the services it manages: Bitcoin, Lightning, Taproot Assets, Cashu Mint.',
               paths: ['install', 'install/**'],
             },
             {
               label: 'Your Orchard',
               description:
-                'Operate Orchard day to day: set up the instance, settings, crew, the change log, the Home screen, the Bitcoin/Lightning/Mint service views (including mint database backup and restore), and the built-in AI assistant.',
+                'Operate Orchard day to day: set up the instance, settings, crew, the change log, the Home screen, the Bitcoin/Lightning/Mint service views (including mint database backup and restore, and the mint system metrics dashboard), and the built-in AI assistant.',
               paths: ['orchard', 'orchard/**'],
             },
             {

@@ -30,6 +30,8 @@ Postgres you set up for Lightning, and expose it on the internet with a Cloudfla
   (the same instance your LND node uses) and Redis for the response cache.
 - **A hardened systemd service** so the mint starts on boot and restarts on
   failure.
+- **A metrics page** the mint publishes for Orchard, which charts system metrics on the mint's
+  System dashboard.
 - **A public mint URL** served through a Cloudflare Tunnel, with TLS terminated at
   Cloudflare's edge.
 
@@ -181,8 +183,8 @@ sudo chmod g+r /data/lnd/data/chain/bitcoin/mainnet/admin.macaroon
 
 ### Download and install cdk-mintd
 
-CDK publishes a static binary for each release, built with the Postgres and Redis
-features this guide uses, so there is nothing to compile.
+CDK publishes a static binary for each release, built with the Postgres, Redis, and
+metrics features this guide uses, so there is nothing to compile.
 
 * With user `admin`, download the release binary for your architecture and its checksum
   file
@@ -317,6 +319,11 @@ macaroon_file = "/home/cdk-mintd/.lnd/data/chain/bitcoin/mainnet/admin.macaroon"
 enabled = true
 address = "127.0.0.1"
 port = 8086
+
+[prometheus]
+enabled = true
+address = "127.0.0.1"
+port = 9000
 ```
 
 * Come back to the `admin` user
@@ -324,6 +331,14 @@ port = 8086
 ```bash
 exit
 ```
+
+<Aside type="note" title="The mint's metrics">
+  `[prometheus]` has the mint publish how it is running; processor and memory use, HTTP
+  and database activity, how long operations take. The snapshot is available at the page at
+  `http://127.0.0.1:9000/metrics`. Nothing else reads it, and the address keeps it
+  reachable only from this machine. Orchard picks it up in the next step and charts it
+  on the mint's [System dashboard](/orchard/mint/#system).
+</Aside>
 
 <Aside type="note" title="Managing the mint through Orchard">
   With `[mint_management_rpc]` enabled, the mint reads `[mint_info]` from this file only
@@ -435,6 +450,21 @@ curl http://127.0.0.1:8085/v1/info
 **Example** of expected output (truncated):
 
 <Code code={`{"name":"Your Mint","version":"cdk-mintd/${latestCdkVersion}","description":"Sovereign bank in cyberspace","contact":[...],"nuts":{...}}`} />
+
+* Check the metrics page Orchard reads in the next step. It returns a plain text list
+  of counters
+
+```bash
+curl http://127.0.0.1:9000/metrics
+```
+
+**Example** of expected output (truncated):
+
+```
+# HELP cdk_http_requests_total Total number of HTTP requests
+# TYPE cdk_http_requests_total counter
+cdk_http_requests_total{endpoint="/v1/info",status="200"} 1
+```
 
 <Aside type="tip" title="Mint is up">
   A JSON response from `/v1/info` means the mint is running and serving its API.
@@ -648,6 +678,7 @@ cloudflared tunnel delete <NAME>
 | --- | --- | --- |
 | 8085 | TCP (localhost) | Mint HTTP API, forwarded by the tunnel |
 | 8086 | TCP (localhost) | Management gRPC, used by Orchard |
+| 9000 | TCP (localhost) | Metrics page, read by Orchard |
 | 6379 | TCP (localhost) | Redis response cache |
 | 5432 | TCP (localhost) | Postgres, shared with LND |
 

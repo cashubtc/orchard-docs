@@ -180,11 +180,12 @@ TAPROOT_ASSETS_CERT=<tls.cert>            # path to tapd's TLS cert
 
 ### Cashu Mint
 
-Connect your Cashu Mint to Orchard. Orchard reaches the mint three ways:
+Connect your Cashu Mint to Orchard. Orchard reaches the mint four ways:
 
 - **Public API** — to read mint info and the features it supports.
 - **Database** — to read rich data the RPC doesn't surface (yet).
 - **Management RPC** — for management actions.
+- **Metrics** — to chart how the mint itself is running (cdk only).
 
 Set the implementation in **Connection**; the **Database** and **Management RPC**
 are each configured a little differently, depending on the implementation.
@@ -269,6 +270,21 @@ Orchard's settings to how the mint serves the RPC.
   </TabItem>
 </Tabs>
 
+**Mint System Metrics**
+
+`cdk-mintd` can publish how it is running; processor and memory use, HTTP and database
+activity, how long mint operations take. Point Orchard at that endpoint and it reads the
+numbers every minute and charts them on the mint's
+[System dashboard](/orchard/mint/#system).
+
+```ini
+MINT_METRICS_API=http://localhost:9000  # base url for mint metrics endpoint
+```
+
+<Aside type="note">
+  Mint system metrics are only available for CDK mints (`MINT_TYPE=cdk`).
+</Aside>
+
 | Variable | Description | Typical |
 | --- | --- | --- |
 | `MINT_TYPE` | Mint implementation. Valid: `cdk`, `nutshell`. | — |
@@ -283,3 +299,5 @@ Orchard's settings to how the mint serves the RPC.
 | `MINT_RPC_KEY` | Path to the RPC client key. | — |
 | `MINT_RPC_CERT` | Path to the RPC client certificate. | — |
 | `MINT_RPC_CA` | Path to the RPC CA certificate. | — |
+| `MINT_METRICS_API` | Base URL of the mint's metrics endpoint. cdk only. | `http://localhost:9000` |
+

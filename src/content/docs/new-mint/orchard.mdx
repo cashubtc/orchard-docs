@@ -210,6 +210,7 @@ MINT_DATABASE=postgres://orchard:your-orchard-db-password@127.0.0.1:5432/cdk_min
 MINT_RPC_HOST=localhost
 MINT_RPC_PORT=8086
 MINT_RPC_MTLS=false
+MINT_METRICS_API=http://localhost:9000
 ```
 
 * Save and exit, then make the Lightning macaroon readable by the `lnd` group and come
@@ -235,6 +236,13 @@ sudo chmod g+r /data/lnd/data/chain/bitcoin/mainnet/readonly.macaroon
   [mutual TLS](/new-mint/mint/#secure-the-management-api-with-mutual-tls) option instead,
   leave `MINT_RPC_MTLS` at its default and point `MINT_RPC_KEY`, `MINT_RPC_CERT`, and
   `MINT_RPC_CA` at the `client.key`, `client.pem`, and `ca.pem` you generated.
+</Aside>
+
+<Aside type="note" title="Mint metrics">
+  `MINT_METRICS_API` points at the metrics page you turned on with `[prometheus]` in the
+  [mint step](/new-mint/mint/#configuration), and the port matches the one you set
+  there. It fills the mint's [System dashboard](/orchard/mint/#system). If you left the
+  mint's `[prometheus]` block out, comment this line out too.
 </Aside>
 
 <Aside type="note" title="Tor proxy">

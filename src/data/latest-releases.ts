@@ -24,7 +24,7 @@ export const latestTag = await fetchLatestTag('cashubtc/orchard', 'v1.9.0');
 /** Same tag without the leading `v`, e.g. `1.9.0` — for `VERSION=` pinning. */
 export const latestVersion = stripV(latestTag);
 
-/** cdk-mintd's latest release tag, e.g. `v0.17.1`. */
-export const latestCdkTag = await fetchLatestTag('cashubtc/cdk', 'v0.17.1');
-/** Same tag without the leading `v`, e.g. `0.17.1` — for `VERSION=` in the mint guide. */
+/** cdk-mintd's latest release tag, e.g. `v0.18.1`. */
+export const latestCdkTag = await fetchLatestTag('cashubtc/cdk', 'v0.18.1');
+/** Same tag without the leading `v`, e.g. `0.18.1` — for `VERSION=` in the mint guide. */
 export const latestCdkVersion = stripV(latestCdkTag);

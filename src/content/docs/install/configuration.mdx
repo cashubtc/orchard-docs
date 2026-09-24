@@ -245,7 +245,8 @@ Orchard's settings to how the mint serves the RPC.
 <Tabs syncKey="cashu-rpc-tls">
   <TabItem label="Insecure">
     For a mint on the same machine, reachable only from it, serving the RPC without TLS.
-    cdk-mintd does this by default, until a TLS certificate directory exists; Nutshell
+    cdk-mintd with `allow_insecure = true` under `[mint_management_rpc]` and no TLS
+    certificate directory; Nutshell
     when `mint_rpc_server_mutual_tls=false`.
 
     ```ini

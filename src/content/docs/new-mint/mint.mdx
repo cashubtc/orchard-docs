@@ -222,8 +222,8 @@ rm cdk-mintd-$VERSION-$ARCH SHA256SUMS
 
 ### Create the data directory
 
-The mint keeps its configuration and seed in a work directory. Following the same
-layout, put it under `/data`.
+The mint uses a work directory for its logs, its config file, and its secrets file.
+Following the same layout, put it under `/data`.
 
 * With user `admin`, create the work directory and give it to the `cdk-mintd` user
 
@@ -253,8 +253,8 @@ army van defense carry jealous true garbage claim echo media make ...
 ```
 
 * Write the phrase down and keep an offline copy before going further. You paste it
-  into `config.toml` in the next step, but the server should not be the only place it
-  lives: if the disk dies, that offline copy is half of how you restore the mint.
+  into the mint's secrets file in the next step, but the server should not be the only
+  place it lives: if the disk dies, that offline copy is half of how you restore the mint.
 
 <Aside type="danger" title="The seed is half of your backup">
   This phrase controls every keyset the mint issues, and it never changes. Have a
@@ -266,30 +266,69 @@ army van defense carry jealous true garbage claim echo media make ...
 
 ## Configuration
 
-* Change to the `cdk-mintd` user and create the config file in the work directory
+The mint's configuration is split in two. Secrets (the seed, the database password,
+and the Redis address) go in a secrets file that only the `cdk-mintd` user can read.
+Everything else goes in `config.toml`, which names each secret by reference instead of
+holding its value.
+
+### Create the secrets file
+
+* Change to the `cdk-mintd` user and create the secrets file in the work directory
 
 ```bash
 sudo su - cdk-mintd
+nano /data/cdk-mintd/mintd.env
+```
+
+* Paste the following, replacing the placeholders. Use the database password you chose
+  above and paste your seed phrase into `CDK_MINTD_MNEMONIC`. Keep the double quotes.
+  Save and exit
+
+```ini title="/data/cdk-mintd/mintd.env"
+CDK_MINTD_DATABASE="postgres"
+CDK_MINTD_POSTGRES_URL="postgresql://cdk_mintd:your-mint-db-password@127.0.0.1:5432/cdk_mintd"
+CDK_MINTD_MNEMONIC="your twelve or twenty-four word seed phrase here"
+CDK_MINTD_REDIS_URL="redis://127.0.0.1:6379"
+```
+
+* Make it readable by the `cdk-mintd` user only
+
+```bash
+chmod 600 /data/cdk-mintd/mintd.env
+```
+
+<Aside type="note" title="Why the database is set here">
+  The mint stores its configuration in its own database, so it has to find that
+  database before it can read anything else. `CDK_MINTD_DATABASE` and
+  `CDK_MINTD_POSTGRES_URL` tell it where to look. Every `cdk-mintd` command below
+  needs them.
+</Aside>
+
+### Create the config file
+
+* Still as the `cdk-mintd` user, create the config file in the work directory
+
+```bash
 nano /data/cdk-mintd/config.toml
 ```
 
 * Paste the following, replacing the placeholders. Set `url` to the public hostname
-  you will route through the tunnel below, paste your seed into `mnemonic`, and use
-  the LND macaroon path for your network (`mainnet` shown). Save and exit
+  you will route through the tunnel below, and use the LND macaroon path for your
+  network (`mainnet` shown). Save and exit
 
 ```toml title="/data/cdk-mintd/config.toml"
 [info]
 url = "https://mint.yourdomain.com/"
 listen_host = "127.0.0.1"
 listen_port = 8085
-mnemonic = "your twelve or twenty-four word seed phrase here"
+mnemonic = "env:CDK_MINTD_MNEMONIC"
 
 [info.http_cache]
 backend = "redis"
 ttl = 60
 tti = 60
 key_prefix = "mintd"
-connection_string = "redis://127.0.0.1:6379"
+connection_string = "env:CDK_MINTD_REDIS_URL"
 
 [mint_info]
 name = "Your Mint"
@@ -300,11 +339,11 @@ contact_email = "you@yourdomain.com"
 engine = "postgres"
 
 [database.postgres]
-url = "postgresql://cdk_mintd:your-mint-db-password@127.0.0.1:5432/cdk_mintd"
+url = "env:CDK_MINTD_POSTGRES_URL"
 tls_mode = "disable"
 
-[ln]
-ln_backend = "lnd"
+[payment_backend]
+backend = "lnd"
 min_mint = 1
 max_mint = 500000
 min_melt = 1
@@ -319,11 +358,37 @@ macaroon_file = "/home/cdk-mintd/.lnd/data/chain/bitcoin/mainnet/admin.macaroon"
 enabled = true
 address = "127.0.0.1"
 port = 8086
+allow_insecure = true
 
 [prometheus]
 enabled = true
 address = "127.0.0.1"
 port = 9000
+```
+
+### Import the config
+
+The mint does not read `config.toml` when it starts. You import the file into the mint's
+database once, and the mint runs from that stored copy from then on.
+
+* Still as the `cdk-mintd` user, load the secrets file into your shell so the commands
+  below can resolve the references
+
+```bash
+set -a; . /data/cdk-mintd/mintd.env; set +a
+```
+
+* Check the config file. This reads your secrets and reports any mistake by its field
+  name, without changing anything
+
+```bash
+cdk-mintd config validate --file /data/cdk-mintd/config.toml
+```
+
+* Import it into the database as a new mint
+
+```bash
+cdk-mintd --work-dir /data/cdk-mintd config init --new-mint --file /data/cdk-mintd/config.toml
 ```
 
 * Come back to the `admin` user
@@ -341,12 +406,11 @@ exit
 </Aside>
 
 <Aside type="note" title="Managing the mint through Orchard">
-  With `[mint_management_rpc]` enabled, the mint reads `[mint_info]` from this file only
-  on first start. After that, info can be managed over the
-  gRPC by Orchard, not by editing `config.toml`. It runs insecurely here because Orchard
-  shares this machine, and the port is reachable only from it. If Orchard runs on a
-  different host, secure it with
-  [mutual TLS](#secure-the-management-api-with-mutual-tls) instead.
+  With `[mint_management_rpc]` enabled, the mint takes `[mint_info]` from this file on
+  its first start. After that, you manage the mint's info from Orchard. The management
+  API runs insecurely here (`allow_insecure`) because Orchard shares this machine, and
+  the port is reachable only from it. If Orchard runs on a different host, secure it
+  with [mutual TLS](#secure-the-management-api-with-mutual-tls) instead.
 </Aside>
 
 ### Create systemd service
@@ -372,6 +436,7 @@ Requires=lnd.service postgresql.service redis-server.service
 After=lnd.service postgresql.service redis-server.service
 
 [Service]
+EnvironmentFile=/data/cdk-mintd/mintd.env
 ExecStart=/usr/local/bin/cdk-mintd --work-dir /data/cdk-mintd
 
 User=cdk-mintd
@@ -525,8 +590,9 @@ curl https://mint.yourdomain.com/v1/info
   [Mint information](/orchard/mint/#info).
 - **Fees and limits.** Set `input_fee_ppk` under `[info]` to charge a per-input fee,
   `fee_percent` and `reserve_fee_min` under `[lnd]` to tune the Lightning fee reserve,
-  and `max_inputs` / `max_outputs` under `[limits]` to cap transaction size. Once Orchard
-  is connected, you can change the input fee by rotating to a new keyset; see
+  and `max_inputs` / `max_outputs` under `[limits]` to cap transaction size. Apply these
+  with [Change the configuration](#change-the-configuration). Once Orchard is connected,
+  you can change the input fee by rotating to a new keyset; see
   [Keysets](/orchard/mint/#keysets).
 - **A least-privilege macaroon.** Instead of `admin.macaroon`, bake an LND macaroon
   limited to invoice and offchain permissions and point `macaroon_file` at it, so a
@@ -584,7 +650,67 @@ Give Orchard the three client files so it can connect: `ca.pem` to verify the mi
 `client.pem` and `client.key` as its own identity. To return to running insecurely, stop
 the mint, remove `/data/cdk-mintd/tls`, and start it again.
 
+## Change the configuration
+
+The mint runs from the copy of `config.toml` stored in its database, so editing the file
+does nothing on its own. To change a setting, export the stored copy, edit it, and apply
+it back.
+
+<Aside type="caution" title="Applying overwrites changes made in Orchard">
+  Applying a config resets the mint's info and quote expiry times to whatever is in the
+  file. Anything you changed in Orchard since is overwritten.
+</Aside>
+
+* Change to the `cdk-mintd` user and load the secrets file
+
+```bash
+sudo su - cdk-mintd
+set -a; . /data/cdk-mintd/mintd.env; set +a
+```
+
+* Export the stored configuration over your config file, so you edit what the mint is
+  actually running
+
+```bash
+cdk-mintd --work-dir /data/cdk-mintd config export --file /data/cdk-mintd/config.toml --force
+```
+
+* Edit the file, then check and apply it
+
+```bash
+nano /data/cdk-mintd/config.toml
+cdk-mintd config validate --file /data/cdk-mintd/config.toml
+cdk-mintd --work-dir /data/cdk-mintd config apply --file /data/cdk-mintd/config.toml
+exit
+```
+
+* With user `admin`, restart the mint to use the new configuration
+
+```bash
+sudo systemctl restart cdk-mintd
+```
+
+Restart right after applying. Until you do, the mint rejects changes from Orchard.
+
+If the mint fails to start with the new configuration, go back to the previous one and
+restart again:
+
+```bash
+sudo su - cdk-mintd
+set -a; . /data/cdk-mintd/mintd.env; set +a
+cdk-mintd --work-dir /data/cdk-mintd config rollback
+exit
+sudo systemctl restart cdk-mintd
+```
+
 ## Upgrade
+
+<Aside type="caution" title="Coming from v0.17?">
+  Version 0.18 moved the mint's configuration into its database, so upgrading from v0.17
+  or earlier needs a one-time import before the first start. Follow CDK's
+  [v0.18 migration guide](https://github.com/cashubtc/cdk/blob/v0.18.1/docs/migrations/v0.18.md)
+  instead of the steps below.
+</Aside>
 
 * With user `admin`, stop the service
 

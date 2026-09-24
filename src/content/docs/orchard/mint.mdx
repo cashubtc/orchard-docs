@@ -46,7 +46,9 @@ Some features are managed in the mint's own config file, and others can be manag
 
 <Aside type="note" title="Why the split">
 The mint's RPC offers only limited real-time control over mint features for now, so anything
-it doesn't expose has to be set in the config file directly.
+it doesn't expose has to be set in the config file directly. On a cdk mint, config file
+changes take effect only after you apply them and restart; see
+[Change the configuration](/new-mint/mint/#change-the-configuration).
 </Aside>
 
 ## Keysets
@@ -57,6 +59,13 @@ Keysets can be rotated to change fees, versions, and denominations.
 ## Database
 
 Orchard opens up the mint database. You can browse mint, melt, and swap records with a rich set of filters to find exactly what you need.
+
+<Aside type="note" title="Changing a mint quote's state">
+Changing a mint quote's state, such as marking it paid, is off by default on cdk mints.
+Marking a quote paid lets it be minted without a confirmed payment, so only turn it on
+if you need it: set `allow_mint_quote_payment_override = true` under
+`[mint_management_rpc]`, then [apply the config](/new-mint/mint/#change-the-configuration).
+</Aside>
 
 Back up and restore the mint database straight from the dashboard.
 
@@ -77,8 +86,9 @@ a successful restore.
 
 A lost or corrupted mint is restored from two things together:
 
-- **The secret seed**, which derives the mint's signing keys. This static private key lives in the
-  mint daemon's config rather than its database. This half stays your responsibility.
+- **The secret seed**, which derives the mint's signing keys. This static private key lives
+  outside the mint's database, in the secret the mint's config points to. This half stays
+  your responsibility.
 - **The database**, which changes every time the mint issues or redeems ecash.
 
 With both, a mint lost to a dead disk or similar catastrophe comes back fully operational, with the same keysets and
